@@ -1,0 +1,6 @@
+
+
+Lyt på netværk på bestemt port.
+sudo tcpdump -i wlp3s0 port 54545 -XX
+
+wlp3s0 = netværk, se dit netværk med ifconfig
