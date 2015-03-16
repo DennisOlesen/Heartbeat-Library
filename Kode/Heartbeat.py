@@ -40,6 +40,7 @@ class heartbeat():
     myIp = (s.getsockname()[0])
     #myIp = gethostbyname(gethostname())
     i = 0
+    ipList = []
       
     while(True):
       if self.state == "leader":
@@ -51,6 +52,8 @@ class heartbeat():
         self.broadcast(myIp)
         try:
           data, addr = sock.recvfrom(1024)
+          if data not in ipList:
+            ipList.append(data)
           print data
         except:
           print "aint no thang"
@@ -70,7 +73,7 @@ class heartbeat():
             print message
             if message != "":
               s = socket(AF_INET,SOCK_DGRAM)
-              s.sendto("HELLO BRUH", (message,5005))
+              s.sendto(myIp, (message,5005))
               print message
               timer = random.randint(5, 20)
           except:
