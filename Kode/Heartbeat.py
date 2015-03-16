@@ -8,15 +8,17 @@ from socket import *
 import time
 import random
 import os
+import fcntl
+import struct
+
 state = ""
 broadcast_IP = '255.255.255.255'
 broadcast_PORT = 54545
 
 print ('Sending heartbeat to IP %s, port %d.\n') % (broadcast_IP, broadcast_PORT)
 
+
 class heartbeat():
-
-
   def __init__(self):
     cs = socket(AF_INET, SOCK_DGRAM)
     cs.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
@@ -33,15 +35,22 @@ class heartbeat():
     self.cs.bind( ('', broadcast_PORT))
     self.cs.setblocking(0)
     timer = random.randint(5, 20)
+    s = socket(AF_INET, SOCK_DGRAM)
+    s.connect(("google.com",80))
+    myIp = (s.getsockname()[0])
+    sock = socket(AF_INET, SOCK_DGRAM)
+    sock.bind( ('', 54546))
+    sock.setblocking(0)
+
+
     while(True):
       if self.state == "leader":
-        self.broadcast("Hello followers")
-        data = self.cs.recv(1024)
+        self.broadcast(myIp)
+        try:
+          data = sock.recv(1024)
+        except:
+          pass
         time.sleep(0.5)
-
-        if data != "Hello followers":
-         print str(data)
-
       elif self.state == "candidate":
         self.broadcast("Anarchy")
 
@@ -52,8 +61,9 @@ class heartbeat():
             print "I'm a leader"
 
           try:
-            if self.cs.recv(1024) == "Hello followers":
-              self.broadcast("Follower says: Hello leader")
+            message = self.cs.recv(1024)
+            if message != "":
+              self.cs.sendto("HELLO BRUH", (message,54546))
               timer = random.randint(5, 20)
           except:
             timer -= 1
