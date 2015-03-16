@@ -38,13 +38,16 @@ class heartbeat():
     s = socket(AF_INET, SOCK_DGRAM)
     s.connect(("google.com",80))
     myIp = (s.getsockname()[0])
-    sock = socket(AF_INET, SOCK_DGRAM)
-    sock.bind( ("", 54546))
-    sock.setblocking(0)
-
-
+    #myIp = gethostbyname(gethostname())
+    i = 0
+      
     while(True):
       if self.state == "leader":
+        if i == 0:
+          sock = socket(AF_INET, SOCK_DGRAM)
+          sock.bind( ("", 5005))
+          sock.setblocking(0)
+          i = 1
         self.broadcast(myIp)
         try:
           data, addr = sock.recvfrom(1024)
@@ -66,7 +69,8 @@ class heartbeat():
             message = self.cs.recv(1024)
             print message
             if message != "":
-              sock.sendto("HELLO BRUH", (message,54546))
+              s = socket(AF_INET,SOCK_DGRAM)
+              s.sendto("HELLO BRUH", (message,5005))
               print message
               timer = random.randint(5, 20)
           except:
