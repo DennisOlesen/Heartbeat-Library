@@ -38,7 +38,7 @@ class heartbeat():
     s = socket(AF_INET, SOCK_DGRAM)
     s.connect(("google.com",80))
     myIp = (s.getsockname()[0])
-    #myIp = gethostbyname(gethostname())
+   
     i = 0
     ipList = []
       
@@ -52,34 +52,32 @@ class heartbeat():
         self.broadcast(myIp)
         try:
           data, addr = sock.recvfrom(1024)
-          if data not in ipList:
-            ipList.append(data)
-          print data
+          if addr[0] not in ipList:
+            ipList.append(addr[0])
+            print ipList
         except:
-          print "aint no thang"
+          print "No data recieved"
         time.sleep(0.5)
       
       elif self.state == "candidate":
         self.broadcast("Anarchy")
 
       elif self.state == "follower":
-          print timer
+          print "Leader-election in:", timer
           if timer == 0:
             self.state = "leader"
-            print "I'm a leader"
-
+            print "State set to: Leader"
+          time.sleep(0.5)
           try:
             message = self.cs.recv(1024)
-            print message
+            print "Broadcast ip-address:",  message
             if message != "":
               s = socket(AF_INET,SOCK_DGRAM)
-              s.sendto(myIp, (message,5005))
-              print message
+              s.sendto("data", (message,5005))
               timer = random.randint(5, 20)
           except:
             timer -= 1
-            time.sleep(0.5)
-
+            
 # Tester opgaven
 def main():
   hb = heartbeat()
