@@ -39,7 +39,7 @@ class heartbeat():
     s.connect(("google.com",80))
     myIp = (s.getsockname()[0])
     sock = socket(AF_INET, SOCK_DGRAM)
-    sock.bind( ('', 54546))
+    sock.bind( ("", 54546))
     sock.setblocking(0)
 
 
@@ -47,10 +47,12 @@ class heartbeat():
       if self.state == "leader":
         self.broadcast(myIp)
         try:
-          data = sock.recv(1024)
+          data, addr = sock.recvfrom(1024)
+          print data
         except:
-          pass
+          print "aint no thang"
         time.sleep(0.5)
+      
       elif self.state == "candidate":
         self.broadcast("Anarchy")
 
@@ -62,8 +64,10 @@ class heartbeat():
 
           try:
             message = self.cs.recv(1024)
+            print message
             if message != "":
-              self.cs.sendto("HELLO BRUH", (message,54546))
+              sock.sendto("HELLO BRUH", (message,54546))
+              print message
               timer = random.randint(5, 20)
           except:
             timer -= 1
