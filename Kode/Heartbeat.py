@@ -10,6 +10,8 @@ import random
 import os
 import fcntl
 import struct
+import time
+import sys
 
 state = ""
 broadcast_IP = '255.255.255.255'
@@ -20,6 +22,7 @@ print ('Sending heartbeat to IP %s, port %d.\n') % (broadcast_IP, broadcast_PORT
 
 class heartbeat():
   def __init__(self):
+    self.LTIMEOUT = 2
     cs = socket(AF_INET, SOCK_DGRAM)
     cs.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     cs.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
@@ -38,7 +41,7 @@ class heartbeat():
     s = socket(AF_INET, SOCK_DGRAM)
     s.connect(("google.com",80))
     myIp = (s.getsockname()[0])
-   
+    castTimer = 0
     i = 0
     ipList = []
       
@@ -49,16 +52,30 @@ class heartbeat():
           sock.bind( ("", 5005))
           sock.setblocking(0)
           i = 1
-        self.broadcast(myIp)
+        if castTimer < time.time():
+          self.broadcast(myIp)
+          castTimer = time.time() + 0.5 
         try:
           data, addr = sock.recvfrom(1024)
-          if addr[0] not in ipList:
-            ipList.append(addr[0])
-            print ipList
+          magic = 1 
+          if ipList == []:
+             ipList.append([addr[0], time.time() + self.LTIMEOUT])
+          for sub in ipList: 
+            if addr[0] in sub:
+              sub[1] = time.time() + self.LTIMEOUT
+              magic = 0
+            if sub == ipList[len(ipList)-1] and magic: 
+              ipList.append([addr[0], time.time() + self.LTIMEOUT])
+          for sub in ipList:
+            sys.stdout.write(sub[0] + " ")
+          print ""
+
         except:
-          print "No data recieved"
-        time.sleep(0.5)
-      
+         pass      
+        for ip in ipList:
+           if ip[1] < time.time():
+             ipList.remove(ip) 
+         
       elif self.state == "candidate":
         self.broadcast("Anarchy")
 
@@ -88,3 +105,23 @@ def main():
 # Sikrer sig at main metoden bliver eksekveret.
 if __name__ == "__main__":
   main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
