@@ -54,12 +54,13 @@ class heartbeat():
           i = 1
         if castTimer < time.time():
           self.broadcast(myIp)
+          
           castTimer = time.time() + 0.5 
         try:
           data, addr = sock.recvfrom(1024)
           magic = 1 
           if ipList == []:
-             ipList.append([addr[0], time.time() + self.LTIMEOUT])
+             ipList.append([myIp, time.time() + self.LTIMEOUT]) #appender sig selv til at starte med.
           for sub in ipList: 
             if addr[0] in sub:
               sub[1] = time.time() + self.LTIMEOUT
@@ -69,7 +70,12 @@ class heartbeat():
           for sub in ipList:
             sys.stdout.write(sub[0] + " ")
           print ""
-
+          for sub in ipList:
+            if sub[0] == myIp:
+               sub[1] = time.time() + self.LTIMEOUT
+               break
+            if sub == ipList[len(ipList)-1]:
+               ipList.append([myIp, time.time() + self.LTIMEOUT])
         except:
          pass      
         for ip in ipList:
