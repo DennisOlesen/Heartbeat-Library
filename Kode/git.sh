@@ -1,4 +1,4 @@
-echo "Enter commit message\n"
+echo -e "Enter commit message"
 read message
 
 git add -A
