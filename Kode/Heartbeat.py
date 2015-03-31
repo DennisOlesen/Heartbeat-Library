@@ -50,7 +50,7 @@ class heartbeat():
         if i == 0:
            i = 1
         if castTimer < time.time():
-          self.broadcast(ipList)
+          self.broadcast(str(ipList))
           
           castTimer = time.time() + 0.5 
         try:
@@ -89,13 +89,13 @@ class heartbeat():
         self.broadcast("Vote")
         voteTime = time.time() + 2
         while(voteCounter <= ((len(ipList))/2)):
+          if voteTime < time.time():
+               self.state = "follower"
+               timer = time.time() + random.uniform(2.0, 5.0)
+               break
           try:
             message, addr = sock.recvfrom(1024)
             print message
-            if voteTime < time.time():
-               self.state = "follower"
-               break
- 
             if message == "Voted":
                voteCounter += 1
                print voteCounter
