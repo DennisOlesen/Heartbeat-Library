@@ -1,7 +1,6 @@
 #-*- coding:utf-8 -*-
 
-# Bachelorprojekt 2015 - Heartbeat-protokollen.
-# Dennis Bøgelund Olesen & Erik David Allin
+# Bachelorprojekt 2015 - Heartbeat-protokollen./
 
 from __future__ import division
 from socket import *
@@ -28,6 +27,7 @@ class heartbeat():
     cs.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
     self.cs = cs
     self.state = "follower"
+    
 
   def broadcast(self, data):
     self.cs.sendto(data, (broadcast_IP, broadcast_PORT))
@@ -37,7 +37,7 @@ class heartbeat():
   def start(self):
     self.cs.bind( ('', broadcast_PORT))
     self.cs.setblocking(0)
-    timer = random.randint(5, 20)
+    timer = time.time() + random.uniform(2.0, 5.0)
     s = socket(AF_INET, SOCK_DGRAM)
     s.connect(("google.com",80))
     myIp = (s.getsockname()[0])
@@ -48,10 +48,7 @@ class heartbeat():
     while(True):
       if self.state == "leader":
         if i == 0:
-          sock = socket(AF_INET, SOCK_DGRAM)
-          sock.bind( ("", 5005))
-          sock.setblocking(0)
-          i = 1
+           i = 1
         if castTimer < time.time():
           self.broadcast(myIp)
           
@@ -83,24 +80,40 @@ class heartbeat():
              ipList.remove(ip) 
          
       elif self.state == "candidate":
-        self.broadcast("Anarchy")
+        sock = socket(AF_INET, SOCK_DGRAM)
+        sock.bind( ("", 5005))
+        sock.setblocking(0)
+
+        voteCounter = 1 
+        print "omg im a candidate, wuttup wid dat"
+        self.broadcast("Vote")
+        while(voteCounter - len(ipList) > ((len(ipList))/2)):
+          try:
+            message, addr = sock.recvfrom(1024)
+            if message == "Voted":
+               voteCounter += 1
+               print voteCounter
+          except:
+            pass
 
       elif self.state == "follower":
-          print "Leader-election in:", timer
-          if timer == 0:
-            self.state = "leader"
-            print "State set to: Leader"
+          print "Leader-election in:", timer - time.time()
+          if timer - time.time() < 0:
+            self.state = "candidate"
+            print "State set to: candidate"
           time.sleep(0.5)
           try:
-            message = self.cs.recv(1024)
+            message, addr = self.cs.recvfrom(1024)
             print "Broadcast ip-address:",  message
-            if message != "":
+            if message == "Vote":
+              s = socket(AF_INET, SOCK_DGRAM)
+              s.sendto("voted", (addr, 5005))
+            else:
               s = socket(AF_INET,SOCK_DGRAM)
-              s.sendto("data", (message,5005))
-              timer = random.randint(5, 20)
+              s.sendto("data", (addr, 5005))
+              timer = timer.time() + random.uniform(2.0, 5.0)
           except:
-            timer -= 1
-            
+            pass            
 # Tester opgaven
 def main():
   hb = heartbeat()
