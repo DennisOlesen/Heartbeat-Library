@@ -82,11 +82,11 @@ class heartbeat():
          
       elif self.state == "candidate":
         sock = socket(AF_INET, SOCK_DGRAM)
+        sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         sock.bind( ("", 5005))
         sock.setblocking(0)
 
         voteCounter = 1 
-        print "omg im a candidate, wuttup wid dat"
         self.broadcast("Vote")
         voteTime = time.time() + 2
         while(voteCounter <= ((len(ipList))/2)):
@@ -106,6 +106,7 @@ class heartbeat():
         if self.state != "follower":
           voteCounter = 0
           self.state = "leader" 
+          print "State set to: leader"
 
       elif self.state == "follower":
           print "Leader-election in:", timer - time.time()
