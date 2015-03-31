@@ -88,7 +88,7 @@ class heartbeat():
         print "omg im a candidate, wuttup wid dat"
         self.broadcast("Vote")
         voteTime = time.time() + 2
-        while(voteCounter =< ((len(ipList))/2)):
+        while(voteCounter <= ((len(ipList))/2)):
           try:
             message, addr = sock.recvfrom(1024)
             print message
@@ -99,7 +99,7 @@ class heartbeat():
             if message == "Voted":
                voteCounter += 1
                print voteCounter
-         except:
+          except:
             continue
         if self.state != "follower":
           self.state = "leader" 
