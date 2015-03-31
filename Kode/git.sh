@@ -1,3 +1,6 @@
+echo "Enter commit message\n"
+read message
+
 git add -A
-git commit -m "Der er pushed!"
+git commit -m "$message"
 git push origin master
