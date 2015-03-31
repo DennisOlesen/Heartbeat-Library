@@ -94,7 +94,7 @@ class heartbeat():
                voteCounter += 1
                print voteCounter
           except:
-            pass
+            continue
 
       elif self.state == "follower":
           print "Leader-election in:", timer - time.time()
@@ -104,14 +104,15 @@ class heartbeat():
           time.sleep(0.5)
           try:
             message, addr = self.cs.recvfrom(1024)
-            print "Broadcast ip-address:",  message
+            print "Broadcast ip-address:",  addr
             if message == "Vote":
               s = socket(AF_INET, SOCK_DGRAM)
-              s.sendto("voted", (addr, 5005))
+              s.sendto("voted", (addr[0], 5005))
+              print addr
             else:
               s = socket(AF_INET,SOCK_DGRAM)
-              s.sendto("data", (addr, 5005))
-              timer = timer.time() + random.uniform(2.0, 5.0)
+              s.sendto("data", (addr[0], 5005))
+            timer = timer.time() + random.uniform(2.0, 5.0)
           except:
             pass            
 # Tester opgaven
