@@ -84,11 +84,11 @@ class heartbeat():
         sock.bind( ("", 5005))
         sock.setblocking(0)
 
-        voteCounter = 0 
+        voteCounter = 1 
         print "omg im a candidate, wuttup wid dat"
         self.broadcast("Vote")
         voteTime = time.time() + 2
-        while(voteCounter < ((len(ipList))/2)):
+        while(voteCounter <= ((len(ipList))/2)):
           if voteTime < time.time():
                self.state = "follower"
                timer = time.time() + random.uniform(2.0, 5.0)
@@ -116,6 +116,8 @@ class heartbeat():
             else:
               s = socket(AF_INET,SOCK_DGRAM)
               s.sendto("data", (addr[0], 5005))
+              #opdaterer loggen
+              ipList = eval(message) 
             timer = time.time() + random.uniform(2.0, 5.0)
           except:
             pass            
