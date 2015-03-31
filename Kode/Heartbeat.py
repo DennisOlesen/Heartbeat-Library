@@ -88,7 +88,7 @@ class heartbeat():
         print "omg im a candidate, wuttup wid dat"
         self.broadcast("Vote")
         voteTime = time.time() + 2
-        while(voteCounter <= ((len(ipList))/2)):
+        while(voteCounter < ((len(ipList))/2)):
           if voteTime < time.time():
                self.state = "follower"
                timer = time.time() + random.uniform(2.0, 5.0)
@@ -100,16 +100,12 @@ class heartbeat():
                voteCounter += 1
                print voteCounter
           except:
-            continue
+            pass 
         if self.state != "follower":
           self.state = "leader" 
 
       elif self.state == "follower":
           print "Leader-election in:", timer - time.time()
-          if timer - time.time() < 0:
-            self.state = "candidate"
-            print "State set to: candidate"
-          time.sleep(0.5)
           try:
             message, addr = self.cs.recvfrom(1024)
             print "Broadcast ip-address:",  addr
@@ -120,9 +116,14 @@ class heartbeat():
             else:
               s = socket(AF_INET,SOCK_DGRAM)
               s.sendto("data", (addr[0], 5005))
-            timer = timer.time() + random.uniform(2.0, 5.0)
+            timer = time.time() + random.uniform(2.0, 5.0)
           except:
             pass            
+          if timer - time.time() < 0:
+            self.state = "candidate"
+            print "State set to: candidate"
+          time.sleep(0.5)
+ 
 # Tester opgaven
 def main():
   hb = heartbeat()
