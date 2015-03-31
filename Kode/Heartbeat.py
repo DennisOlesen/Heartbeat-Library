@@ -45,6 +45,7 @@ class heartbeat():
     castTimer = 0
     i = 0
     ipList = []
+    tLastVote = 0
       
     while(True):
       if self.state == "leader":
@@ -113,7 +114,8 @@ class heartbeat():
           try:
             message, addr = self.cs.recvfrom(1024)
             print "Broadcast ip-address:",  addr
-            if message == "Vote":
+            if message == "Vote" and tLastVote < time.time():
+              tLastVote = time.time() + 2
               s = socket(AF_INET, SOCK_DGRAM)
               s.sendto("Voted", (addr[0], 5005))
               print addr
