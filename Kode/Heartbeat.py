@@ -90,6 +90,7 @@ class heartbeat():
         while(voteCounter - len(ipList) > ((len(ipList))/2)):
           try:
             message, addr = sock.recvfrom(1024)
+            print message
             if message == "Voted":
                voteCounter += 1
                print voteCounter
@@ -107,7 +108,7 @@ class heartbeat():
             print "Broadcast ip-address:",  addr
             if message == "Vote":
               s = socket(AF_INET, SOCK_DGRAM)
-              s.sendto("voted", (addr[0], 5005))
+              s.sendto("Voted", (addr[0], 5005))
               print addr
             else:
               s = socket(AF_INET,SOCK_DGRAM)
