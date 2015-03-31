@@ -12,6 +12,7 @@ import struct
 import time
 import sys
 
+
 state = ""
 broadcast_IP = '255.255.255.255'
 broadcast_PORT = 54545
@@ -91,6 +92,7 @@ class heartbeat():
         while(voteCounter <= ((len(ipList))/2)):
           if voteTime < time.time():
                self.state = "follower"
+               voteCounter = 0
                timer = time.time() + random.uniform(2.0, 5.0)
                break
           try:
@@ -102,6 +104,7 @@ class heartbeat():
           except:
             pass 
         if self.state != "follower":
+          voteCounter = 0
           self.state = "leader" 
 
       elif self.state == "follower":
