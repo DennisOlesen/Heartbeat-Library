@@ -1,0 +1,134 @@
+%{{{ Spam
+\documentclass[a4paper,12pt]{article}
+
+%use danish hyphenation and titles
+%handle utf8-characters
+\usepackage[danish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+%for images
+\usepackage[pdftex]{graphicx}
+
+%allow nested figures
+\usepackage{subfigure}
+
+%control line spacing
+\usepackage{setspace}
+%\singlespacing
+\onehalfspacing
+%\doublespacing
+
+%set margins
+%\usepackage[margin=0.75in]{geometry}
+
+%allows margin-notes
+%good for work in progress papers
+%\usepackage{marginnote}
+
+%allows pretty quoting using ``'' or `'
+\usepackage{upquote}
+
+%two definitions of the color grey
+\usepackage{color}
+\definecolor{listinggray}{gray}{0.9}
+%\definecolor{lbcolor}{rgb}{0.9,0.9,0.9}
+
+
+% References
+\usepackage{hyperref}
+
+%allows pretty source code
+\usepackage{listings}
+\lstset{
+  language=,
+  literate=
+    {æ}{{\ae}}1
+    {ø}{{\o}}1
+    {å}{{\aa}}1
+    {Æ}{{\AE}}1
+    {Ø}{{\O}}1
+    {Å}{{\AA}}1,
+  backgroundcolor=\color{listinggray},
+  tabsize=3,
+  rulecolor=,
+  basicstyle=\scriptsize,
+  upquote=true,
+  aboveskip={1.5\baselineskip},
+  columns=fixed,
+  showstringspaces=false,
+  extendedchars=true,
+  breaklines=true,
+  prebreak =\raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}},
+  frame=single,
+  showtabs=false,
+  showspaces=false,
+  showstringspaces=false,
+  identifierstyle=\ttfamily,
+  keywordstyle=\color[rgb]{0,0,1},
+  commentstyle=\color[rgb]{0.133,0.545,0.133},
+  stringstyle=\color[rgb]{0.627,0.126,0.941},
+}
+%captions on listings
+\usepackage[center,font=small,labelfont=bf,textfont=it]{caption}
+
+%allows fancy enumeration
+\usepackage{enumerate}
+
+%allows use of the BibTex for the bibliography
+\usepackage[numbers]{natbib}
+
+%make references and URLs in the pdf to clickable links
+\usepackage{hyperref}
+
+%removes the numbers from sections
+\setcounter{secnumdepth}{0}
+
+%proper header formatting
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead[]{} %clear standard settings
+\chead[]{} %clear standard settings
+\rhead[]{\rightmark} %current section
+\lfoot[]{} %clear standard settings
+\cfoot[]{\thepage} %current page number 
+\rfoot[]{} %clear standard settingsF
+
+\usepackage{hyperref} % The package for links. This is also used for the ToC links.
+%}}}
+\title{Heartbeat protokollen
+\\
+Bachelorprojekt 2015}
+\author{Erik Allin - smt504 \\ Dennis Olesen - cwb579}
+\date{??. juni 2015}
+
+%Centreret sidehoved
+\chead{Erik Allin - smt504 \& Dennis Olesen - cwb579}
+
+\begin{document}
+\maketitle
+\newpage
+%\renewcommand*\contentsname{Table of Contents}
+%\tableofcontents
+%\section*{Forside-lel}
+%\newpage
+%\clearpage
+
+
+\section*{Beskrivelse af problemet}
+
+
+\section*{Analyse af problemet}
+
+
+\section*{Status}
+
+
+\section*{Tidsplan for resten af forløbet}
+
+
+
+\section*{Litteraturhenvisninger}
+
+
+\end{document}
