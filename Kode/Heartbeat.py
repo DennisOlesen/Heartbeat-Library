@@ -1,12 +1,11 @@
 #-*- coding:utf-8 -*-
 
-# Bachelorprojekt 2015 - Heartbeat-protokollen./
+# Bachelorprojekt 2015 - Heartbeat-protokollen.
 
 from __future__ import division
 from socket import *
 import time, random, os, sys
 import thread, SimpleHTTPServer, SocketServer
-
 
 state = ""
 broadcast_IP = '255.255.255.255'
@@ -17,10 +16,10 @@ print ('Sending heartbeat to IP %s, port %d.\n') % (broadcast_IP, broadcast_PORT
 
 class heartbeat():
   """
-  Klasse for heartbeat-protokollen, der so fare kan håndtere 
+  Klasse for heartbeat-protokollen, der so fare kan håndtere
   Discovery samt leader election
   """
-   
+
   def __init__(self):
     """
     Initialiserer klassen.
@@ -34,7 +33,7 @@ class heartbeat():
     b_sock.setblocking(0)
     self.b_sock = b_sock
     self.state = "follower"
-    
+
 
   def broadcast(self, data):
     """
@@ -49,38 +48,38 @@ class heartbeat():
     Starter heartbeat-protokollen.
     """
     timer = time.time() + random.uniform(2.0, 5.0)
-    
+
     # Finder frem til ip-adressen for maskinen, så det virker på linux.
     s = socket(AF_INET, SOCK_DGRAM)
     s.connect(("google.com", 80))
     myIp = (s.getsockname()[0])
-    
+
     castTimer = 0
     ipList = []
     tLastVote = 0
-      
+
     while(True):
-    #Lederen er ansvarlig for at opdatere loggen løbende via Heartbeats
-    #Lederen er ansvarlig for at opdatere routerens liste løbende når
-    #en maskine stopper med at svare.
+    # Lederen er ansvarlig for at opdatere loggen løbende via Heartbeats,
+    # Lederen er ansvarlig for at opdatere routerens liste løbende når
+    # en maskine stopper med at svare.
       if self.state == "leader":
         if castTimer < time.time():
           self.broadcast(str(ipList))
-          castTimer = time.time() + 0.5 
-        
+          castTimer = time.time() + 0.5
+
         try:
           data, addr = sock.recvfrom(1024)
           elemNotSet = 1 # Til at checke om elementer er blevet placeret
-          
+
           # Appender sig selv til at starte med.
           if ipList == []:
-           ipList.append([myIp, time.time() + LTIMEOUT]) 
-          
-          for sub in ipList: 
+           ipList.append([myIp, time.time() + LTIMEOUT])
+
+          for sub in ipList:
             if addr[0] in sub:
               sub[1] = time.time() + LTIMEOUT
               elemNotSet = 0
-            if sub == ipList[len(ipList)-1] and elemNotSet: 
+            if sub == ipList[len(ipList)-1] and elemNotSet:
               ipList.append([addr[0], time.time() + LTIMEOUT])
           #######################################
           for sub in ipList:
@@ -94,26 +93,27 @@ class heartbeat():
             if sub == ipList[len(ipList)-1]:
               ipList.append([myIp, time.time() + LTIMEOUT])
         except:
-         pass      
+         pass
         for ip in ipList:
            if ip[1] < time.time():
-             ipList.remove(ip) 
-         
+             ipList.remove(ip)
+
       elif self.state == "candidate":
-      #Kandidaten er overgangsstadiet mellem følger og leder.
-      #Den opretter en afstemning for at blive den nye leder.
+      # Kandidaten er overgangsstadiet mellem følger og leder.
+      # Den opretter en afstemning for at blive den nye leder.
         sock = socket(AF_INET, SOCK_DGRAM)
         sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         sock.bind( ("", 5005))
         sock.setblocking(0)
-      #Votecounter starter på 1, da en kandidat altid stemmer på sig selv.
-        voteCounter = 1 
+      # Votecounter starter på 1,
+      # da en kandidat altid stemmer på sig selv.
+        voteCounter = 1
         self.broadcast("Vote")
-        #Laver en voteTime, for at sikre sig at 
-        #den ikke venter på stemmer forevigt.
+        # Laver en voteTime, for at sikre sig at
+        # den ikke venter på stemmer forevigt.
         voteTime = time.time() + LTIMEOUT
         while(voteCounter <= ((len(ipList))/2)):
-          #Returnere til følger hvis der ikke er stemmer nok
+          # Returnerer til følger hvis der ikke er stemmer nok
           if voteTime < time.time():
             self.state = "follower"
             voteCounter = 0
@@ -126,36 +126,36 @@ class heartbeat():
               voteCounter += 1
               print voteCounter
           except:
-            pass 
-        #Bliver leder hvis der er stemmer nok til at komme ud af løkken.
-        #og endnu ikke er blevet følger.
+            pass
+        # Bliver leder hvis der er stemmer nok til at komme ud
+        # af løkken, og endnu ikke er blevet følger.
         if self.state != "follower":
           voteCounter = 0
-          self.state = "leader" 
+          self.state = "leader"
           print "State set to: leader"
 
       elif self.state == "follower":
-        #Følgeren lytter på og besvarer lederens forspørgsler.
-        #Samt skifter til kandidat hvis den ikke hører fra lederen. 
+        # Følgeren lytter på og besvarer lederens forspørgsler,
+        # samt skifter til kandidat hvis den ikke hører fra lederen.
         print "Leader-election in:", timer - time.time()
         try:
           message, addr = self.b_sock.recvfrom(1024)
           print "Broadcast ip-address:",  addr
-          #Stemmer på kandidat hvis den modtager besked.
-          #Stememr kun 1 gang per valg.
+          # Stemmer på kandidat hvis den modtager besked.
+          # Stemmer kun 1 gang per valg.
           if message == "Vote" and tLastVote < time.time():
             tLastVote = time.time() + LTIMEOUT
             s = socket(AF_INET, SOCK_DGRAM)
             s.sendto("Voted", (addr[0], 5005))
           else:
-            #Svarer på lederens heartbeat.
+            # Svarer på lederens heartbeat.
             s = socket(AF_INET,SOCK_DGRAM)
             s.sendto("data", (addr[0], 5005))
             # Opdaterer loggen
-            ipList = eval(message) 
+            ipList = eval(message)
           timer = time.time() + random.uniform(2.0, 5.0)
         except:
-          pass            
+          pass
         #Bliver kandidat hvis der ikke modtages besked fra lederen.
         if timer - time.time() < 0:
           self.state = "candidate"
@@ -170,7 +170,7 @@ def mySimpleServer(port):
 
   print "serving at port", port
   httpd.serve_forever()
- 
+
 # Tester opgaven
 def main():
   hb = heartbeat()
@@ -181,17 +181,3 @@ def main():
 # Sikrer sig at main metoden bliver eksekveret.
 if __name__ == "__main__":
   main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
