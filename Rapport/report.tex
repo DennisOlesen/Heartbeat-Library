@@ -131,7 +131,7 @@ Dette kan vi undgå ved, at have mulighed for at vælge en ny leder, når følge
 \\[5px]
 Dette system vil altså afhænge af, at have fem del-funktionaliteter der tilsammen udgør systemet. Disse fem funktionaliteter kan ses som Discovery, hvor der oprettes forbindelse til følgere på netværket, samt liveness hvor der regelmæssigt tjekkes for, at følgere og leder er i live. Leader-election sikrer, at der hurtigt kan findes en ny leder, hvis den nuværende fejler. Logging sikrer sig, at der hele tiden er konsistens i systemet, så rækkefølgen af opgaver ikke går galt, når der vælges en ny leder. Til sidst er der load-balancing, som afhænger af at det resterende system fungerer, så det kan balancere belastningen af følgerne.
 
-\section*{Analyse af problemet - done}
+\section*{Analyse af problemet}
 \subsection*{Discovery} 
 For at skabe forbindelse til maskiner på et lokalt netværk, er man, som vi kom frem til i forrige afsnit, nødt til at benytte sig af en discovery protokol. Et sådant system kendes også som network Discovery services (INDSÆT REFERENCE TIL KAP. 19.2). Normen er her, at man opretter forbindelse til andre systemer i netværket, ved at broadcaste(multicaste) til sin lokale IP, og derved få beskeden ud til de resterende systemer. Dette virker som den oplagte måde, at gøre det på da der arbejdes på et lokalt netværk. Problematikken er i midlertidig om det er en directory server eller serverless model, der vil fungere bedst i forbindelse med resten af systemet. 
 \\
