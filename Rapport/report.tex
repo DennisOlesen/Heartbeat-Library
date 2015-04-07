@@ -176,6 +176,15 @@ Da dette gøres regelmæssigt fra den nuværende leader, så vil der altid forek
 
 
 \subsection*{Leader-election}
+Det er dog ikke kun lederen, der holder styr på aktive brugere - alle følgerne i systemet sikrer sig også hele tiden, at der er en reelt fungerende leder i systemet.
+\\
+Dette gøres ved, ligesom ved lederen, at der er en timer, der afgør om en følger skal blive ved med at være følger, eller går over og bliver kandidat. Hvis følgeren ikke modtager besked/broadcast fra lederen i det valgte tidsrum, så skifter denne over til at blive kandidat.
+\\[5px]
+Kandidaten starter et valg, hvor den sender en forespørgsel ud til alle følgere om at blive stemt på.
+\\
+Undervejs tælles der stemmer op, der modtages fra alle followers, der har modtaget beskeden - som de gør på samme måde, som broadcastet fra lederen. Hvis kandidaten undervejs opnår et antal stemmer, der er større eller ligeså stort som halvdelen af brugere på listen over aktive IP-adresser, \textit{ipList}, så skifter den sin state til at være leder.
+\\
+Hvis der ikke opnås nok stemmer indenfor tiden, \textit{voteTime}, som er defineret på samme måde ud fra time.time() og vores variabel LTIMEOUT, så går kandidaten hen og bliver sat til følger igen.
 
 
 \subsection*{Logging}

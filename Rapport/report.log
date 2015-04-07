@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014/Arch Linux) (preloaded format=pdflatex 2015.4.6)  7 APR 2015 16:17
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014/Arch Linux) (preloaded format=pdflatex 2015.4.6)  7 APR 2015 23:22
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -801,32 +801,32 @@ Overfull \hbox (2.41527pt too wide) in paragraph at lines 167--176
  funk-tio-nen sendto()
  []
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 200.
 Package babel Info: Redefining danish shorthand "|
-(babel)             in language  on input line 200.
+(babel)             in language  on input line 188.
 Package babel Info: Redefining danish shorthand "~
-(babel)             in language  on input line 200.
+(babel)             in language  on input line 188.
 Package babel Info: Redefining danish shorthand "|
-(babel)             in language  on input line 200.
+(babel)             in language  on input line 188.
 Package babel Info: Redefining danish shorthand "~
-(babel)             in language  on input line 200.
+(babel)             in language  on input line 188.
 [6]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 209.
 Package babel Info: Redefining danish shorthand "|
-(babel)             in language  on input line 200.
+(babel)             in language  on input line 209.
 Package babel Info: Redefining danish shorthand "~
-(babel)             in language  on input line 200.
+(babel)             in language  on input line 209.
 Package babel Info: Redefining danish shorthand "|
-(babel)             in language  on input line 200.
+(babel)             in language  on input line 209.
 Package babel Info: Redefining danish shorthand "~
-(babel)             in language  on input line 200.
+(babel)             in language  on input line 209.
  [7]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 200.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 209.
  (./report.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 200.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 200.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 209.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 209.
 Package rerunfilecheck Info: File `report.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 200.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 209.
  ) 
 Here is how much of TeX's memory you used:
  9376 strings out of 493109
@@ -842,7 +842,7 @@ exmf-dist/fonts/type1/public/cm-super/sfbx1440.pfb></usr/share/texmf-dist/fonts
 m-super/sfrm1200.pfb></usr/share/texmf-dist/fonts/type1/public/cm-super/sfrm144
 0.pfb></usr/share/texmf-dist/fonts/type1/public/cm-super/sfrm2074.pfb></usr/sha
 re/texmf-dist/fonts/type1/public/cm-super/sfti1200.pfb>
-Output written on report.pdf (7 pages, 112473 bytes).
+Output written on report.pdf (7 pages, 114435 bytes).
 PDF statistics:
  86 PDF objects out of 1000 (max. 8388607)
  70 compressed objects within 1 object stream

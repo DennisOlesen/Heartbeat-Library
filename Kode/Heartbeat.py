@@ -105,6 +105,7 @@ class heartbeat():
         sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         sock.bind( ("", 5005))
         sock.setblocking(0)
+
       # Votecounter starter på 1,
       # da en kandidat altid stemmer på sig selv.
         voteCounter = 1
@@ -156,7 +157,7 @@ class heartbeat():
           timer = time.time() + random.uniform(2.0, 5.0)
         except:
           pass
-        #Bliver kandidat hvis der ikke modtages besked fra lederen.
+        # Bliver kandidat hvis der ikke modtages besked fra lederen.
         if timer - time.time() < 0:
           self.state = "candidate"
           print "State set to: candidate"
