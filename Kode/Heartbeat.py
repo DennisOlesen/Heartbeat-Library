@@ -5,7 +5,7 @@
 from __future__ import division
 from socket import *
 import time, random, os, sys
-import thread, SimpleHTTPServer, SocketServer
+import thread, SimpleHTTPServer, SocketServer, psutil
 
 state = ""
 broadcast_IP = '255.255.255.255'
@@ -174,6 +174,8 @@ def mySimpleServer(port):
 
 # Tester opgaven
 def main():
+  psutil.cpu_percent()
+  
   hb = heartbeat()
   hb.start()
 
