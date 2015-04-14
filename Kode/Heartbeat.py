@@ -69,37 +69,41 @@ class heartbeat():
 
         try:
           data, addr = sock.recvfrom(1024)
-          elemNotSet = 1 # Til at checke om elementer er blevet placeret
-          cpuLoad = psutil.cpu_percent()
+          if (data == "Voted"):
+            pass
+          else:
+            elemNotSet = 1 # Til at checke om elementer er blevet placeret
+            cpuLoad = psutil.cpu_percent()
 
-          # Appender sig selv til at starte med.
-          if ipList == []:
-           ipList.append([myIp, time.time() + LTIMEOUT, cpuLoad])
-
-          # Opdaterer værdier for følgerne
-          for sub in ipList:
-            if addr[0] in sub:
-              sub[1] = time.time() + LTIMEOUT
-              sub[2] = int(data)
-              elemNotSet = 0
-            if sub == ipList[len(ipList)-1] and elemNotSet:
-              ipList.append([addr[0], time.time() + LTIMEOUT, int(data)])
-          #######################################
-          for sub in ipList:
-            sys.stdout.write(sub[0] + sub[2] + " ")
-          print ""
-          #######################################
-
-          # Opdaterer værdier for lederen
-          for sub in ipList:
-            if sub[0] == myIp:
-              sub[1] = time.time() + LTIMEOUT
-              sub[2] = cpuLoad
-              break
-            if sub == ipList[len(ipList)-1]:
+            # Appender sig selv til at starte med.
+            if ipList == []:
               ipList.append([myIp, time.time() + LTIMEOUT, cpuLoad])
+
+            # Opdaterer værdier for følgerne
+            for sub in ipList:
+              if addr[0] in sub:
+                sub[1] = time.time() + LTIMEOUT
+                sub[2] = data
+                elemNotSet = 0
+              if sub == ipList[len(ipList)-1] and elemNotSet:
+                ipList.append([addr[0], time.time() + LTIMEOUT, data])
+            # Opdaterer værdier for lederen
+            for sub in ipList:
+              if sub[0] == myIp:
+                sub[1] = time.time() + LTIMEOUT
+                sub[2] = cpuLoad
+                break
+              if sub == ipList[len(ipList)-1]:
+                ipList.append([myIp, time.time() + LTIMEOUT, cpuLoad])
+            #######################################
+            for sub in ipList:
+              print "[" + str(sub[0]) + " " + str(sub[2]) + "]"
+              #sys.stdout.write("[" + sub[0] + " " + sub[2] + "]" + " ")
+            print ""
+            #######################################
+
         except:
-         pass
+          pass
         for ip in ipList:
            if ip[1] < time.time():
              ipList.remove(ip)
