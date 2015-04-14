@@ -95,12 +95,10 @@ class heartbeat():
                 break
               if sub == ipList[len(ipList)-1]:
                 ipList.append([myIp, time.time() + LTIMEOUT, cpuLoad])
-            #######################################
+            # Printer en oversigt over IP-adresser samt CPU-load
             for sub in ipList:
               print "[" + str(sub[0]) + " " + str(sub[2]) + "]"
-              #sys.stdout.write("[" + sub[0] + " " + sub[2] + "]" + " ")
-            print ""
-            #######################################
+              print ""
 
         except:
           pass
