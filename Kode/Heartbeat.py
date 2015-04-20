@@ -202,7 +202,7 @@ def mySimpleServer(port):
 
 # Tester opgaven
 def main():
-  hb = heartbeat(IP, PORT)
+  hb = heartbeat(192.168.43.165, 4004)
   hb.start()
 
 

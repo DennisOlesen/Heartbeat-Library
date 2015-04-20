@@ -3,7 +3,7 @@
 # library. If you want to make a suggestion or fix something you can contact-me
 # at voorloop_at_gmail.com
 # Distributed over IDC(I Don't Care) license
-import socket
+from socket import *
 import select
 import time
 import sys
@@ -32,8 +32,8 @@ class TheServer:
     channel = {}
 
     def __init__(self, host, port):
-        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.server = socket(AF_INET, SOCK_STREAM)
+        self.server.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         self.server.bind((host, port))
         self.server.listen(200)
 
@@ -41,16 +41,15 @@ class TheServer:
         self.input_list.append(self.server)
         while 1:
             time.sleep(delay)
-
-						sock = socket(AF_INET, SOCK_DGRAM)
-		        sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-		        sock.bind( ("", 4004))
-		        sock.setblocking(0)
-						try:
-						  message, addr = sock.recvfrom(1024)
-							forward_to = eval(message)
-						except:
-							pass
+            sock = socket(AF_INET, SOCK_DGRAM)
+            sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+            sock.bind( ("", 4004))
+            sock.setblocking(0)
+            try:
+              message, addr = sock.recvfrom(1024)
+              forward_to = eval(message)
+            except:
+              pass
 
             ss = select.select
             inputready, outputready, exceptready = ss(self.input_list, [], [])
@@ -67,7 +66,7 @@ class TheServer:
                     self.on_recv()
 
     def on_accept(self):
-			  target = random.randint(0, len(forward_to-1)
+        target = random.randint(0, len(forward_to-1))
         forward = Forward().start(forward_to[target][0], forward_to[target][1])
         clientsock, clientaddr = self.server.accept()
         if forward:
