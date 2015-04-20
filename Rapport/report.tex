@@ -191,14 +191,25 @@ Hvis der ikke opnås nok stemmer indenfor tiden, \textit{voteTime}, som er defin
 
 
 \subsection*{Load-balancing}
+For at sikre sig, at de aktive maskiner i systemet ikke går hen
+ og bliver overbelastet, så indføres load-balancing. Herved
+  sørges der for, at hvis en maskines CPU-load bliver for høj
+   så tildeles den en mindre del af det fremtidige arbejde, 
+    uddelegeres. Til at finde frem til maskines CPU-load bruges
+    biblioteket psutil, og konkret dens under-funktion:
+     psutil.cpu\_percent().
+Vi vælger blot at se på en processor på den samlede CPU fremfor alle processorer, som der kan kigges på via biblioteket.
+Indtil videre sender lederen og følgerne aktivt deres nuværende CPU-load ud, så der på vores liste/log ipList hele tiden er den aktuelle load. Indtil videre gøres der ikke mere ved dette, men senere hen skal funktionaliteten være som beskrevet tidligere.
 
 
 
 \section*{Status}
-
+Fra starten havde vi opdelt projektet i Analyse, Udvikling, Testning og dokumentation. Som alle havde sideløbende rapportskrivning til. I forhold til vores oprindelige tidsplan skulle udviklingen/implementeringen være omtrent færdig ved midtvejsrapporten.
+Dette passer nogenlunde med at implementeringen forhåbentligt er den mest tidskrævende process, da den har krævet udvidelse og omtænkning af visse aspekter i analysen, samt krævet de rigtige værktøjer. Vi har imidlertid lavet analysen og implementeringen mangler kun routing som vil blive lavet via en router hvis routing table bliver løbende opdateret. Denne del tilfalder det brugeren selv at sætte op, da det er router afhængigt, dog vil programmet give routeren det input der skal bruges. Dog laver vi selv en router simulering for at kunne teste systemet. Efter tests mangler der dokumentering samt
 
 \section*{Tidsplan for resten af forløbet}
 
+\includegraphics[scale=0.5]{tidsplanmidtvej.jpg}
 
 
 
