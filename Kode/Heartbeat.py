@@ -14,7 +14,7 @@ LTIMEOUT = 2
 
 print ('Sending heartbeat to IP %s, port %d.\n') % (broadcast_IP, broadcast_PORT)
 
-class heartbeat(ip, port):
+class heartbeat():
   """
   Klasse for heartbeat-protokollen.
   """
@@ -32,9 +32,6 @@ class heartbeat(ip, port):
     b_sock.setblocking(0)
     self.b_sock = b_sock
     self.state = "follower"
-    self.router_port = port
-    self.router_ip = ip
-
 
   def broadcast(self, data):
     """
@@ -43,7 +40,7 @@ class heartbeat(ip, port):
     self.b_sock.sendto(data, (broadcast_IP, broadcast_PORT))
 
 
-  def start(self):
+  def start(self, ip, port):
     thread.start_new_thread(mySimpleServer, (8080,))
     """
     Starter heartbeat-protokollen.
@@ -84,7 +81,7 @@ class heartbeat(ip, port):
               routerList = []
               for i in range(len(ipList)):
                 routerList.append([ipList[i][0], iplist[i][2]])
-              s.sendto(eval(str(routerList)), (self.router_ip, self.router_port))
+              s.sendto(eval(str(routerList)), (ip, port))
 
             # Opdaterer værdier for følgerne
             for sub in ipList:
@@ -99,7 +96,7 @@ class heartbeat(ip, port):
                 routerList = []
                 for i in range(len(ipList)):
                   routerList.append([ipList[i][0], iplist[i][2]])
-                s.sendto(eval(str(routerList)), (self.router_ip, self.router_port))
+                s.sendto(eval(str(routerList)), (ip, port))
 
             # Opdaterer værdier for lederen
             for sub in ipList:
@@ -123,7 +120,7 @@ class heartbeat(ip, port):
              routerList = []
              for i in range(len(ipList)):
                routerList.append([ipList[i][0], iplist[i][2]])
-             s.sendto(eval(str(routerList)), (self.router_ip, self.router_port))
+             s.sendto(eval(str(routerList)), (ip, port))
 
       elif self.state == "candidate":
       # Kandidaten er overgangsstadiet mellem følger og leder.
@@ -202,8 +199,8 @@ def mySimpleServer(port):
 
 # Tester opgaven
 def main():
-  hb = heartbeat(192.168.43.165, 4004)
-  hb.start()
+  hb = heartbeat()
+  hb.start("192.168.43.165", 4004)
 
 
 
