@@ -14,10 +14,9 @@ LTIMEOUT = 2
 
 print ('Sending heartbeat to IP %s, port %d.\n') % (broadcast_IP, broadcast_PORT)
 
-class heartbeat():
+class heartbeat(ip, port):
   """
-  Klasse for heartbeat-protokollen, der so fare kan håndtere
-  Discovery samt leader election
+  Klasse for heartbeat-protokollen.
   """
 
   def __init__(self):
@@ -33,6 +32,8 @@ class heartbeat():
     b_sock.setblocking(0)
     self.b_sock = b_sock
     self.state = "follower"
+    self.router_port = port
+    self.router_ip = ip
 
 
   def broadcast(self, data):
@@ -78,6 +79,12 @@ class heartbeat():
             # Appender sig selv til at starte med.
             if ipList == []:
               ipList.append([myIp, time.time() + LTIMEOUT, cpuLoad])
+              # Sender listen over IP og cpuload til routeren
+              s = socket(AF_INET, SOCK_DGRAM)
+              routerList = []
+              for i in range(len(ipList)):
+                routerList.append([ipList[i][0], iplist[i][2]])
+              s.sendto(eval(str(routerList)), (self.router_ip, self.router_port))
 
             # Opdaterer værdier for følgerne
             for sub in ipList:
@@ -87,6 +94,13 @@ class heartbeat():
                 elemNotSet = 0
               if sub == ipList[len(ipList)-1] and elemNotSet:
                 ipList.append([addr[0], time.time() + LTIMEOUT, data])
+                # Sender listen over IP og cpuload til routeren
+                s = socket(AF_INET, SOCK_DGRAM)
+                routerList = []
+                for i in range(len(ipList)):
+                  routerList.append([ipList[i][0], iplist[i][2]])
+                s.sendto(eval(str(routerList)), (self.router_ip, self.router_port))
+
             # Opdaterer værdier for lederen
             for sub in ipList:
               if sub[0] == myIp:
@@ -105,6 +119,11 @@ class heartbeat():
         for ip in ipList:
            if ip[1] < time.time():
              ipList.remove(ip)
+             s = socket(AF_INET, SOCK_DGRAM)
+             routerList = []
+             for i in range(len(ipList)):
+               routerList.append([ipList[i][0], iplist[i][2]])
+             s.sendto(eval(str(routerList)), (self.router_ip, self.router_port))
 
       elif self.state == "candidate":
       # Kandidaten er overgangsstadiet mellem følger og leder.
@@ -183,7 +202,7 @@ def mySimpleServer(port):
 
 # Tester opgaven
 def main():
-  hb = heartbeat()
+  hb = heartbeat(IP, PORT)
   hb.start()
 
 
