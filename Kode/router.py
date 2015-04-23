@@ -7,6 +7,7 @@ from socket import *
 import select
 import time
 import sys
+import random
 
 # Changing the buffer_size and delay, you can improve the speed and bandwidth.
 # But when buffer get to high or delay go too down, you can broke things
@@ -17,7 +18,7 @@ forward_to = []
 
 class Forward:
     def __init__(self):
-        self.forward = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.forward = socket(AF_INET, SOCK_STREAM)
 
     def start(self, host, port):
         try:
@@ -39,21 +40,38 @@ class TheServer:
 
     def main_loop(self):
         self.input_list.append(self.server)
-        while 1:
-            time.sleep(delay)
-            sock = socket(AF_INET, SOCK_DGRAM)
-            sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-            sock.bind( ("", 4004))
-            sock.setblocking(0)
-            try:
-              message, addr = sock.recvfrom(1024)
-              forward_to = eval(message)
-            except:
-              pass
 
+        sock = socket(AF_INET, SOCK_DGRAM)
+        sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        sock.bind(("", 40040))
+        sock.setblocking(0)
+
+        self.input_list.append(sock)
+
+        while 1:
+            print "waiting for delay"
+
+            # time.sleep(delay)
+            # try:
+            #   print "trying read"
+            #   message, addr = sock.recvfrom(1024)
+            #   print "udp data", message
+            #   forward_to = eval(message)
+            # except:            
+            #   pass
+
+            print "waiting in select"
             ss = select.select
             inputready, outputready, exceptready = ss(self.input_list, [], [])
             for self.s in inputready:
+                if self.s == sock:
+                  print "trying read"
+                  message, addr = sock.recvfrom(1024)
+                  print "udp data", message
+                  forward_to = eval(message)
+
+                  break
+
                 if self.s == self.server:
                     self.on_accept()
                     break
@@ -66,7 +84,7 @@ class TheServer:
                     self.on_recv()
 
     def on_accept(self):
-        target = random.randint(0, len(forward_to-1))
+        target = random.randint(0, len(forward_to))
         forward = Forward().start(forward_to[target][0], forward_to[target][1])
         clientsock, clientaddr = self.server.accept()
         if forward:

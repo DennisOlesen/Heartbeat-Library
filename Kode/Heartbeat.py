@@ -120,7 +120,7 @@ class heartbeat():
              routerList = []
              for i in range(len(ipList)):
                routerList.append([ipList[i][0], iplist[i][2]])
-             s.sendto(eval(str(routerList)), (ip, port))
+             s.sendto(str(routerList), (ip, port))
 
       elif self.state == "candidate":
       # Kandidaten er overgangsstadiet mellem følger og leder.
