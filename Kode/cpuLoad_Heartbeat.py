@@ -5,7 +5,7 @@
 from __future__ import division
 from socket import *
 import time, random, os, sys
-import thread, SimpleHTTPServer, SocketServer
+import thread, SimpleHTTPServer, SocketServer, psutil
 
 state = ""
 broadcast_IP = '255.255.255.255'
@@ -40,7 +40,7 @@ class heartbeat():
     self.b_sock.sendto(data, (broadcast_IP, broadcast_PORT))
 
 
-  def start(self):
+  def start(self, ip, port):
     thread.start_new_thread(mySimpleServer, (8080,))
     """
     Starter heartbeat-protokollen.
@@ -55,75 +55,72 @@ class heartbeat():
     castTimer = 0
     ipList = []
     tLastVote = 0
-    newMessage = ""
-    previousMessage = "" #commitMessage
 
     while(True):
-    # Lederen er ansvarlig for at opdatere loggen løbende via Heartbeats.
+    # Lederen er ansvarlig for at opdatere loggen løbende via Heartbeats,
+    # Lederen er ansvarlig for at opdatere routerens liste løbende når
+    # en maskine stopper med at svare.
       if self.state == "leader":
         if castTimer < time.time():
-          if (commitList == []):
-            previousMessage = newMessage
-            
-          self.broadcast(newMessage)
+          self.broadcast(str(ipList))
           castTimer = time.time() + 0.5
-          commitList = []
-          for i in ipList:
-            commitList.append(ipList[0])
 
         try:
           data, addr = sock.recvfrom(1024)
           if (data == "Voted"):
             pass
           else:
-            # Overrider følgerens iplist, hvis følgeren ikke har den samme
-            # previousMessage som leaderen.
-            if (data != previousMessage):
-              ips = []
-              for i in ipList:
-                ips.append(ipList[0])
-              s = socket(AF_INET,SOCK_DGRAM)
-              s.sendto("ow:" + str(ips), (addr[0], 5005))
-
-
             elemNotSet = 1 # Til at checke om elementer er blevet placeret
+            cpuLoad = psutil.cpu_percent()
 
             # Appender sig selv til at starte med.
             if ipList == []:
-              ipList.append([myIp, time.time() + LTIMEOUT])
-              newMessage = newMessage + "ad:" + str(myIp)
+              ipList.append([myIp, time.time() + LTIMEOUT, cpuLoad])
+              # Sender listen over IP og cpuload til routeren
+              s = socket(AF_INET, SOCK_DGRAM)
+              routerList = []
+              for i in range(len(ipList)):
+                routerList.append([ipList[i][0], iplist[i][2]])
+              s.sendto(eval(str(routerList)), (ip, port))
 
             # Opdaterer værdier for følgerne
             for sub in ipList:
               if addr[0] in sub:
                 sub[1] = time.time() + LTIMEOUT
+                sub[2] = data
                 elemNotSet = 0
               if sub == ipList[len(ipList)-1] and elemNotSet:
-                ipList.append([addr[0], time.time() + LTIMEOUT])
-                newMessage = newMessage + "ad:" + str(addr[0])
+                ipList.append([addr[0], time.time() + LTIMEOUT, data])
+                # Sender listen over IP og cpuload til routeren
+                s = socket(AF_INET, SOCK_DGRAM)
+                routerList = []
+                for i in range(len(ipList)):
+                  routerList.append([ipList[i][0], iplist[i][2]])
+                s.sendto(eval(str(routerList)), (ip, port))
 
             # Opdaterer værdier for lederen
             for sub in ipList:
               if sub[0] == myIp:
                 sub[1] = time.time() + LTIMEOUT
+                sub[2] = cpuLoad
                 break
               if sub == ipList[len(ipList)-1]:
-                ipList.append([myIp, time.time() + LTIMEOUT])
-                newMessage = newMessage + "ad:" + str(myIp)
-            # Printer en oversigt over IP-adresser samt
+                ipList.append([myIp, time.time() + LTIMEOUT, cpuLoad])
+            # Printer en oversigt over IP-adresser samt CPU-load
             for sub in ipList:
-              print "[" + str(sub[0]) + "]"
+              print "[" + str(sub[0]) + " " + str(sub[2]) + "]"
               print ""
 
-            if addr[0] in commitList:
-              commitList.remove(addr[0])
         except:
           pass
         for ip in ipList:
            if ip[1] < time.time():
              ipList.remove(ip)
-             newMessage = newMessage + "re:" + str(ip[0])
-
+             s = socket(AF_INET, SOCK_DGRAM)
+             routerList = []
+             for i in range(len(ipList)):
+               routerList.append([ipList[i][0], iplist[i][2]])
+             s.sendto(str(routerList), (ip, port))
 
       elif self.state == "candidate":
       # Kandidaten er overgangsstadiet mellem følger og leder.
@@ -178,7 +175,8 @@ class heartbeat():
           else:
             # Svarer på lederens heartbeat.
             s = socket(AF_INET,SOCK_DGRAM)
-            s.sendto("", (addr[0], 5005))
+            cpuLoad = psutil.cpu_percent()
+            s.sendto(str(cpuLoad), (addr[0], 5005))
             # Opdaterer loggen
             ipList = eval(message)
           timer = time.time() + random.uniform(2.0, 5.0)
@@ -202,7 +200,7 @@ def mySimpleServer(port):
 # Tester opgaven
 def main():
   hb = heartbeat()
-  hb.start()
+  hb.start("192.168.43.165", 4004)
 
 
 
