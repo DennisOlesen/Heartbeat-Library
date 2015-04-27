@@ -212,9 +212,7 @@ class heartbeat():
             splittext = message.split(",")
             key = splittext[0]
             msg = splittext[1]
-            if ipLog.getKey() == int(key):
-               print "key's good"
-               ipLog.parse(msg)
+            ipLog.parse(msg)
             s = socket(AF_INET,SOCK_DGRAM)
             s.sendto(str(ipLog.getKey()), (addr[0], 5005))
  
