@@ -68,7 +68,9 @@ class heartbeat():
         if castTimer < time.time():
           #hvis der er lige så mange som forventet, comitter vi. 
           if expectedResponses == 0:
-             print "eriks mor!"
+             print "Commiting"
+             print ipList
+             print ipLog.getLog()
              ipLog.commit(currentKey)
              message = message + " co:" + str(currentKey)
              
@@ -87,16 +89,17 @@ class heartbeat():
             pass
           else:
             print message 
-            if (int(data) == ipLog.getKey()-1):
+            if (int(data) == currentKey-1):
                expectedResponses -= 1 
              
             if (int(data) < ipLog.getLowestKey()):
               s = socket(AF_INET,SOCK_DGRAM)
-              s.sendto(str(ipLog.getLog()) + "," + str(ipLog.getList()), (addr[0], 5005))
+              print "magic"
+              s.sendto("ow:" + str(ipLog.getLog()) + "," + str(ipLog.getList()), (addr[0], 5005))
+              print "trick"
 
 
-
-            if (int(data) != ipLog.getKey()-1 ):
+            if (int(data) != currentKey ):
               #Tjekker hvis en følger er bagud, sender bagud data
               upToDateData = ipLog.compile(data)
               s = socket(AF_INET,SOCK_DGRAM)
@@ -112,6 +115,7 @@ class heartbeat():
               if sub == ipList[len(ipList)-1] and elemNotSet:
                 ipList.append([addr[0], time.time() + LTIMEOUT])
                 message = message + " ad:" + str(addr[0])
+                print message
                 ipLog.add(addr[0])
 
            # Printer en oversigt over IP-adresser samt
@@ -123,6 +127,7 @@ class heartbeat():
         if ipList == []:
           ipList.append([myIp, time.time() + LTIMEOUT])
           message = message + " ad:" + str(myIp)
+          print message
           ipLog.add(myIp)
 
 
@@ -134,6 +139,7 @@ class heartbeat():
           if sub == ipList[len(ipList)-1]:
              ipList.append([myIp, time.time() + LTIMEOUT])
              message = message + " ad:" + str(myIp)
+             print message
              ipList.add(myIp)
 
         for ip in ipList:
@@ -185,6 +191,12 @@ class heartbeat():
         # samt skifter til kandidat hvis den ikke hører fra lederen.
         print "Leader-election in:", timer - time.time()
         try:
+          data, addr = sock.recvfrom(1024)
+          ipLog.parse(data)
+        except:
+          pass  
+ 
+        try:
           message, addr = self.b_sock.recvfrom(1024)
           print "Broadcast ip-address:",  addr
           # Stemmer på kandidat hvis den modtager besked.
@@ -195,21 +207,17 @@ class heartbeat():
             s.sendto("Voted", (addr[0], 5005))
           else:
             # Svarer på lederens heartbeat.
-            s = socket(AF_INET,SOCK_DGRAM)
-            s.sendto(str(ipLog.getKey()), (addr[0], 5005))
-            # Opdaterer loggen
+           # Opdaterer loggen
             splittext = message.split(",")
             print ipLog.getLog()
+            print ipList
             key = splittext[0]
             msg = splittext[1]
-            if ipLog.getKey() == int(key)-1:
+            if ipLog.getKey() == int(key):
                ipLog.parse(msg)
-            else:
-              try:
-                data, addr = sock.recvfrom(1024)
-                ipLog.parse(data)
-              except:
-                pass  
+            s = socket(AF_INET,SOCK_DGRAM)
+            s.sendto(str(ipLog.getKey()), (addr[0], 5005))
+ 
           timer = time.time() + random.uniform(2.0, 5.0)
         except:
           pass
