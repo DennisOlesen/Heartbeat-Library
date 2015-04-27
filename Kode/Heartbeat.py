@@ -56,17 +56,26 @@ class heartbeat():
     ipList = []
     tLastVote = 0
     message = ""
+    currentKey = -1
+    expectedResponses = 1
     while(True):
     # Lederen er ansvarlig for at opdatere loggen løbende via Heartbeats.
       if self.state == "leader":
         if len(ipLog.getList()) != len(ipList):
            ipList = []
            for sub in ipLog.getList():
-               ipList.append(sub, time.time() + LTIMEOUT)
+             ipList.append(sub, time.time() + LTIMEOUT)
         if castTimer < time.time():
+          #hvis der er lige så mange som forventet, comitter vi. 
+          if expectedResponses == 0:
+             ipLog.commit(currentKey)
+             message = message + " co:" + str(currentKey)
+             
           print ipLog.getKey()
           #opdatere loggen
+          expectedResponses = len(ipList)-1
           self.broadcast(str(ipLog.getKey()) + "," + message)
+          currentKey = ipLog.getKey()
           message = ""
           castTimer = time.time() + 0.5
 
@@ -75,7 +84,9 @@ class heartbeat():
           if (data == "Voted"):
             pass
           else:
-              
+            if (int(data) == ipLog.getKey()-1):
+               expectedResponses -= 1  
+
             if (int(data) != ipLog.getKey()-1 ):
               #Tjekker hvis en følger er bagud, sender bagud data
               upToDateData = ipLog.compile(data)

@@ -5,8 +5,10 @@ class log():
   def __init__(self):
    self.log = []
    self.ipList = []  
+   self.key = 0
   def add(self, ip):
-    self.log.append([self.getKey()+1, "ad:"+ str(ip)])
+    self.log.append([self.key, "ad:"+ str(ip)])
+    self.key += 1
     if ip not in self.ipList:
       self.ipList.append(ip)
     
@@ -14,7 +16,8 @@ class log():
 
   def remove(self, ip):
     self.ipList.remove(ip)
-    self.log.append([self.getKey()+1, "re:" + str(ip)])
+    self.log.append([self.key, "re:" + str(ip)])
+    self.key += 1
 
   def overwrite(self, newLog):
     data = newLog.split(",") 
@@ -40,10 +43,7 @@ class log():
         self.overwrite(sub[3:])
 
   def getKey(self):
-    if self.log == []:
-      return -1
-    return self.log[len(self.log)-1][0]
-  
+    return self.key 
   def getList(self):
     return self.ipList
 
