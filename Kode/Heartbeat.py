@@ -6,7 +6,7 @@ from __future__ import division
 from socket import *
 import time, random, os, sys
 import thread, SimpleHTTPServer, SocketServer
-
+import Log
 state = ""
 broadcast_IP = '255.255.255.255'
 broadcast_PORT = 54545
@@ -51,39 +51,34 @@ class heartbeat():
     s = socket(AF_INET, SOCK_DGRAM)
     s.connect(("google.com", 80))
     myIp = (s.getsockname()[0])
-
+    ipLog = Log.log() 
     castTimer = 0
     ipList = []
     tLastVote = 0
-    newMessage = ""
-    previousMessage = "" #commitMessage
-
+    message = ""
     while(True):
     # Lederen er ansvarlig for at opdatere loggen løbende via Heartbeats.
       if self.state == "leader":
+        if len(ipLog.getList()) != len(ipList):
+           ipList = []
+           for sub in ipLog.getList():
+               ipList.append(sub, time.time() + LTIMEOUT)
         if castTimer < time.time():
-          if (commitList == []):
-            previousMessage = newMessage
-            
-          self.broadcast(newMessage)
+          #opdatere loggen
+          self.broadcast(str(ipLog.getKey()) + "," + message)
           castTimer = time.time() + 0.5
-          commitList = []
-          for i in ipList:
-            commitList.append(ipList[0])
 
         try:
           data, addr = sock.recvfrom(1024)
           if (data == "Voted"):
             pass
           else:
-            # Overrider følgerens iplist, hvis følgeren ikke har den samme
-            # previousMessage som leaderen.
-            if (data != previousMessage):
-              ips = []
-              for i in ipList:
-                ips.append(ipList[0])
+              
+            if (int(data) != ipLog.getKey()-1 ):
+              #Tjekker hvis en følger er bagud, sender bagud data
+              upToDateData = ipLog.compile(data)
               s = socket(AF_INET,SOCK_DGRAM)
-              s.sendto("ow:" + str(ips), (addr[0], 5005))
+              s.sendto(upToDateData, (addr[0], 5005))
 
 
             elemNotSet = 1 # Til at checke om elementer er blevet placeret
@@ -91,7 +86,8 @@ class heartbeat():
             # Appender sig selv til at starte med.
             if ipList == []:
               ipList.append([myIp, time.time() + LTIMEOUT])
-              newMessage = newMessage + "ad:" + str(myIp)
+              message = message + "ad:" + str(myIp)
+              ipLog.add(myIp)
 
             # Opdaterer værdier for følgerne
             for sub in ipList:
@@ -100,7 +96,8 @@ class heartbeat():
                 elemNotSet = 0
               if sub == ipList[len(ipList)-1] and elemNotSet:
                 ipList.append([addr[0], time.time() + LTIMEOUT])
-                newMessage = newMessage + "ad:" + str(addr[0])
+                message = message + "ad:" + str(addr[0])
+                ipLog.add(addr[0])
 
             # Opdaterer værdier for lederen
             for sub in ipList:
@@ -109,31 +106,26 @@ class heartbeat():
                 break
               if sub == ipList[len(ipList)-1]:
                 ipList.append([myIp, time.time() + LTIMEOUT])
-                newMessage = newMessage + "ad:" + str(myIp)
+                message = message + "ad:" + str(myIp)
+                ipList.add(myIp)
             # Printer en oversigt over IP-adresser samt
             for sub in ipList:
               print "[" + str(sub[0]) + "]"
               print ""
 
-            if addr[0] in commitList:
-              commitList.remove(addr[0])
         except:
           pass
         for ip in ipList:
            if ip[1] < time.time():
              ipList.remove(ip)
-             newMessage = newMessage + "re:" + str(ip[0])
+             message = message + "re:" + str(ip[0])
+             ipLog.remove(ip[0])
 
 
       elif self.state == "candidate":
       # Kandidaten er overgangsstadiet mellem følger og leder.
       # Den opretter en afstemning for at blive den nye leder.
-        sock = socket(AF_INET, SOCK_DGRAM)
-        sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-        sock.bind( ("", 5005))
-        sock.setblocking(0)
-
-      # Votecounter starter på 1,
+            # Votecounter starter på 1,
       # da en kandidat altid stemmer på sig selv.
         voteCounter = 1
         self.broadcast("Vote")
@@ -163,6 +155,12 @@ class heartbeat():
           print "State set to: leader"
 
       elif self.state == "follower":
+        sock = socket(AF_INET, SOCK_DGRAM)
+        sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        sock.bind( ("", 5005))
+        sock.setblocking(0)
+
+
         # Følgeren lytter på og besvarer lederens forspørgsler,
         # samt skifter til kandidat hvis den ikke hører fra lederen.
         print "Leader-election in:", timer - time.time()
@@ -178,9 +176,17 @@ class heartbeat():
           else:
             # Svarer på lederens heartbeat.
             s = socket(AF_INET,SOCK_DGRAM)
-            s.sendto("", (addr[0], 5005))
+            s.sendto(str(ipLog.getKey()), (addr[0], 5005))
             # Opdaterer loggen
-            ipList = eval(message)
+            key, msg = message.split(",")
+            if ipLog.getKey() == int(key)-1:
+               ipLog.parse(msg)
+            else:
+              try:
+                data, addr = sock.recvfrom(1024)
+                ipLog.parse(data)
+              except:
+                pass  
           timer = time.time() + random.uniform(2.0, 5.0)
         except:
           pass
