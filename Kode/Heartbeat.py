@@ -64,9 +64,9 @@ class heartbeat():
            for sub in ipLog.getList():
                ipList.append(sub, time.time() + LTIMEOUT)
         if castTimer < time.time():
+          print ipLog.getKey()
           #opdatere loggen
           self.broadcast(str(ipLog.getKey()) + "," + message)
-          print message
           message = ""
           castTimer = time.time() + 0.5
 
@@ -182,14 +182,13 @@ class heartbeat():
             print "ups"
             # Opdaterer loggen
             splittext = message.split(",")
-            print splittext
+            print ipLog.getLog()
             key = splittext[0]
             msg = splittext[1]
             if ipLog.getKey() == int(key)-1:
                ipLog.parse(msg)
             else:
               try:
-                print "eriks mor"
                 data, addr = sock.recvfrom(1024)
                 ipLog.parse(data)
               except:
