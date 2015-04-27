@@ -68,12 +68,13 @@ class heartbeat():
         if castTimer < time.time():
           #hvis der er lige så mange som forventet, comitter vi. 
           if expectedResponses == 0:
+             print "eriks mor!"
              ipLog.commit(currentKey)
              message = message + " co:" + str(currentKey)
              
           print ipLog.getKey()
           print ipLog.getLog()
-          #opdatere loggen
+          # Opdaterer loggen
           expectedResponses = len(ipList)-1
           self.broadcast(str(ipLog.getKey()) + "," + message)
           currentKey = ipLog.getKey()
@@ -85,9 +86,10 @@ class heartbeat():
           if (data == "Voted"):
             pass
           else:
+            print message 
             if (int(data) == ipLog.getKey()-1):
-               expectedResponses -= 1  
-
+               expectedResponses -= 1 
+             
             if (int(data) < ipLog.getLowestKey()):
               s = socket(AF_INET,SOCK_DGRAM)
               s.sendto(str(ipLog.getLog()) + "," + str(ipLog.getList()), (addr[0], 5005))
@@ -102,12 +104,6 @@ class heartbeat():
 
             elemNotSet = 1 # Til at checke om elementer er blevet placeret
 
-            # Appender sig selv til at starte med.
-            if ipList == []:
-              ipList.append([myIp, time.time() + LTIMEOUT])
-              message = message + " ad:" + str(myIp)
-              ipLog.add(myIp)
-
             # Opdaterer værdier for følgerne
             for sub in ipList:
               if addr[0] in sub:
@@ -118,13 +114,19 @@ class heartbeat():
                 message = message + " ad:" + str(addr[0])
                 ipLog.add(addr[0])
 
-            # Opdaterer værdier for lederen
-            # Printer en oversigt over IP-adresser samt
+           # Printer en oversigt over IP-adresser samt
             for sub in ipList:
               print "[" + str(sub[0]) + "]"
-
         except:
           pass
+        # Appender sig selv til at starte med.
+        if ipList == []:
+          ipList.append([myIp, time.time() + LTIMEOUT])
+          message = message + " ad:" + str(myIp)
+          ipLog.add(myIp)
+
+
+         # Opdaterer værdier for lederen
         for sub in ipList:
           if sub[0] == myIp:
              sub[1] = time.time() + LTIMEOUT
@@ -194,9 +196,7 @@ class heartbeat():
           else:
             # Svarer på lederens heartbeat.
             s = socket(AF_INET,SOCK_DGRAM)
-            print "whaaaat"
             s.sendto(str(ipLog.getKey()), (addr[0], 5005))
-            print "ups"
             # Opdaterer loggen
             splittext = message.split(",")
             print ipLog.getLog()
