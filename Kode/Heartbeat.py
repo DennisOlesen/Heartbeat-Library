@@ -66,6 +66,8 @@ class heartbeat():
         if castTimer < time.time():
           #opdatere loggen
           self.broadcast(str(ipLog.getKey()) + "," + message)
+          print message
+          message = ""
           castTimer = time.time() + 0.5
 
         try:
@@ -85,7 +87,7 @@ class heartbeat():
             # Appender sig selv til at starte med.
             if ipList == []:
               ipList.append([myIp, time.time() + LTIMEOUT])
-              message = message + "ad:" + str(myIp)
+              message = message + " ad:" + str(myIp)
               ipLog.add(myIp)
 
             # Opdaterer værdier for følgerne
@@ -95,28 +97,29 @@ class heartbeat():
                 elemNotSet = 0
               if sub == ipList[len(ipList)-1] and elemNotSet:
                 ipList.append([addr[0], time.time() + LTIMEOUT])
-                message = message + "ad:" + str(addr[0])
+                message = message + " ad:" + str(addr[0])
                 ipLog.add(addr[0])
 
             # Opdaterer værdier for lederen
-            for sub in ipList:
-              if sub[0] == myIp:
-                sub[1] = time.time() + LTIMEOUT
-                break
-              if sub == ipList[len(ipList)-1]:
-                ipList.append([myIp, time.time() + LTIMEOUT])
-                message = message + "ad:" + str(myIp)
-                ipList.add(myIp)
             # Printer en oversigt over IP-adresser samt
             for sub in ipList:
               print "[" + str(sub[0]) + "]"
 
         except:
           pass
+        for sub in ipList:
+          if sub[0] == myIp:
+             sub[1] = time.time() + LTIMEOUT
+             break
+          if sub == ipList[len(ipList)-1]:
+             ipList.append([myIp, time.time() + LTIMEOUT])
+             message = message + " ad:" + str(myIp)
+             ipList.add(myIp)
+
         for ip in ipList:
            if ip[1] < time.time():
              ipList.remove(ip)
-             message = message + "re:" + str(ip[0])
+             message = message + " re:" + str(ip[0])
              ipLog.remove(ip[0])
 
 
@@ -174,13 +177,19 @@ class heartbeat():
           else:
             # Svarer på lederens heartbeat.
             s = socket(AF_INET,SOCK_DGRAM)
+            print "whaaaat"
             s.sendto(str(ipLog.getKey()), (addr[0], 5005))
+            print "ups"
             # Opdaterer loggen
-            key, msg = message.split(",")
+            splittext = message.split(",")
+            print splittext
+            key = splittext[0]
+            msg = splittext[1]
             if ipLog.getKey() == int(key)-1:
                ipLog.parse(msg)
             else:
               try:
+                print "eriks mor"
                 data, addr = sock.recvfrom(1024)
                 ipLog.parse(data)
               except:
