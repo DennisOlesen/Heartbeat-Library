@@ -80,7 +80,6 @@ class heartbeat():
               s = socket(AF_INET,SOCK_DGRAM)
               s.sendto(upToDateData, (addr[0], 5005))
 
-
             elemNotSet = 1 # Til at checke om elementer er blevet placeret
 
             # Appender sig selv til at starte med.
@@ -111,7 +110,6 @@ class heartbeat():
             # Printer en oversigt over IP-adresser samt
             for sub in ipList:
               print "[" + str(sub[0]) + "]"
-              print ""
 
         except:
           pass
