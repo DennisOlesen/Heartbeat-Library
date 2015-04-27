@@ -20,7 +20,7 @@ class log():
     self.key += 1
 
   def overwrite(self, newLog):
-    data = newLog.split(",") 
+    data = newLog.split("-") 
     self.log = eval(data[0])
     self.ipList = eval(data[1])
     self.key = self.log[len(self.log)-1][0]

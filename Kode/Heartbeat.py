@@ -94,7 +94,7 @@ class heartbeat():
             if (int(data) < int(ipLog.getLowestKey())):
               s = socket(AF_INET,SOCK_DGRAM)
               print "magic"
-              s.sendto("ow:" + str(ipLog.getLog()) + "," + str(ipLog.getList()), (addr[0], 5005))
+              s.sendto("ow:" + str(ipLog.getLog()) + "-" + str(ipLog.getList()), (addr[0], 5005))
 
 
             if (int(data) != currentKey ):
