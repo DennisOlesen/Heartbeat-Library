@@ -92,8 +92,8 @@ class heartbeat():
             print message 
             if (int(data) == currentKey):
                expectedResponses -= 1 
-             
-            if (int(data) < ipLog.getLowestKey()):
+            print ipLog.getLowestKey(), data 
+            if (int(data) < int(ipLog.getLowestKey())):
               s = socket(AF_INET,SOCK_DGRAM)
               print "magic"
               s.sendto("ow:" + str(ipLog.getLog()) + "," + str(ipLog.getList()), (addr[0], 5005))
@@ -128,7 +128,6 @@ class heartbeat():
         if ipList == []:
           ipList.append([myIp, time.time() + LTIMEOUT])
           message = message + " ad:" + str(myIp)
-          print message
           ipLog.add(myIp)
 
 
@@ -140,7 +139,6 @@ class heartbeat():
           if sub == ipList[len(ipList)-1]:
              ipList.append([myIp, time.time() + LTIMEOUT])
              message = message + " ad:" + str(myIp)
-             print message
              ipList.add(myIp)
 
         for ip in ipList:
@@ -169,7 +167,6 @@ class heartbeat():
             break
           try:
             message, addr = sock.recvfrom(1024)
-            print message
             if message == "Voted":
               voteCounter += 1
               print voteCounter
@@ -216,7 +213,11 @@ class heartbeat():
             ipLog.parse(msg)
             s = socket(AF_INET,SOCK_DGRAM)
             s.sendto(str(ipLog.getKey()), (addr[0], 5005))
- 
+            try:
+              msg, addr = sock.recvfrom(1024)
+              ipLog.parse(msg) 
+            except:
+              pass
           timer = time.time() + random.uniform(2.0, 5.0)
         except:
           pass
