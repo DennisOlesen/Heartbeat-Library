@@ -24,6 +24,7 @@ class log():
     self.log = eval(data[0])
     self.ipList = eval(data[1])
     self.key = self.log[len(self.log)-1][0]
+    print self.ipList, self.log, self.key
 
   def commit(self, key):
     for sub in self.log:
