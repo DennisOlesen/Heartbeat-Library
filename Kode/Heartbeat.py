@@ -64,13 +64,11 @@ class heartbeat():
         if len(ipLog.getList()) != len(ipList):
            ipList = []
            for sub in ipLog.getList():
-             ipList.append(sub, time.time() + LTIMEOUT)
+             ipList.append([sub, time.time() + LTIMEOUT])
         if castTimer < time.time():
-          #hvis der er lige så mange som forventet, comitter vi. 
+          # Hvis der er lige så mange som forventet, comitter vi. 
           if expectedResponses == 0:
              print "Commiting"
-             print ipList
-             print ipLog.getLog()
              ipLog.commit(currentKey)
              message = message + " co:" + str(currentKey)
              
@@ -97,7 +95,6 @@ class heartbeat():
               s = socket(AF_INET,SOCK_DGRAM)
               print "magic"
               s.sendto("ow:" + str(ipLog.getLog()) + "," + str(ipLog.getList()), (addr[0], 5005))
-              print "trick"
 
 
             if (int(data) != currentKey ):
@@ -214,7 +211,9 @@ class heartbeat():
             s = socket(AF_INET,SOCK_DGRAM)
             s.sendto(str(ipLog.getKey()), (addr[0], 5005))
             try:
+              print "some really long sentence 10000000000000000000001"
               msg, addr = sock.recvfrom(1024)
+              print msg
               ipLog.parse(msg) 
             except:
               pass
