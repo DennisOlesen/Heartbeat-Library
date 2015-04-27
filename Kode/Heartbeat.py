@@ -199,7 +199,8 @@ class heartbeat():
  
         try:
           message, addr = self.b_sock.recvfrom(1024)
-          print "Broadcast ip-address:",  addr
+          ########print "Broadcast ip-address:",  addr
+          print ipLog.getLog()
           # Stemmer på kandidat hvis den modtager besked.
           # Stemmer kun 1 gang per valg.
           if message == "Vote" and tLastVote < time.time():
