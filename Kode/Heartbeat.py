@@ -72,6 +72,7 @@ class heartbeat():
              message = message + " co:" + str(currentKey)
              
           print ipLog.getKey()
+          print ipLog.getLog()
           #opdatere loggen
           expectedResponses = len(ipList)-1
           self.broadcast(str(ipLog.getKey()) + "," + message)
@@ -86,6 +87,12 @@ class heartbeat():
           else:
             if (int(data) == ipLog.getKey()-1):
                expectedResponses -= 1  
+
+            if (int(data) < ipLog.getLowestKey()):
+              s = socket(AF_INET,SOCK_DGRAM)
+              s.sendto(str(ipLog.getLog()) + "," + str(ipLog.getList()), (addr[0], 5005))
+
+
 
             if (int(data) != ipLog.getKey()-1 ):
               #Tjekker hvis en følger er bagud, sender bagud data
@@ -171,7 +178,6 @@ class heartbeat():
         sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         sock.bind( ("", 5005))
         sock.setblocking(0)
-
 
         # Følgeren lytter på og besvarer lederens forspørgsler,
         # samt skifter til kandidat hvis den ikke hører fra lederen.

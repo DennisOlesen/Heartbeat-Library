@@ -23,6 +23,7 @@ class log():
     data = newLog.split(",") 
     self.log = eval(data[0])
     self.ipList = eval(data[1])
+    self.key = self.log[len(self.log)-1][0]
 
   def commit(self, key):
     for sub in self.log:
@@ -49,6 +50,9 @@ class log():
 
   def getLog(self):
     return self.log
+  
+  def getLowestKey(self):
+    return self.log[0][0]
 
   def compile(self,key):
     text = ""
