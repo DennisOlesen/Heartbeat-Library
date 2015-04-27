@@ -77,7 +77,8 @@ class heartbeat():
           print ipLog.getKey()
           print ipLog.getLog()
           # Opdaterer loggen
-          expectedResponses = len(ipList)-1
+          if len(ipList) > 1:
+            expectedResponses = len(ipList)-1
           self.broadcast(str(ipLog.getKey()) + "," + message)
           currentKey = ipLog.getKey()
           message = ""
@@ -89,7 +90,7 @@ class heartbeat():
             pass
           else:
             print message 
-            if (int(data) == currentKey-1):
+            if (int(data) == currentKey):
                expectedResponses -= 1 
              
             if (int(data) < ipLog.getLowestKey()):
@@ -207,13 +208,12 @@ class heartbeat():
             s.sendto("Voted", (addr[0], 5005))
           else:
             # Svarer på lederens heartbeat.
-           # Opdaterer loggen
+            # Opdaterer loggen
             splittext = message.split(",")
-            print ipLog.getLog()
-            print ipList
             key = splittext[0]
             msg = splittext[1]
             if ipLog.getKey() == int(key):
+               print "key's good"
                ipLog.parse(msg)
             s = socket(AF_INET,SOCK_DGRAM)
             s.sendto(str(ipLog.getKey()), (addr[0], 5005))
