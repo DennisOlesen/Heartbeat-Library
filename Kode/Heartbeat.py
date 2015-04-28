@@ -187,6 +187,7 @@ class heartbeat():
         print "Leader-election in:", timer - time.time()
         try:
           data, addr = sock.recvfrom(1024)
+          print data
           ipLog.parse(data)
         except:
           pass  
@@ -210,14 +211,7 @@ class heartbeat():
             ipLog.parse(msg)
             s = socket(AF_INET,SOCK_DGRAM)
             s.sendto(str(ipLog.getKey()), (addr[0], 5005))
-            try:
-              print "some really long sentence 10000000000000000000001"
-              msg, addr = sock.recvfrom(1024)
-              print msg
-              ipLog.parse(msg) 
-            except:
-              pass
-          timer = time.time() + random.uniform(2.0, 5.0)
+            timer = time.time() + random.uniform(2.0, 5.0)
         except:
           pass
         # Bliver kandidat hvis der ikke modtages besked fra lederen.

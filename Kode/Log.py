@@ -20,9 +20,13 @@ class log():
     self.key += 1
 
   def overwrite(self, newLog):
+    print "o1"
     data = newLog.split("-") 
+    print "o2"
     self.log = eval(data[0])
+    print "o3"
     self.ipList = eval(data[1])
+    print "04"
     self.key = self.log[len(self.log)-1][0]
     print self.ipList, self.log, self.key
 
