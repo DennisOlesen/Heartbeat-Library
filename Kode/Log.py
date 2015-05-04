@@ -32,7 +32,6 @@ class log():
 
   def commit(self, key):
     while(int(self.log[0][0]) <= int(key)):
-      print "srsss", self.log[0][0] , "<=" , key
       self.log.pop(0)
       if len(self.log) == 0:
          break

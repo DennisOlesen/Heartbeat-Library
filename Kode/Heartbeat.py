@@ -41,7 +41,7 @@ class heartbeat():
     """
     #print "broadcast send:", data
     self.b_sock.sendto(data, (broadcast_IP, broadcast_PORT))
-    print data
+    #print data
 
   def start(self):
     thread.start_new_thread(mySimpleServer, (8080,))
@@ -84,8 +84,8 @@ class heartbeat():
              message = message + " co:" + str(currentKey)
              
           #print ipLog.getKey()
-          #print "Log: " ,  ipLog.getLog()
-          #print "List: " , ipLog.getList()
+          print "Log: " ,  ipLog.getLog()
+          print "List: " , ipLog.getList()
           # Opdaterer loggen
           if len(ipList) > 1:
             expectedResponses = len(ipList)-1
@@ -220,6 +220,7 @@ class heartbeat():
             splittext = message.split(",")
             key = splittext[0]
             msg = splittext[1]
+            print msg
             ipLog.parse(msg)
             #s = socket(AF_INET,SOCK_DGRAM)
             if len(ipLog.getLog()) == 0 and ipLog.getKey() == 0:
@@ -229,8 +230,8 @@ class heartbeat():
             timer = time.time() + random.uniform(2.0, 5.0)
         except:
           pass
-        print "Log: ", ipLog.getLog() , "eriks mor"
-        print "List: ", ipLog.getList() , "ulla"
+        print "Log: ", ipLog.getLog()
+        print "List: ", ipLog.getList()
         # Bliver kandidat hvis der ikke modtages besked fra lederen.
         if timer - time.time() < 0:
           self.state = "candidate"
