@@ -20,13 +20,13 @@ class log():
     self.key += 1
 
   def overwrite(self, newLog):
-    print "o1"
+    print "o1", newLog
     data = newLog.split("-") 
-    print "o2"
+    print "o2", data
     self.log = eval(data[0])
-    print "o3"
+    print "o3", self.log
     self.ipList = eval(data[1])
-    print "04"
+    print "04", self.ipList
     self.key = self.log[len(self.log)-1][0]
     print self.ipList, self.log, self.key
 
@@ -37,7 +37,12 @@ class log():
     pass
 
   def parse(self, text):
-    textSplit = text.split()    
+    if text[0:3] == "ow:":
+      self.overwrite(text[3:])
+      return
+
+    textSplit = text.split() 
+
     for sub in textSplit:
       if sub[0:3] == "ad:":
         self.add(sub[3:])
@@ -62,6 +67,7 @@ class log():
   def compile(self,key):
     text = ""
     for sub in self.log:
+      print "test", sub, key
       if sub[0] > key:
         text = text + sub[1] + " "
     return text
