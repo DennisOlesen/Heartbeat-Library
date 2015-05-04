@@ -37,6 +37,8 @@ class log():
          break
 
   def parse(self, text):
+    if text == "":
+       return 0
     if text[0:3] == "ow:":
       self.overwrite(text[3:])
       return
