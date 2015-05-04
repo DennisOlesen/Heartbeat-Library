@@ -31,9 +31,15 @@ class log():
     #print self.ipList, self.log, self.key
 
   def commit(self, key):
-    for sub in self.log:
+    tmp = self.log
+    for sub in tmp:
+       print len(tmp)
+       print sub[0]
        if sub[0] <= key:
-         self.log.remove(sub)
+         print sub, "key: ", sub[0] , "<" , key
+       for sub in tmp:
+         if sub[0] == key:
+           self.log.remove(sub)
     pass
 
   def parse(self, text):
