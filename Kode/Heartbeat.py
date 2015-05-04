@@ -229,8 +229,8 @@ class heartbeat():
             timer = time.time() + random.uniform(2.0, 5.0)
         except:
           pass
-        print "Log: ", ipLog.getLog()
-        print "List: ", ipLog.getList()
+        print "Log: ", ipLog.getLog() , "eriks mor"
+        print "List: ", ipLog.getList() , "ulla"
         # Bliver kandidat hvis der ikke modtages besked fra lederen.
         if timer - time.time() < 0:
           self.state = "candidate"
