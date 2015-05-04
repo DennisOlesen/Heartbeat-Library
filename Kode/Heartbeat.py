@@ -78,7 +78,7 @@ class heartbeat():
              ipList.append([sub, time.time() + LTIMEOUT])
         if castTimer < time.time():
           # Hvis der er lige så mange som forventet, comitter vi. 
-          if expectedResponses == 0:
+          if expectedResponses == 0 and len(ipLog.getLog()) != 0:
              print "Commiting"
              ipLog.commit(currentKey)
              message = message + " co:" + str(currentKey)
@@ -89,11 +89,13 @@ class heartbeat():
           # Opdaterer loggen
           if len(ipList) > 1:
             expectedResponses = len(ipList)-1
+          else:
+            expectedResponses = 1
           self.broadcast(str(ipLog.getKey()) + "," + message)
           currentKey = ipLog.getKey()
           message = ""
           castTimer = time.time() + 0.5
-
+          
         try:
           data, addr = sock.recvfrom(1024)
           #print "xxxxxxxxxxxxxxxxxxxxx"
