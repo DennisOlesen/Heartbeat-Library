@@ -81,7 +81,7 @@ class heartbeat():
           if expectedResponses == 0 and len(ipLog.getLog()) != 0:
              print "Commiting"
              ipLog.commit(currentKey)
-             message = message + " co:" + str(currentKey)
+             message = message + " co:" + str(currentKey-1)
              
           #print ipLog.getKey()
           print "Log: " ,  ipLog.getLog()
@@ -91,11 +91,11 @@ class heartbeat():
             expectedResponses = len(ipList)-1
           else:
             expectedResponses = 1
-          self.broadcast(str(ipLog.getKey()) + "," + message)
+          self.broadcast(str(ipLog.getKey()-1) + "," + message)
+          print "Key, message: " , ipLog.getKey()-1, message
           currentKey = ipLog.getKey()
           message = ""
           castTimer = time.time() + 0.5
-          
         try:
           data, addr = sock.recvfrom(1024)
           #print "xxxxxxxxxxxxxxxxxxxxx"
@@ -106,11 +106,11 @@ class heartbeat():
             if (int(data) == currentKey):
                expectedResponses -= 1 
             #print data, "<", ipLog.getLowestKey() 
+             
             if (int(data) < int(ipLog.getLowestKey())):
               #s = socket(AF_INET,SOCK_DGRAM)
               #print "magic"
               sock.sendto("ow:" + str(ipLog.getLog()) + "-" + str(ipLog.getList()), (addr[0], 5005))
-
 
             if (int(data) != currentKey ):
               #Tjekker hvis en følger er bagud, sender bagud data
@@ -126,6 +126,7 @@ class heartbeat():
               if addr[0] in sub:
                 sub[1] = time.time() + LTIMEOUT
                 elemNotSet = 0
+                print sub
               if sub == ipList[len(ipList)-1] and elemNotSet:
                 ipList.append([addr[0], time.time() + LTIMEOUT])
                 message = message + " ad:" + str(addr[0])
@@ -136,7 +137,7 @@ class heartbeat():
             #for sub in ipList:
             #  print "[" + str(sub[0]) + "]"
         except:
-          pass
+            pass
         # Appender sig selv til at starte med.
         if ipList == []:
           ipList.append([myIp, time.time() + LTIMEOUT])
@@ -219,6 +220,7 @@ class heartbeat():
           else:
             # Svarer på lederens heartbeat.
             # Opdaterer loggen
+            print message
             splittext = message.split(",")
             key = splittext[0]
             msg = splittext[1]
