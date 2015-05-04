@@ -83,8 +83,9 @@ class heartbeat():
              ipLog.commit(currentKey)
              message = message + " co:" + str(currentKey)
              
-          print ipLog.getKey()
-          print ipLog.getLog()
+          #print ipLog.getKey()
+          print "Log: " ,  ipLog.getLog()
+          print "List: " , ipLog.getList()
           # Opdaterer loggen
           if len(ipList) > 1:
             expectedResponses = len(ipList)-1
@@ -228,6 +229,8 @@ class heartbeat():
             timer = time.time() + random.uniform(2.0, 5.0)
         except:
           pass
+        print "Log: ", ipLog.getLog()
+        print "List: ", ipLog.getList()
         # Bliver kandidat hvis der ikke modtages besked fra lederen.
         if timer - time.time() < 0:
           self.state = "candidate"
