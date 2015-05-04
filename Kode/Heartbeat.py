@@ -150,7 +150,7 @@ class heartbeat():
           if sub == ipList[len(ipList)-1]:
              ipList.append([myIp, time.time() + LTIMEOUT])
              message = message + " ad:" + str(myIp)
-             ipList.add(myIp)
+             ipLog.add(myIp)
 
         for ip in ipList:
            if ip[1] < time.time():
