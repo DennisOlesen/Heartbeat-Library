@@ -100,20 +100,20 @@ class heartbeat():
           if (data == "Voted"):
             pass
           else:
-            print message 
+            #print message 
             if (int(data) == currentKey):
                expectedResponses -= 1 
-            print data, "<", ipLog.getLowestKey() 
+            #print data, "<", ipLog.getLowestKey() 
             if (int(data) < int(ipLog.getLowestKey())):
               #s = socket(AF_INET,SOCK_DGRAM)
-              print "magic"
+              #print "magic"
               sock.sendto("ow:" + str(ipLog.getLog()) + "-" + str(ipLog.getList()), (addr[0], 5005))
 
 
             if (int(data) != currentKey ):
               #Tjekker hvis en følger er bagud, sender bagud data
               upToDateData = ipLog.compile(int(data))
-              print "Sending", upToDateData, "..."
+              #print "Sending", upToDateData, "..."
               #s = socket(AF_INET,SOCK_DGRAM)
               sock.sendto(upToDateData, (addr[0], 5005))
 
@@ -180,7 +180,7 @@ class heartbeat():
             message, addr = sock.recvfrom(1024)
             if message == "Voted":
               voteCounter += 1
-              print voteCounter
+              #print voteCounter
           except:
             pass
         # Bliver leder hvis der er stemmer nok til at komme ud
@@ -196,10 +196,10 @@ class heartbeat():
         #print "Leader-election in:", timer - time.time()
         try:
           data, addr = sock.recvfrom(1024)
-          print "from leader:", data
+          #print "from leader:", data
           ipLog.parse(data)
 
-          print ipLog.getLog()
+          #print ipLog.getLog()
         except:
          # traceback.print_exc(file=sys.stdout)  
          pass
