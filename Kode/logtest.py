@@ -24,5 +24,6 @@ while(1):
      ipLog.commit(myInput[3:])
 
   print ipLog.getLog()
+  print ipLog.getList()
 
 

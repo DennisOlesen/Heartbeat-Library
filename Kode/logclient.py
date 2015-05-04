@@ -14,6 +14,7 @@ while(1):
   
     ipLog.parse(myInput)
     print ipLog.getLog()
+    print ipLog.getList()
   except:
     pass
 
