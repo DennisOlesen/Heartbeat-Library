@@ -232,11 +232,12 @@ class heartbeat():
             else:
               sock.sendto(str(ipLog.getKey()), (addr[0], 5005))
             timer = time.time() + random.uniform(2.0, 5.0)
+            print "Log: ", ipLog.getLog()
+            print "List: ", ipLog.getList()
+ 
         except:
           pass
-        print "Log: ", ipLog.getLog()
-        print "List: ", ipLog.getList()
-        # Bliver kandidat hvis der ikke modtages besked fra lederen.
+       # Bliver kandidat hvis der ikke modtages besked fra lederen.
         if timer - time.time() < 0:
           self.state = "candidate"
           print "State set to: candidate"
