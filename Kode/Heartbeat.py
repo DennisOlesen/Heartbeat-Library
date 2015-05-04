@@ -200,7 +200,7 @@ class heartbeat():
 
           print ipLog.getLog()
         except:
-          traceback.print_exc(file=sys.stdout)  
+         # traceback.print_exc(file=sys.stdout)  
  
         try:
           message, addr = self.b_sock.recvfrom(1024)
