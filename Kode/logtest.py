@@ -21,6 +21,7 @@ while(1):
      sock.sendto("ow:"+str(ipLog.getLog()) + "-" + str(ipLog.getList()), ("192.168.43.69", 5005))
   if myInput[0:3] == "co:":
      sock.sendto(myInput, ("192.168.43.69", 5005))
+     print "waaat"
      ipLog.commit(myInput[3:])
 
   print ipLog.getLog()
