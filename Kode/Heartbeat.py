@@ -41,7 +41,7 @@ class heartbeat():
     """
     #print "broadcast send:", data
     self.b_sock.sendto(data, (broadcast_IP, broadcast_PORT))
-
+    print data
 
   def start(self):
     thread.start_new_thread(mySimpleServer, (8080,))
@@ -84,8 +84,8 @@ class heartbeat():
              message = message + " co:" + str(currentKey)
              
           #print ipLog.getKey()
-          print "Log: " ,  ipLog.getLog()
-          print "List: " , ipLog.getList()
+          #print "Log: " ,  ipLog.getLog()
+          #print "List: " , ipLog.getList()
           # Opdaterer loggen
           if len(ipList) > 1:
             expectedResponses = len(ipList)-1
