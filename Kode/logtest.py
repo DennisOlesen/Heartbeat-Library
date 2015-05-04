@@ -13,12 +13,15 @@ while(1):
   
   if myInput[0:3] == "ad:":
     sock.sendto(myInput, ("192.168.43.69", 5005))
+    ipLog.add(myInput[3:])
   if myInput[0:3] == "re:":
     sock.sendto(myInput, ("192.168.43.69", 5005))
+    ipLog.remove(myInput[3:])
   if myInput[0:3] == "ow:":
-     sock.sendto("ow:"+str(ipLog.getLog()) + "-" + str(ipLog.getList(), "192.168.43.69", 5005))
+     sock.sendto("ow:"+str(ipLog.getLog()) + "-" + str(ipLog.getList()), ("192.168.43.69", 5005))
   if myInput[0:3] == "co:":
      sock.sendto(myInput, ("192.168.43.69", 5005))
+     ipLog.commit(myInput[3:])
 
   print ipLog.getLog()
 
