@@ -201,7 +201,7 @@ class heartbeat():
           data, addr = sock.recvfrom(1024)
           #print "from leader:", data
           #print "noget data: " , data
-          #ipLog.parse(data)
+          ipLog.parse(data)
 
           #print ipLog.getLog()
         except:
@@ -221,7 +221,7 @@ class heartbeat():
           else:
             # Svarer på lederens heartbeat.
             # Opdaterer loggen
-            print message
+            print "broadcastbesked: ",  message
             splittext = message.split(",")
             key = splittext[0]
             msg = splittext[1]
