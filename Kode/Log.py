@@ -58,7 +58,7 @@ class log():
         self.overwrite(sub[3:])
 
   def getKey(self):
-    return self.key 
+    return self.key-1
   def getList(self):
     return self.ipList
 
@@ -67,7 +67,7 @@ class log():
   
   def getLowestKey(self):
     if len(self.log) == 0: 
-      return self.key-1
+      return self.key
     return self.log[0][0]
 
   def compile(self,key):
