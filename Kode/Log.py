@@ -67,13 +67,13 @@ class log():
   
   def getLowestKey(self):
     if len(self.log) == 0: 
-      return self.key
+      return self.key-1
     return self.log[0][0]
 
   def compile(self,key):
     text = ""
     for sub in self.log:
       #print "test", sub, key
-      if sub[0] >= key:
+      if sub[0] > key:
         text = text + sub[1] + " "
     return text
