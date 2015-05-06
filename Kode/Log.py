@@ -44,8 +44,8 @@ class log():
     textSplit = text.split() 
 
     for sub in textSplit:
-      print "yo mamma ", self.log[self.key][1], self.key
-      if sub == self.log[self.key][1]:
+      print "yo mamma ", self.log[len(self.log)-1][1], self.key
+      if sub == self.log[len(self.log)-1][1]:
          print "your mom"
          continue 
       print "okay, so er vi her"
