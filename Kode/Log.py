@@ -45,6 +45,7 @@ class log():
 
     for sub in textSplit:
       if sub == self.log[key][1]:
+         print "your mom"
          continue 
       if sub[0:3] == "ad:":
         self.add(sub[3:])
