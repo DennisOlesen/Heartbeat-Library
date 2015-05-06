@@ -112,13 +112,16 @@ class heartbeat():
               #s = socket(AF_INET,SOCK_DGRAM)
               #print "magic"
               sock.sendto("ow:" + str(ipLog.getLog()) + "-" + str(ipLog.getList()), (addr[0], 5005))
-
-            if (int(data) != currentKey and int(data) != -1):
+            print "currentKey: " , currentKey , " ok?"
+            if (int(data) < currentKey and int(data) != -1):
               #Tjekker hvis en følger er bagud, sender bagud data
+              print "Pakker upToDateData"
               upToDateData = ipLog.compile(int(data))
+   
               #print "Sending", upToDateData, "..."
               #s = socket(AF_INET,SOCK_DGRAM)
               sock.sendto(upToDateData, (addr[0], 5005))
+              print "Data er sendt: " , upToDateData
 
             elemNotSet = 1 # Til at checke om elementer er blevet placeret
 
@@ -202,6 +205,7 @@ class heartbeat():
           data, addr = sock.recvfrom(1024)
           #print "from leader:", data
           #print "noget data: " , data
+          print "Parse data: " , data
           ipLog.parse(data)
 
           #print ipLog.getLog()
