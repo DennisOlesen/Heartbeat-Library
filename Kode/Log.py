@@ -44,6 +44,8 @@ class log():
     textSplit = text.split() 
 
     for sub in textSplit:
+      if sub == self.log[key]:
+         continue 
       if sub[0:3] == "ad:":
         self.add(sub[3:])
       if sub[0:3] == "re:":
