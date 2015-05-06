@@ -48,7 +48,7 @@ class log():
       if sub == self.log[self.key][1]:
          print "your mom"
          continue 
-      print "okay, så er vi her"
+      print "okay, so er vi her"
       if sub[0:3] == "ad:":
         self.add(sub[3:])
       if sub[0:3] == "re:":
