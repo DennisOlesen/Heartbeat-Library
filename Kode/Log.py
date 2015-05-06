@@ -74,6 +74,6 @@ class log():
     text = ""
     for sub in self.log:
       #print "test", sub, key
-      if sub[0] > key:
+      if sub[0] >= key:
         text = text + sub[1] + " "
     return text

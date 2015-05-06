@@ -98,6 +98,7 @@ class heartbeat():
           castTimer = time.time() + 0.5
         try:
           data, addr = sock.recvfrom(1024)
+          print "svar far hb: " , data , " ok?"
           #print "xxxxxxxxxxxxxxxxxxxxx"
           if (data == "Voted"):
             pass
