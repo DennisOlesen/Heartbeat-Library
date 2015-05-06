@@ -112,7 +112,7 @@ class heartbeat():
               #print "magic"
               sock.sendto("ow:" + str(ipLog.getLog()) + "-" + str(ipLog.getList()), (addr[0], 5005))
 
-            if (int(data) != currentKey ):
+            if (int(data) != currentKey and int(data) != -1):
               #Tjekker hvis en følger er bagud, sender bagud data
               upToDateData = ipLog.compile(int(data))
               #print "Sending", upToDateData, "..."
