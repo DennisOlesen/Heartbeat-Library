@@ -81,7 +81,7 @@ class heartbeat():
           if expectedResponses == 0 and len(ipLog.getLog()) != 0:
              print "Commiting"
              ipLog.commit(currentKey)
-             message = message + " co:" + str(currentKey-1)
+             message = message + " co:" + str(currentKey)
              
           #print ipLog.getKey()
           print "Log: " ,  ipLog.getLog()
