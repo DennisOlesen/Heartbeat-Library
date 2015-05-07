@@ -106,7 +106,7 @@ class heartbeat():
             #print message 
             if (int(data) == currentKey):
                expectedResponses -= 1 
-            #print data, "<", ipLog.getLowestKey() 
+            print "OW?: " , data, "<", ipLog.getLowestKey() , "ow?"
              
             if (int(data) < int(ipLog.getLowestKey())):
               #s = socket(AF_INET,SOCK_DGRAM)
