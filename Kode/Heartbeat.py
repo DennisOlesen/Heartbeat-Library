@@ -108,7 +108,7 @@ class heartbeat():
                expectedResponses -= 1 
             print "OW?: " , data, "<", ipLog.getLowestKey() , "ow?"
              
-            if (int(data) < int(ipLog.getLowestKey())):
+            if (int(data) < int(ipLog.getLowestKey()) or int(data) > currentKey):
               #s = socket(AF_INET,SOCK_DGRAM)
               #print "magic"
               sock.sendto("ow:" + str(ipLog.getLog()) + "-" + str(ipLog.getList()), (addr[0], 5005))
