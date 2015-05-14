@@ -64,7 +64,7 @@ class heartbeat():
     """
     Sender data ud til en given broadcast IP og PORT.
     """
-    #print "broadcast send:", data
+    print "broadcast send:", data
     self.b_sock.sendto(data, (broadcast_IP, broadcast_PORT))
     #print data
 
@@ -88,6 +88,7 @@ class heartbeat():
         self.expectedResponses = len(self.ipList)-1
       else:
         self.expectedResponses = 1
+      print self.message
       self.broadcast(str(self.ipLog.getKey()-1) + "," + self.message)
       #print "Key, self.message: " , self.ipLog.getKey()-1, self.message
       self.currentKey = self.ipLog.getKey()
@@ -210,7 +211,7 @@ class heartbeat():
      pass
    try:
      message, addr = self.b_sock.recvfrom(1024)
-     #print "received:", self.message
+     print "received:", self.message
      ########print "Broadcast ip-address:",  addr
      #print self.ipLog.getLog()
      # Stemmer på kandidat hvis den modtager besked.
