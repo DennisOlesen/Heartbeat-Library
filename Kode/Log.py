@@ -6,18 +6,32 @@ class log():
    self.log = []
    self.ipList = []  
    self.key = 0
-  def add(self, ip):
-    self.log.append([self.key, "ad:"+ str(ip)])
-    self.key += 1
-    if ip not in self.ipList:
-      self.ipList.append(ip)
-    
+  def add(self, key, ip):
+    if (len(self.log) != 0):
+      if (self.log[len(self.log)-1][0] + 1) == int(key):
+        self.log.append([int(key), "ad:"+ str(ip)])
+        self.key += 1
+        if ip not in self.ipList:
+          self.ipList.append(ip)
+    elif (len(self.log) == 0):
+      self.log.append([int(key), "ad:"+ str(ip)])
+      self.key += 1
+      if ip not in self.ipList:
+         self.ipList.append(ip)
+ 
     return 1
 
-  def remove(self, ip):
-    self.ipList.remove(ip)
-    self.log.append([self.key, "re:" + str(ip)])
-    self.key += 1
+  def remove(self, key, ip):
+    if (len(self.log) != 0):
+     if self.log[len(self.log)-1][0] + 1 == int(key):
+      self.ipList.remove(ip)
+      self.log.append([int(key), "re:" + str(ip)])
+      self.key += 1
+    elif (len(self.log) == 0):
+      self.ipList.remove(ip)
+      self.log.append([int(key), "re:" + str(ip)])
+      self.key += 1
+
 
   def overwrite(self, newLog):
     #print "o1", newLog
@@ -37,26 +51,25 @@ class log():
          break
 
   def parse(self, text):
+    
     if text[0:3] == "ow:":
       self.overwrite(text[3:])
       return
 
-    textSplit = text.split() 
-
+    textSplit = text.split()
     for sub in textSplit:
-      print "yo mamma ", self.log[len(self.log)-1][1], self.key
-      if sub == self.log[len(self.log)-1][1]:
-         print "your mom"
-         continue 
-      print "okay, so er vi her"
-      if sub[0:3] == "ad:":
-        self.add(sub[3:])
-      if sub[0:3] == "re:":
-        self.remove(sub[3:])
-      if sub[0:3] == "co:":
-        self.commit(int(sub[3:]))
-      if sub[0:3] == "ow:":
-        self.overwrite(sub[3:])
+      try:
+        key, text = sub.split(",")
+      except:
+        key = 0
+        text = sub
+
+      if text[0:3] == "ad:":
+        self.add(int(key), text)
+      if text[0:3] == "re:":
+        self.remove(int(key), text)
+      if text[0:3] == "co:":
+        self.commit(int(text[3:]))
 
   def getKey(self):
     return self.key-1

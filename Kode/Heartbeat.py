@@ -89,13 +89,13 @@ class heartbeat():
       else:
         self.expectedResponses = 1
       self.broadcast(str(self.ipLog.getKey()-1) + "," + self.message)
-      print "Key, self.message: " , self.ipLog.getKey()-1, self.message
+      #print "Key, self.message: " , self.ipLog.getKey()-1, self.message
       self.currentKey = self.ipLog.getKey()
       self.message = ""
       self.castTimer = time.time() + 0.5
     try:
       data, addr = sock.recvfrom(1024)
-      print "svar far hb: " , data , " ok?"
+      #print "svar far hb: " , data , " ok?"
       #print "xxxxxxxxxxxxxxxxxxxxx"
       if (data == "Voted"):
         pass
@@ -118,7 +118,7 @@ class heartbeat():
           #print "Sending", upToDateData, "..."
           #s = socket(AF_INET,SOCK_DGRAM)
           self.sock.sendto(upToDateData, (addr[0], 5005))
-          print "Data er sendt: " , upToDateData
+          #print "Data er sendt: " , upToDateData
    
         elemNotSet = 1 # Til at checke om elementer er blevet placeret
    
@@ -127,10 +127,10 @@ class heartbeat():
           if addr[0] in sub:
             sub[1] = time.time() + LTIMEOUT
             elemNotSet = 0
-            print sub
+            #print sub
           if sub == self.ipList[len(self.ipList)-1] and elemNotSet:
             self.ipList.append([addr[0], time.time() + LTIMEOUT])
-            self.message = self.message + " ad:" + str(addr[0])
+            self.message = self.message + " " + str(self.ipLog.getKey()+1) + ","+"ad:" + str(addr[0])
             #print self.message
             self.ipLog.add(addr[0])
    
@@ -142,8 +142,9 @@ class heartbeat():
     # Appender sig selv til at starte med.
     if self.ipList == []:
       self.ipList.append([self.myIp, time.time() + LTIMEOUT])
-      self.message = self.message + " ad:" + str(self.myIp)
-      self.ipLog.add(self.myIp)
+      self.message = self.message + " " + str(self.ipLog.getKey()+1) + "," + "ad:" + str(self.myIp)
+      #print self.message
+      self.ipLog.parse(self.message)
    
    
      # Opdaterer værdier for lederen
@@ -153,14 +154,14 @@ class heartbeat():
          break
       if sub == self.ipList[len(self.ipList)-1]:
          self.ipList.append([self.myIp, time.time() + LTIMEOUT])
-         self.message = self.message + " ad:" + str(self.myIp)
-         self.ipLog.add(self.myIp)
+         self.message = self.message + " " + str(self.ipLog.getKey()+1) + ","+"ad:" + str(self.myIp)
+         self.ipLog.parse(self.message)
    
     for ip in self.ipList:
        if ip[1] < time.time():
          self.ipList.remove(ip)
-         self.message = self.message + " re:" + str(ip[0])
-         self.ipLog.remove(ip[0])
+         self.message = self.message + " " + str(self.ipLog.getKey()+1) + "," "re:" + str(ip[0])
+         self.ipLog.parse(self.message)
    
    
   def candidate(self):
