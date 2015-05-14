@@ -204,7 +204,7 @@ class heartbeat():
     data, addr = self.sock.recvfrom(1024)
     #print "from leader:", data
     #print "noget data: " , data
-    print "Parse data: " , data
+    #print "Parse data: " , data
     self.ipLog.parse(data)
   
     #print self.ipLog.getLog()
@@ -213,7 +213,7 @@ class heartbeat():
      pass
    try:
      message, addr = self.b_sock.recvfrom(1024)
-     print "received:", self.message
+     #print "received:", self.message
      ########print "Broadcast ip-address:",  addr
      #print self.ipLog.getLog()
      # Stemmer på kandidat hvis den modtager besked.
@@ -225,15 +225,15 @@ class heartbeat():
      else:
        # Svarer på lederens heartbeat.
        # Opdaterer loggen
-       print "broadcastbesked: ",  message
+      # print "broadcastbesked: ",  message
        try:
 	 key, msg = message.split("-")
        except:
-         print message.split("-")
+         #print message.split("-")
          key = int(message.split("-")[1])
          msg = ""
-       print "Yoloswag"
-       print "msg: " + msg + ":msg"
+       #print "Yoloswag"
+       #print "msg: " + msg + ":msg"
       
        self.ipLog.parse(msg)
        #s = socket(AF_INET,SOCK_DGRAM)
