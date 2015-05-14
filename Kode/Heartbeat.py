@@ -134,7 +134,7 @@ class heartbeat():
 	    self.ipList.append([addr[0], time.time() + LTIMEOUT])
 	    self.message = self.message + " " + str(self.ipLog.getKey()+1) + ","+"ad:" + str(addr[0])
 	    #print self.message
-	    self.ipLog.add(addr[0])
+	    self.ipLog.parse(self.message)
    
        # Printer en oversigt over IP-adresser samt
 	#for sub in self.ipList:
@@ -239,7 +239,7 @@ class heartbeat():
        if len(self.ipLog.getLog()) == 0: #and self.ipLog.getKey() == 0:
          self.sock.sendto(str(-1), (addr[0], 5005))
        else:
-         self.sock.sendto(str(self.ipLog.getKey()), (addr[0], 5005))
+         self.sock.sendto(str(self.ipLog.getKey()+1), (addr[0], 5005))
        self.timer = time.time() + random.uniform(2.0, 5.0)
        print "Log: ", self.ipLog.getLog()
        print "List: ", self.ipLog.getList()
