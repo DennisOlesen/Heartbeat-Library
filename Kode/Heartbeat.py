@@ -163,7 +163,7 @@ class heartbeat():
          self.ipLog.remove(ip[0])
    
    
-    def candidate(self):
+  def candidate(self):
      # Kandidaten er overgangsstadiet mellem følger og leder.
     # Den opretter en afstemning for at blive den nye leder.
           # Votecounter starter på 1,
@@ -208,21 +208,21 @@ class heartbeat():
    # traceback.print_exc(file=sys.stdout)  
      pass
    try:
-     self.message, addr = self.b_sock.recvfrom(1024)
+     message, addr = self.b_sock.recvfrom(1024)
      #print "received:", self.message
      ########print "Broadcast ip-address:",  addr
      #print self.ipLog.getLog()
      # Stemmer på kandidat hvis den modtager besked.
      # Stemmer kun 1 gang per valg.
-     if self.message == "Vote" and self.tLastVote < time.time():
+     if message == "Vote" and self.tLastVote < time.time():
        self.tLastVote = time.time() + LTIMEOUT
        #s = socket(AF_INET, SOCK_DGRAM)
        self.sock.sendto("Voted", (addr[0], 5005))
      else:
        # Svarer på lederens heartbeat.
        # Opdaterer loggen
-       print "broadcastbesked: ",  self.message
-       splittext = self.message.split(",")
+       print "broadcastbesked: ",  message
+       splittext = message.split(",")
        key = splittext[0]
        msg = splittext[1]
        print msg
@@ -247,7 +247,6 @@ class heartbeat():
 
 
   def start(self):
-
     thread.start_new_thread(mySimpleServer, (8080,))
     while(True):
     # Lederen er ansvarlig for at opdatere loggen løbende via Heartbeats.
