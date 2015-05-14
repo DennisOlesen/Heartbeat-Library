@@ -89,7 +89,7 @@ class heartbeat():
       else:
         self.expectedResponses = 1
       print self.message
-      self.broadcast(str(self.ipLog.getKey()-1) + "," + self.message)
+      self.broadcast(str(self.ipLog.getKey()-1) + "-" + self.message)
       #print "Key, self.message: " , self.ipLog.getKey()-1, self.message
       self.currentKey = self.ipLog.getKey()
       self.message = ""
@@ -224,10 +224,8 @@ class heartbeat():
        # Svarer på lederens heartbeat.
        # Opdaterer loggen
        print "broadcastbesked: ",  message
-       splittext = message.split(",")
-       key = splittext[0]
-       msg = splittext[1]
-       print msg
+       key, msg = message.split("-")
+       print "msg: " + msg + ":msg"
        self.ipLog.parse(msg)
        #s = socket(AF_INET,SOCK_DGRAM)
        if len(self.ipLog.getLog()) == 0 and self.ipLog.getKey() == 0:
