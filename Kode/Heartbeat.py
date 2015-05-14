@@ -110,7 +110,7 @@ class heartbeat():
 	  #s = socket(AF_INET,SOCK_DGRAM)
 	  #print "magic"
           print "sending ow" 
-	  sock.sendto("ow:" + str(self.ipLog.getLog()) + "-" + str(self.ipLog.getList()), (addr[0], 5005))
+	  self.sock.sendto("ow:" + str(self.ipLog.getLog()) + "-" + str(self.ipLog.getList()), (addr[0], 5005))
 	print "self.currentKey: " , self.currentKey , " ok?"
 	if (int(data) < self.currentKey and int(data) != -1):
 	  #Tjekker hvis en følger er bagud, sender bagud data
