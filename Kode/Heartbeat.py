@@ -34,6 +34,31 @@ class heartbeat():
     b_sock.setblocking(0)
     self.b_sock = b_sock
     self.state = "follower"
+    """
+    Starter heartbeat-protokollen.
+    """
+    self.timer = time.time() + random.uniform(2.0, 5.0)
+
+    # Finder frem til ip-adressen for maskinen, så det virker på linux.
+    s = socket(AF_INET, SOCK_DGRAM)
+    s.connect(("google.com", 80))
+    self.myIp = (s.getsockname()[0])
+    s = None
+
+    self.ipLog = Log.log() 
+    self.castTimer = 0
+    self.ipList = []
+    self.tLastVote = 0
+    self.message = ""
+    self.currentKey = -1
+    self.expectedResponses = 1
+
+    self.sock = socket(AF_INET, SOCK_DGRAM)
+    self.sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+    self.sock.bind( ("", 5005))
+    self.sock.setblocking(0)
+
+
 
   def broadcast(self, data):
     """
@@ -43,212 +68,198 @@ class heartbeat():
     self.b_sock.sendto(data, (broadcast_IP, broadcast_PORT))
     #print data
 
+  def leader(self):
+    if len(self.ipLog.getList()) != len(self.ipList):
+       self.ipList = []
+       for sub in self.ipLog.getList():
+         self.ipList.append([sub, time.time() + LTIMEOUT])
+    if self.castTimer < time.time():
+      # Hvis der er lige så mange som forventet, comitter vi. 
+      if self.expectedResponses == 0 and len(self.ipLog.getLog()) != 0:
+         print "Commiting"
+         self.ipLog.commit(self.currentKey)
+         self.message = self.message + " co:" + str(self.currentKey)
+         
+      #print self.ipLog.getKey()
+      print "Log: " ,  self.ipLog.getLog()
+      print "List: " , self.ipLog.getList()
+      # Opdaterer loggen
+      if len(self.ipList) > 1:
+        self.expectedResponses = len(self.ipList)-1
+      else:
+        self.expectedResponses = 1
+      self.broadcast(str(self.ipLog.getKey()-1) + "," + self.message)
+      print "Key, self.message: " , self.ipLog.getKey()-1, self.message
+      self.currentKey = self.ipLog.getKey()
+      self.message = ""
+      self.castTimer = time.time() + 0.5
+    try:
+      data, addr = sock.recvfrom(1024)
+      print "svar far hb: " , data , " ok?"
+      #print "xxxxxxxxxxxxxxxxxxxxx"
+      if (data == "Voted"):
+        pass
+      else:
+        #print self.message 
+        if (int(data) == self.currentKey):
+           self.expectedResponses -= 1 
+        print "OW?: " , data, "<", self.ipLog.getLowestKey() , "ow?"
+         
+        if (int(data) < int(self.ipLog.getLowestKey()) or int(data) > self.currentKey):
+          #s = socket(AF_INET,SOCK_DGRAM)
+          #print "magic"
+          sock.sendto("ow:" + str(self.ipLog.getLog()) + "-" + str(self.ipLog.getList()), (addr[0], 5005))
+        print "self.currentKey: " , self.currentKey , " ok?"
+        if (int(data) < self.currentKey and int(data) != -1):
+          #Tjekker hvis en følger er bagud, sender bagud data
+          print "Pakker upToDateData"
+          upToDateData = self.ipLog.compile(int(data))
+   
+          #print "Sending", upToDateData, "..."
+          #s = socket(AF_INET,SOCK_DGRAM)
+          self.sock.sendto(upToDateData, (addr[0], 5005))
+          print "Data er sendt: " , upToDateData
+   
+        elemNotSet = 1 # Til at checke om elementer er blevet placeret
+   
+        # Opdaterer værdier for følgerne
+        for sub in self.ipList:
+          if addr[0] in sub:
+            sub[1] = time.time() + LTIMEOUT
+            elemNotSet = 0
+            print sub
+          if sub == self.ipList[len(self.ipList)-1] and elemNotSet:
+            self.ipList.append([addr[0], time.time() + LTIMEOUT])
+            self.message = self.message + " ad:" + str(addr[0])
+            #print self.message
+            self.ipLog.add(addr[0])
+   
+       # Printer en oversigt over IP-adresser samt
+        #for sub in self.ipList:
+        #  print "[" + str(sub[0]) + "]"
+    except:
+        pass
+    # Appender sig selv til at starte med.
+    if self.ipList == []:
+      self.ipList.append([self.myIp, time.time() + LTIMEOUT])
+      self.message = self.message + " ad:" + str(self.myIp)
+      self.ipLog.add(self.myIp)
+   
+   
+     # Opdaterer værdier for lederen
+    for sub in self.ipList:
+      if sub[0] == self.myIp:
+         sub[1] = time.time() + LTIMEOUT
+         break
+      if sub == self.ipList[len(self.ipList)-1]:
+         self.ipList.append([self.myIp, time.time() + LTIMEOUT])
+         self.message = self.message + " ad:" + str(self.myIp)
+         self.ipLog.add(self.myIp)
+   
+    for ip in self.ipList:
+       if ip[1] < time.time():
+         self.ipList.remove(ip)
+         self.message = self.message + " re:" + str(ip[0])
+         self.ipLog.remove(ip[0])
+   
+   
+    def candidate(self):
+     # Kandidaten er overgangsstadiet mellem følger og leder.
+    # Den opretter en afstemning for at blive den nye leder.
+          # Votecounter starter på 1,
+    # da en kandidat altid stemmer på sig selv.
+      voteCounter = 1
+      self.broadcast("Vote")
+      # Laver en voteTime, for at sikre sig at
+      # den ikke venter på stemmer forevigt.
+      voteTime = time.time() + LTIMEOUT
+      while(voteCounter <= ((len(self.ipList))/2)):
+        # Returnerer til følger hvis der ikke er stemmer nok
+        if voteTime < time.time():
+          self.state = "follower"
+          voteCounter = 0
+          self.timer = time.time() + random.uniform(2.0, 5.0)
+          break
+        try:
+          self.message, addr = self.sock.recvfrom(1024)
+          if self.message == "Voted":
+            voteCounter += 1
+            #print voteCounter
+        except:
+          pass
+      # Bliver leder hvis der er stemmer nok til at komme ud
+      # af løkken, og endnu ikke er blevet følger.
+      if self.state != "follower":
+        voteCounter = 0
+        self.state = "leader"
+        print "State set to: leader"
+
+  
+  def follower(self):
+   try:
+    data, addr = self.sock.recvfrom(1024)
+    #print "from leader:", data
+    #print "noget data: " , data
+    print "Parse data: " , data
+    self.ipLog.parse(data)
+  
+    #print self.ipLog.getLog()
+   except:
+   # traceback.print_exc(file=sys.stdout)  
+     pass
+   try:
+     self.message, addr = self.b_sock.recvfrom(1024)
+     #print "received:", self.message
+     ########print "Broadcast ip-address:",  addr
+     #print self.ipLog.getLog()
+     # Stemmer på kandidat hvis den modtager besked.
+     # Stemmer kun 1 gang per valg.
+     if self.message == "Vote" and self.tLastVote < time.time():
+       self.tLastVote = time.time() + LTIMEOUT
+       #s = socket(AF_INET, SOCK_DGRAM)
+       self.sock.sendto("Voted", (addr[0], 5005))
+     else:
+       # Svarer på lederens heartbeat.
+       # Opdaterer loggen
+       print "broadcastbesked: ",  self.message
+       splittext = self.message.split(",")
+       key = splittext[0]
+       msg = splittext[1]
+       print msg
+       self.ipLog.parse(msg)
+       #s = socket(AF_INET,SOCK_DGRAM)
+       if len(self.ipLog.getLog()) == 0 and self.ipLog.getKey() == 0:
+         self.sock.sendto(str(-1), (addr[0], 5005))
+       else:
+         self.sock.sendto(str(self.ipLog.getKey()), (addr[0], 5005))
+       self.timer = time.time() + random.uniform(2.0, 5.0)
+       print "Log: ", self.ipLog.getLog()
+       print "List: ", self.ipLog.getList()
+
+   except:
+     pass
+# Bliver kandidat hvis der ikke modtages besked fra lederen.
+   if self.timer - time.time() < 0:
+     self.state = "candidate"
+     print "State set to: candidate"
+   time.sleep(0.5)
+
+
+
   def start(self):
+
     thread.start_new_thread(mySimpleServer, (8080,))
-    """
-    Starter heartbeat-protokollen.
-    """
-    timer = time.time() + random.uniform(2.0, 5.0)
-
-    # Finder frem til ip-adressen for maskinen, så det virker på linux.
-    s = socket(AF_INET, SOCK_DGRAM)
-    s.connect(("google.com", 80))
-    myIp = (s.getsockname()[0])
-    s = None
-
-    ipLog = Log.log() 
-    castTimer = 0
-    ipList = []
-    tLastVote = 0
-    message = ""
-    currentKey = -1
-    expectedResponses = 1
-
-    sock = socket(AF_INET, SOCK_DGRAM)
-    sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-    sock.bind( ("", 5005))
-    sock.setblocking(0)
-
     while(True):
     # Lederen er ansvarlig for at opdatere loggen løbende via Heartbeats.
       if self.state == "leader":
-        if len(ipLog.getList()) != len(ipList):
-           ipList = []
-           for sub in ipLog.getList():
-             ipList.append([sub, time.time() + LTIMEOUT])
-        if castTimer < time.time():
-          # Hvis der er lige så mange som forventet, comitter vi. 
-          if expectedResponses == 0 and len(ipLog.getLog()) != 0:
-             print "Commiting"
-             ipLog.commit(currentKey)
-             message = message + " co:" + str(currentKey)
-             
-          #print ipLog.getKey()
-          print "Log: " ,  ipLog.getLog()
-          print "List: " , ipLog.getList()
-          # Opdaterer loggen
-          if len(ipList) > 1:
-            expectedResponses = len(ipList)-1
-          else:
-            expectedResponses = 1
-          self.broadcast(str(ipLog.getKey()-1) + "," + message)
-          print "Key, message: " , ipLog.getKey()-1, message
-          currentKey = ipLog.getKey()
-          message = ""
-          castTimer = time.time() + 0.5
-        try:
-          data, addr = sock.recvfrom(1024)
-          print "svar far hb: " , data , " ok?"
-          #print "xxxxxxxxxxxxxxxxxxxxx"
-          if (data == "Voted"):
-            pass
-          else:
-            #print message 
-            if (int(data) == currentKey):
-               expectedResponses -= 1 
-            print "OW?: " , data, "<", ipLog.getLowestKey() , "ow?"
-             
-            if (int(data) < int(ipLog.getLowestKey()) or int(data) > currentKey):
-              #s = socket(AF_INET,SOCK_DGRAM)
-              #print "magic"
-              sock.sendto("ow:" + str(ipLog.getLog()) + "-" + str(ipLog.getList()), (addr[0], 5005))
-            print "currentKey: " , currentKey , " ok?"
-            if (int(data) < currentKey and int(data) != -1):
-              #Tjekker hvis en følger er bagud, sender bagud data
-              print "Pakker upToDateData"
-              upToDateData = ipLog.compile(int(data))
-   
-              #print "Sending", upToDateData, "..."
-              #s = socket(AF_INET,SOCK_DGRAM)
-              sock.sendto(upToDateData, (addr[0], 5005))
-              print "Data er sendt: " , upToDateData
-
-            elemNotSet = 1 # Til at checke om elementer er blevet placeret
-
-            # Opdaterer værdier for følgerne
-            for sub in ipList:
-              if addr[0] in sub:
-                sub[1] = time.time() + LTIMEOUT
-                elemNotSet = 0
-                print sub
-              if sub == ipList[len(ipList)-1] and elemNotSet:
-                ipList.append([addr[0], time.time() + LTIMEOUT])
-                message = message + " ad:" + str(addr[0])
-                #print message
-                ipLog.add(addr[0])
-
-           # Printer en oversigt over IP-adresser samt
-            #for sub in ipList:
-            #  print "[" + str(sub[0]) + "]"
-        except:
-            pass
-        # Appender sig selv til at starte med.
-        if ipList == []:
-          ipList.append([myIp, time.time() + LTIMEOUT])
-          message = message + " ad:" + str(myIp)
-          ipLog.add(myIp)
-
-
-         # Opdaterer værdier for lederen
-        for sub in ipList:
-          if sub[0] == myIp:
-             sub[1] = time.time() + LTIMEOUT
-             break
-          if sub == ipList[len(ipList)-1]:
-             ipList.append([myIp, time.time() + LTIMEOUT])
-             message = message + " ad:" + str(myIp)
-             ipLog.add(myIp)
-
-        for ip in ipList:
-           if ip[1] < time.time():
-             ipList.remove(ip)
-             message = message + " re:" + str(ip[0])
-             ipLog.remove(ip[0])
-
-
+         self.leader()
       elif self.state == "candidate":
-      # Kandidaten er overgangsstadiet mellem følger og leder.
-      # Den opretter en afstemning for at blive den nye leder.
-            # Votecounter starter på 1,
-      # da en kandidat altid stemmer på sig selv.
-        voteCounter = 1
-        self.broadcast("Vote")
-        # Laver en voteTime, for at sikre sig at
-        # den ikke venter på stemmer forevigt.
-        voteTime = time.time() + LTIMEOUT
-        while(voteCounter <= ((len(ipList))/2)):
-          # Returnerer til følger hvis der ikke er stemmer nok
-          if voteTime < time.time():
-            self.state = "follower"
-            voteCounter = 0
-            timer = time.time() + random.uniform(2.0, 5.0)
-            break
-          try:
-            message, addr = sock.recvfrom(1024)
-            if message == "Voted":
-              voteCounter += 1
-              #print voteCounter
-          except:
-            pass
-        # Bliver leder hvis der er stemmer nok til at komme ud
-        # af løkken, og endnu ikke er blevet følger.
-        if self.state != "follower":
-          voteCounter = 0
-          self.state = "leader"
-          print "State set to: leader"
-
+         self.candidate()
       elif self.state == "follower":
+         self.follower()
         # Følgeren lytter på og besvarer lederens forspørgsler,
         # samt skifter til kandidat hvis den ikke hører fra lederen.
         #print "Leader-election in:", timer - time.time()
-        try:
-          data, addr = sock.recvfrom(1024)
-          #print "from leader:", data
-          #print "noget data: " , data
-          print "Parse data: " , data
-          ipLog.parse(data)
-
-          #print ipLog.getLog()
-        except:
-         # traceback.print_exc(file=sys.stdout)  
-         pass
-        try:
-          message, addr = self.b_sock.recvfrom(1024)
-          #print "received:", message
-          ########print "Broadcast ip-address:",  addr
-          #print ipLog.getLog()
-          # Stemmer på kandidat hvis den modtager besked.
-          # Stemmer kun 1 gang per valg.
-          if message == "Vote" and tLastVote < time.time():
-            tLastVote = time.time() + LTIMEOUT
-            #s = socket(AF_INET, SOCK_DGRAM)
-            sock.sendto("Voted", (addr[0], 5005))
-          else:
-            # Svarer på lederens heartbeat.
-            # Opdaterer loggen
-            print "broadcastbesked: ",  message
-            splittext = message.split(",")
-            key = splittext[0]
-            msg = splittext[1]
-            print msg
-            ipLog.parse(msg)
-            #s = socket(AF_INET,SOCK_DGRAM)
-            if len(ipLog.getLog()) == 0 and ipLog.getKey() == 0:
-              sock.sendto(str(-1), (addr[0], 5005))
-            else:
-              sock.sendto(str(ipLog.getKey()), (addr[0], 5005))
-            timer = time.time() + random.uniform(2.0, 5.0)
-            print "Log: ", ipLog.getLog()
-            print "List: ", ipLog.getList()
- 
-        except:
-          pass
-       # Bliver kandidat hvis der ikke modtages besked fra lederen.
-        if timer - time.time() < 0:
-          self.state = "candidate"
-          print "State set to: candidate"
-        time.sleep(0.5)
-
 
 def mySimpleServer(port):
   Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
