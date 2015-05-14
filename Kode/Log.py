@@ -6,6 +6,8 @@ class log():
    self.log = []
    self.ipList = []  
    self.key = 0
+ #  self.userDic = {}
+   
   def add(self, key, ip):
     if (len(self.log) != 0):
       if (self.log[len(self.log)-1][0] + 1) == int(key):
@@ -20,6 +22,20 @@ class log():
          self.ipList.append(ip)
  
     return 1
+#  def set(self, key, data):
+#    key, dic
+#    if (len(self.log) != 0):
+#      if (self.log[len(self.log)-1][0] + 1) == int(key):
+#        self.log.append([int(key), "se:"+str(value)])
+#        self.key += 1
+#        userDic[key] = value
+#    elif (len(self.log) ==0):
+#        self.log.append([int(key), "se:"+str(value)])
+#        self.key += 1
+#        userDic[keydic] = value
+
+#  def del(self, key):
+#    return userDic[key]
 
   def remove(self, key, ip):
     if (len(self.log) != 0):
@@ -60,11 +76,9 @@ class log():
     for sub in textSplit:
       try:
         key, text = sub.split(",")
-        print "LOG:TRY" + text
       except:
         key = 0
         text = sub
-        print "LOGEXCEPT" + text
 
       if text[0:3] == "ad:":
         self.add(int(key), text[3:])
@@ -72,7 +86,7 @@ class log():
         self.remove(int(key), text[3:])
       if text[0:3] == "co:":
         self.commit(int(text[3:]))
-
+      
   def getKey(self):
     return self.key-1
   def getList(self):

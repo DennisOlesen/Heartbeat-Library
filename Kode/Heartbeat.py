@@ -58,6 +58,8 @@ class heartbeat():
     self.sock.bind( ("", 5005))
     self.sock.setblocking(0)
 
+  def set(self, key, value):
+    
 
 
   def broadcast(self, data):
