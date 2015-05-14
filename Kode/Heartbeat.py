@@ -72,24 +72,24 @@ class heartbeat():
     if len(self.ipLog.getList()) != len(self.ipList):
        self.ipList = []
        for sub in self.ipLog.getList():
-         self.ipList.append([sub, time.time() + LTIMEOUT])
+	 self.ipList.append([sub, time.time() + LTIMEOUT])
     if self.castTimer < time.time():
       # Hvis der er lige så mange som forventet, comitter vi. 
       if self.expectedResponses == 0 and len(self.ipLog.getLog()) != 0:
-         print "Commiting"
-         self.ipLog.commit(self.currentKey)
-         self.message = self.message + " co:" + str(self.currentKey)
-         
+	 print "Commiting"
+	 self.ipLog.commit(self.currentKey)
+	 self.message = self.message + " co:" + str(self.currentKey)
+	 
       #print self.ipLog.getKey()
       print "Log: " ,  self.ipLog.getLog()
       print "List: " , self.ipLog.getList()
       # Opdaterer loggen
       if len(self.ipList) > 1:
-        self.expectedResponses = len(self.ipList)-1
+	self.expectedResponses = len(self.ipList)-1
       else:
-        self.expectedResponses = 1
+	self.expectedResponses = 1
       print self.message
-      self.broadcast(str(self.ipLog.getKey()-1) + "-" + self.message)
+      self.broadcast(str(self.ipLog.getKey()) + "-" + self.message)
       #print "Key, self.message: " , self.ipLog.getKey()-1, self.message
       self.currentKey = self.ipLog.getKey()
       self.message = ""
@@ -99,47 +99,48 @@ class heartbeat():
       #print "svar far hb: " , data , " ok?"
       #print "xxxxxxxxxxxxxxxxxxxxx"
       if (data == "Voted"):
-        pass
+	pass
       else:
-        #print self.message 
-        if (int(data) == self.currentKey):
-           self.expectedResponses -= 1 
-        print "OW?: " , data, "<", self.ipLog.getLowestKey() , "ow?"
-         
-        if (int(data) < int(self.ipLog.getLowestKey()) or int(data) > self.currentKey):
-          #s = socket(AF_INET,SOCK_DGRAM)
-          #print "magic"
-          sock.sendto("ow:" + str(self.ipLog.getLog()) + "-" + str(self.ipLog.getList()), (addr[0], 5005))
-        print "self.currentKey: " , self.currentKey , " ok?"
-        if (int(data) < self.currentKey and int(data) != -1):
-          #Tjekker hvis en følger er bagud, sender bagud data
-          print "Pakker upToDateData"
-          upToDateData = self.ipLog.compile(int(data))
+	#print self.message 
+	if (int(data) == self.currentKey):
+	   self.expectedResponses -= 1 
+	print "OW?: " , data, "<", self.ipLog.getLowestKey() , "ow?"
+	 
+	if (int(data) < int(self.ipLog.getLowestKey()) or int(data) > self.currentKey):
+	  #s = socket(AF_INET,SOCK_DGRAM)
+	  #print "magic"
+          print "sending ow" 
+	  sock.sendto("ow:" + str(self.ipLog.getLog()) + "-" + str(self.ipLog.getList()), (addr[0], 5005))
+	print "self.currentKey: " , self.currentKey , " ok?"
+	if (int(data) < self.currentKey and int(data) != -1):
+	  #Tjekker hvis en følger er bagud, sender bagud data
+	  print "Pakker upToDateData"
+	  upToDateData = self.ipLog.compile(int(data))
    
-          #print "Sending", upToDateData, "..."
-          #s = socket(AF_INET,SOCK_DGRAM)
-          self.sock.sendto(upToDateData, (addr[0], 5005))
-          #print "Data er sendt: " , upToDateData
+	  #print "Sending", upToDateData, "..."
+	  #s = socket(AF_INET,SOCK_DGRAM)
+	  self.sock.sendto(upToDateData, (addr[0], 5005))
+	  #print "Data er sendt: " , upToDateData
    
-        elemNotSet = 1 # Til at checke om elementer er blevet placeret
+	elemNotSet = 1 # Til at checke om elementer er blevet placeret
    
-        # Opdaterer værdier for følgerne
-        for sub in self.ipList:
-          if addr[0] in sub:
-            sub[1] = time.time() + LTIMEOUT
-            elemNotSet = 0
-            #print sub
-          if sub == self.ipList[len(self.ipList)-1] and elemNotSet:
-            self.ipList.append([addr[0], time.time() + LTIMEOUT])
-            self.message = self.message + " " + str(self.ipLog.getKey()+1) + ","+"ad:" + str(addr[0])
-            #print self.message
-            self.ipLog.add(addr[0])
+	# Opdaterer værdier for følgerne
+	for sub in self.ipList:
+	  if addr[0] in sub:
+	    sub[1] = time.time() + LTIMEOUT
+	    elemNotSet = 0
+	    #print sub
+	  if sub == self.ipList[len(self.ipList)-1] and elemNotSet:
+	    self.ipList.append([addr[0], time.time() + LTIMEOUT])
+	    self.message = self.message + " " + str(self.ipLog.getKey()+1) + ","+"ad:" + str(addr[0])
+	    #print self.message
+	    self.ipLog.add(addr[0])
    
        # Printer en oversigt over IP-adresser samt
-        #for sub in self.ipList:
-        #  print "[" + str(sub[0]) + "]"
+	#for sub in self.ipList:
+	#  print "[" + str(sub[0]) + "]"
     except:
-        pass
+	pass
     # Appender sig selv til at starte med.
     if self.ipList == []:
       self.ipList.append([self.myIp, time.time() + LTIMEOUT])
@@ -151,24 +152,24 @@ class heartbeat():
      # Opdaterer værdier for lederen
     for sub in self.ipList:
       if sub[0] == self.myIp:
-         sub[1] = time.time() + LTIMEOUT
-         break
+	 sub[1] = time.time() + LTIMEOUT
+	 break
       if sub == self.ipList[len(self.ipList)-1]:
-         self.ipList.append([self.myIp, time.time() + LTIMEOUT])
-         self.message = self.message + " " + str(self.ipLog.getKey()+1) + ","+"ad:" + str(self.myIp)
-         self.ipLog.parse(self.message)
+	 self.ipList.append([self.myIp, time.time() + LTIMEOUT])
+	 self.message = self.message + " " + str(self.ipLog.getKey()+1) + ","+"ad:" + str(self.myIp)
+	 self.ipLog.parse(self.message)
    
     for ip in self.ipList:
        if ip[1] < time.time():
-         self.ipList.remove(ip)
-         self.message = self.message + " " + str(self.ipLog.getKey()+1) + "," "re:" + str(ip[0])
-         self.ipLog.parse(self.message)
+	 self.ipList.remove(ip)
+	 self.message = self.message + " " + str(self.ipLog.getKey()+1) + "," "re:" + str(ip[0])
+	 self.ipLog.parse(self.message)
    
    
   def candidate(self):
      # Kandidaten er overgangsstadiet mellem følger og leder.
     # Den opretter en afstemning for at blive den nye leder.
-          # Votecounter starter på 1,
+	  # Votecounter starter på 1,
     # da en kandidat altid stemmer på sig selv.
       voteCounter = 1
       self.broadcast("Vote")
@@ -176,25 +177,25 @@ class heartbeat():
       # den ikke venter på stemmer forevigt.
       voteTime = time.time() + LTIMEOUT
       while(voteCounter <= ((len(self.ipList))/2)):
-        # Returnerer til følger hvis der ikke er stemmer nok
-        if voteTime < time.time():
-          self.state = "follower"
-          voteCounter = 0
-          self.timer = time.time() + random.uniform(2.0, 5.0)
-          break
-        try:
-          self.message, addr = self.sock.recvfrom(1024)
-          if self.message == "Voted":
-            voteCounter += 1
-            #print voteCounter
-        except:
-          pass
+	# Returnerer til følger hvis der ikke er stemmer nok
+	if voteTime < time.time():
+	  self.state = "follower"
+	  voteCounter = 0
+	  self.timer = time.time() + random.uniform(2.0, 5.0)
+	  break
+	try:
+	  self.message, addr = self.sock.recvfrom(1024)
+	  if self.message == "Voted":
+	    voteCounter += 1
+	    #print voteCounter
+	except:
+	  pass
       # Bliver leder hvis der er stemmer nok til at komme ud
       # af løkken, og endnu ikke er blevet følger.
       if self.state != "follower":
-        voteCounter = 0
-        self.state = "leader"
-        print "State set to: leader"
+	voteCounter = 0
+	self.state = "leader"
+	print "State set to: leader"
 
   
   def follower(self):
@@ -224,8 +225,15 @@ class heartbeat():
        # Svarer på lederens heartbeat.
        # Opdaterer loggen
        print "broadcastbesked: ",  message
-       key, msg = message.split("-")
+       try:
+	 key, msg = message.split("-")
+       except:
+         print message.split("-")
+         key = int(message.split("-")[1])
+         msg = ""
+       print "Yoloswag"
        print "msg: " + msg + ":msg"
+      
        self.ipLog.parse(msg)
        #s = socket(AF_INET,SOCK_DGRAM)
        if len(self.ipLog.getLog()) == 0 and self.ipLog.getKey() == 0:
