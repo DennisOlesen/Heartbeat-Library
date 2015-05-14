@@ -59,7 +59,7 @@ class heartbeat():
     self.sock.setblocking(0)
 
   def set(self, key, value):
-    
+    pass  
 
 
   def broadcast(self, data):
