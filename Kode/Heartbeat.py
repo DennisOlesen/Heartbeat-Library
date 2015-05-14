@@ -95,8 +95,8 @@ class heartbeat():
       self.message = ""
       self.castTimer = time.time() + 0.5
     try:
-      data, addr = sock.recvfrom(1024)
-      #print "svar far hb: " , data , " ok?"
+      data, addr = self.sock.recvfrom(1024)
+      print "svar far hb: " , data , " ok?"
       #print "xxxxxxxxxxxxxxxxxxxxx"
       if (data == "Voted"):
 	pass
@@ -236,7 +236,7 @@ class heartbeat():
       
        self.ipLog.parse(msg)
        #s = socket(AF_INET,SOCK_DGRAM)
-       if len(self.ipLog.getLog()) == 0 and self.ipLog.getKey() == 0:
+       if len(self.ipLog.getLog()) == 0: #and self.ipLog.getKey() == 0:
          self.sock.sendto(str(-1), (addr[0], 5005))
        else:
          self.sock.sendto(str(self.ipLog.getKey()), (addr[0], 5005))
