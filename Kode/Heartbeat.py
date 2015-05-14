@@ -64,7 +64,7 @@ class heartbeat():
     """
     Sender data ud til en given broadcast IP og PORT.
     """
-    print "broadcast send:", data
+    #print "broadcast send:", data
     self.b_sock.sendto(data, (broadcast_IP, broadcast_PORT))
     #print data
 
@@ -75,7 +75,8 @@ class heartbeat():
 	 self.ipList.append([sub, time.time() + LTIMEOUT])
     if self.castTimer < time.time():
       # Hvis der er lige så mange som forventet, comitter vi. 
-      if self.expectedResponses == 0 and len(self.ipLog.getLog()) != 0:
+      #print "expected" + str(self.expectedResponses) + "responses"
+      if self.expectedResponses == 0 and len(self.ipLog.getLog()) != 1:
 	 print "Commiting"
 	 self.ipLog.commit(self.currentKey)
 	 self.message = self.message + " co:" + str(self.currentKey)
@@ -88,7 +89,7 @@ class heartbeat():
 	self.expectedResponses = len(self.ipList)-1
       else:
 	self.expectedResponses = 1
-      print self.message
+      #print self.message
       self.broadcast(str(self.ipLog.getKey()) + "-" + self.message)
       #print "Key, self.message: " , self.ipLog.getKey()-1, self.message
       self.currentKey = self.ipLog.getKey()
@@ -96,22 +97,22 @@ class heartbeat():
       self.castTimer = time.time() + 0.5
     try:
       data, addr = self.sock.recvfrom(1024)
-      print "svar far hb: " , data , " ok?"
+      #print "svar far hb: " , data , " ok?"
       #print "xxxxxxxxxxxxxxxxxxxxx"
       if (data == "Voted"):
 	pass
       else:
 	#print self.message 
-	if (int(data) == self.currentKey):
+	if (int(data) >= self.currentKey):
 	   self.expectedResponses -= 1 
-	print "OW?: " , data, "<", self.ipLog.getLowestKey() , "ow?"
+	#print "OW?: " , data, "<", self.ipLog.getLowestKey() , "ow?"
 	 
-	if (int(data) < int(self.ipLog.getLowestKey()) or int(data) > self.currentKey):
+	if (int(data) < int(self.ipLog.getLowestKey())): # or int(data) > self.currentKey):
 	  #s = socket(AF_INET,SOCK_DGRAM)
 	  #print "magic"
           print "sending ow" 
 	  self.sock.sendto("ow:" + str(self.ipLog.getLog()) + "-" + str(self.ipLog.getList()), (addr[0], 5005))
-	print "self.currentKey: " , self.currentKey , " ok?"
+	#print "self.currentKey: " , self.currentKey , " ok?"
 	if (int(data) < self.currentKey and int(data) != -1):
 	  #Tjekker hvis en følger er bagud, sender bagud data
 	  print "Pakker upToDateData"

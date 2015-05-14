@@ -60,14 +60,16 @@ class log():
     for sub in textSplit:
       try:
         key, text = sub.split(",")
+        print "LOG:TRY" + text
       except:
         key = 0
         text = sub
+        print "LOGEXCEPT" + text
 
       if text[0:3] == "ad:":
-        self.add(int(key), text)
+        self.add(int(key), text[3:])
       if text[0:3] == "re:":
-        self.remove(int(key), text)
+        self.remove(int(key), text[3:])
       if text[0:3] == "co:":
         self.commit(int(text[3:]))
 
