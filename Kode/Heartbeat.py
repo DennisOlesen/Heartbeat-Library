@@ -239,7 +239,7 @@ class heartbeat():
       
        self.ipLog.parse(msg)
        #s = socket(AF_INET,SOCK_DGRAM)
-       if len(self.ipLog.getLog()) == 0: #and self.ipLog.getKey() == 0:
+       if len(self.ipLog.getLog()) == 0 and self.ipLog.getKey() == -1:
          self.sock.sendto(str(-1), (addr[0], 5005))
        else:
          self.sock.sendto(str(self.ipLog.getKey()+1), (addr[0], 5005))
