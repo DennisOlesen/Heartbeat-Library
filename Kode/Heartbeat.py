@@ -78,7 +78,7 @@ class heartbeat():
     if self.castTimer < time.time():
       # Hvis der er lige så mange som forventet, comitter vi. 
       #print "expected" + str(self.expectedResponses) + "responses"
-      if self.expectedResponses == 0 and len(self.ipLog.getLog()) != 1:
+      if self.expectedResponses == 0 and len(self.ipLog.getLog()) != 0 and len(self.ipList) != 1:
 	 print "Commiting"
 	 self.ipLog.commit(self.currentKey)
 	 self.message = self.message + " co:" + str(self.currentKey)
