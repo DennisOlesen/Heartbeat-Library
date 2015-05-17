@@ -42,11 +42,11 @@ class log():
       if (self.log[len(self.log)-1][0] + 1) == int(key):
         self.log.append([int(key), "de:" + str(data)])
         self.key += 1
-        del self.userDic[dicKey]
+        self.userDic.pop(dicKey, None)
     elif (len(self.log) == 0 and self.key == int(key)):
       self.log.append([int(key), "de:" + str(data)])
       self.key += 1
-      del self.userDic[dicKey]
+      self.userDic.pop(dicKey, None)
 
 
   def remove(self, key, ip):
@@ -78,8 +78,7 @@ class log():
       if len(self.log) == 0:
          break
 
-  def parse(self, text):
-    
+  def parse(self, text): 
     if text[0:3] == "ow:":
       self.overwrite(text[3:])
       return
@@ -87,22 +86,29 @@ class log():
     textSplit = text.split()
     for sub in textSplit:
       try:
-        key, text = sub.split(",")
+        key, text = sub.split(",", 1)
       except:
         key = 0
         text = sub
-
       if text[0:3] == "ad:":
         self.add(int(key), text[3:])
       if text[0:3] == "re:":
         self.remove(int(key), text[3:])
       if text[0:3] == "co:":
         self.commit(int(text[3:]))
+      if text[0:3] == "se:":
+        self.set(int(key), text[3:])
+      if text[0:3] == "de:":
+        self.delete(int(key), text[3:])
       
   def getKey(self):
     return self.key-1
+
   def getList(self):
     return self.ipList
+  
+  def getUser(self):
+    return self.userDic
 
   def getLog(self):
     return self.log

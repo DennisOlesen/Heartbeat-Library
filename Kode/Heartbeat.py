@@ -6,8 +6,10 @@ from __future__ import division
 from socket import *
 import time, random, os, sys
 import thread, SimpleHTTPServer, SocketServer
+import threading
 import Log
 import traceback
+import json
 
 state = ""
 broadcast_IP = '255.255.255.255'
@@ -16,12 +18,12 @@ LTIMEOUT = 2
 
 print ('Sending heartbeat to IP %s, port %d.\n') % (broadcast_IP, broadcast_PORT)
 
-class heartbeat():
+class Heartbeat():
   """
   Klasse for heartbeat-protokollen.
   """
   
- def __init__(self):
+  def __init__(self):
     """
     Initialiserer klassen.
     Sætter vores socket, så vi kan sende data til det senere.
@@ -52,6 +54,7 @@ class heartbeat():
     self.message = ""
     self.currentKey = -1
     self.expectedResponses = 1
+    self.leaderIp = ""
 
     self.sock = socket(AF_INET, SOCK_DGRAM)
     self.sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
@@ -69,7 +72,8 @@ class heartbeat():
     #print data
 
 
-  def leader(self):
+  def leader(self):  
+    self.leaderIp = self.myIp
     if len(self.ipLog.getList()) != len(self.ipList):
        self.ipList = []
        for sub in self.ipLog.getList():
@@ -85,6 +89,7 @@ class heartbeat():
       #print self.ipLog.getKey()
       print "Log: " ,  self.ipLog.getLog()
       print "List: " , self.ipLog.getList()
+      print "userDic: ", self.ipLog.getUser()
       # Opdaterer loggen
       if len(self.ipList) > 1:
 	self.expectedResponses = len(self.ipList)-1
@@ -100,6 +105,16 @@ class heartbeat():
       data, addr = self.sock.recvfrom(1024)
       #print "svar far hb: " , data , " ok?"
       #print "xxxxxxxxxxxxxxxxxxxxx"
+      #modtager set fra follower.
+      if (data[0:3] == "se:"):
+	self.message = self.message + " " + str(self.ipLog.getKey()+1) + "," + data 
+	self.ipLog.parse(self.message)
+
+      if (data[0:3] == "de:"):
+	self.message = self.message + " " + str(self.ipLog.getKey()+1) + "," + data 
+	self.ipLog.parse(self.message)
+ 
+	 
       if (data == "Voted"):
 	pass
       else:
@@ -111,7 +126,7 @@ class heartbeat():
 	if (int(data) < int(self.ipLog.getLowestKey())): # or int(data) > self.currentKey):
 	  #s = socket(AF_INET,SOCK_DGRAM)
 	  #print "magic"
-          print "sending ow" 
+	  print "sending ow" 
 	  self.sock.sendto("ow:" + str(self.ipLog.getLog()) + "-" + str(self.ipLog.getList()), (addr[0], 5005))
 	#print "self.currentKey: " , self.currentKey , " ok?"
 	if (int(data) < self.currentKey and int(data) != -1):
@@ -224,24 +239,25 @@ class heartbeat():
        #s = socket(AF_INET, SOCK_DGRAM)
        self.sock.sendto("Voted", (addr[0], 5005))
      else:
+       self.leaderIp = addr[0]
        # Svarer på lederens heartbeat.
        # Opdaterer loggen
       # print "broadcastbesked: ",  message
        try:
 	 key, msg = message.split("-")
        except:
-         #print message.split("-")
-         key = int(message.split("-")[1])
-         msg = ""
+	 #print message.split("-")
+	 key = int(message.split("-")[1])
+	 msg = ""
        #print "Yoloswag"
        #print "msg: " + msg + ":msg"
       
        self.ipLog.parse(msg)
        #s = socket(AF_INET,SOCK_DGRAM)
        if len(self.ipLog.getLog()) == 0 and self.ipLog.getKey() == -1:
-         self.sock.sendto(str(-1), (addr[0], 5005))
+	 self.sock.sendto(str(-1), (addr[0], 5005))
        else:
-         self.sock.sendto(str(self.ipLog.getKey()+1), (addr[0], 5005))
+	 self.sock.sendto(str(self.ipLog.getKey()+1), (addr[0], 5005))
        self.timer = time.time() + random.uniform(2.0, 5.0)
        print "Log: ", self.ipLog.getLog()
        print "List: ", self.ipLog.getList()
@@ -254,29 +270,45 @@ class heartbeat():
      print "State set to: candidate"
    time.sleep(0.5)
 
-
-
   def start(self):
-    thread.start_new_thread(mySimpleServer, (8080,))
-    while(True):
+    #thread.start_new_thread(mySimpleServer, (8080,))
+    #while(True):
     # Lederen er ansvarlig for at opdatere loggen løbende via Heartbeats.
       if self.state == "leader":
-         self.leader()
+	 self.leader()
       elif self.state == "candidate":
-         self.candidate()
+	 self.candidate()
       elif self.state == "follower":
-         self.follower()
-        # Følgeren lytter på og besvarer lederens forspørgsler,
-        # samt skifter til kandidat hvis den ikke hører fra lederen.
-        #print "Leader-election in:", timer - time.time()
+	 self.follower()
+	# Følgeren lytter på og besvarer lederens forspørgsler,
+	# samt skifter til kandidat hvis den ikke hører fra lederen.
+	#print "Leader-election in:", timer - time.time()
 
+  #def start(self):
+  #  t1 = threading.Thread(target=self.start2())
+   # t1.start()
+ 
   def set(self, key, value):
     
+    myJson = json.dumps({"key" : key, "value" : value}, separators=(',', ':'))
     if (self.state == "leader"):
-      pass
-    
+      self.message = self.message + " " + str(self.ipLog.getKey()+1) + "," + "se:" + myJson 
+      self.ipLog.parse(self.message)
+
     if (self.state == "follower"):
-      pass
+      self.sock.sendto("se:" + myJson, (self.leaderIp, 5005))
+
+  def delete(self, key): 
+     myJson = json.dumps({"key" : key}, separators=(',', ':'))
+     if (self.state == "leader"):
+       self.message = self.message + " " + str(self.ipLog.getKey()+1) + "," +"de:" + myJson 
+       self.ipLog.parse(self.message)
+
+     if (self.state == "follower"):
+       self.sock.sendto("de:" + myJson, (self.leaderIp, 5005))
+   
+  def get(self, key):
+    return self.ipLog.userDict[key]
  
 def mySimpleServer(port):
   Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
@@ -286,13 +318,13 @@ def mySimpleServer(port):
   print "serving at port", port
   httpd.serve_forever()
 
-# Tester opgaven
-def main():
-  hb = heartbeat()
-  hb.start()
+#/ester opgaven
+#def main():
+ # hb = heartbeat()
+  #hb.start()
 
 
 
 # Sikrer sig at main metoden bliver eksekveret.
-if __name__ == "__main__":
-  main()
+#if __name__ == "__main__":
+  #main()
