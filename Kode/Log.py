@@ -1,4 +1,4 @@
-
+import json
 
 class log():
 
@@ -6,7 +6,7 @@ class log():
    self.log = []
    self.ipList = []  
    self.key = 0
- #  self.userDic = {}
+   self.userDic = {}
    
   def add(self, key, ip):
     if (len(self.log) != 0):
@@ -15,27 +15,39 @@ class log():
         self.key += 1
         if ip not in self.ipList:
           self.ipList.append(ip)
-    elif (len(self.log) == 0):
+    elif (len(self.log) == 0 and self.key == int(key)):
       self.log.append([int(key), "ad:"+ str(ip)])
       self.key += 1
       if ip not in self.ipList:
          self.ipList.append(ip)
  
-    return 1
-#  def set(self, key, data):
-#    key, dic
-#    if (len(self.log) != 0):
-#      if (self.log[len(self.log)-1][0] + 1) == int(key):
-#        self.log.append([int(key), "se:"+str(value)])
-#        self.key += 1
-#        userDic[key] = value
-#    elif (len(self.log) ==0):
-#        self.log.append([int(key), "se:"+str(value)])
-#        self.key += 1
-#        userDic[keydic] = value
+  def set(self, key, data):
+    myJson = json.loads(data)
+    dicKey = myJson["key"]
+    value = myJson["value"]
+    if (len(self.log) != 0):
+      if (self.log[len(self.log)-1][0] + 1) == int(key):
+        self.log.append([int(key), "se:" + str(data)])
+        self.key += 1
+        self.userDic[dicKey] = value
+    elif (len(self.log) == 0 and self.key == int(key)):
+      self.log.append([int(key), "se:" + str(data)])
+      self.key += 1
+      self.userDic[dicKey] = value
 
-#  def del(self, key):
-#    return userDic[key]
+  def delete(self, key, data):
+    myJson = json.loads(data)
+    dicKey = myJson["key"]
+    if (len(self.log) != 0):
+      if (self.log[len(self.log)-1][0] + 1) == int(key):
+        self.log.append([int(key), "de:" + str(data)])
+        self.key += 1
+        del self.userDic[dicKey]
+    elif (len(self.log) == 0 and self.key == int(key)):
+      self.log.append([int(key), "de:" + str(data)])
+      self.key += 1
+      del self.userDic[dicKey]
+
 
   def remove(self, key, ip):
     if (len(self.log) != 0):
@@ -43,7 +55,7 @@ class log():
       self.ipList.remove(ip)
       self.log.append([int(key), "re:" + str(ip)])
       self.key += 1
-    elif (len(self.log) == 0):
+    elif (len(self.log) == 0 and self.key == int(key)):
       self.ipList.remove(ip)
       self.log.append([int(key), "re:" + str(ip)])
       self.key += 1
@@ -105,5 +117,5 @@ class log():
     for sub in self.log:
       #print "test", sub, key
       if sub[0] > key:
-        text = text + sub[1] + " "
+        text = text + str(sub[0]) + "," + sub[1] + " "
     return text

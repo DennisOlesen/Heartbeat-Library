@@ -20,8 +20,8 @@ class heartbeat():
   """
   Klasse for heartbeat-protokollen.
   """
-
-  def __init__(self):
+  
+ def __init__(self):
     """
     Initialiserer klassen.
     Sætter vores socket, så vi kan sende data til det senere.
@@ -58,8 +58,6 @@ class heartbeat():
     self.sock.bind( ("", 5005))
     self.sock.setblocking(0)
 
-  def set(self, key, value):
-    pass  
 
 
   def broadcast(self, data):
@@ -69,6 +67,7 @@ class heartbeat():
     #print "broadcast send:", data
     self.b_sock.sendto(data, (broadcast_IP, broadcast_PORT))
     #print data
+
 
   def leader(self):
     if len(self.ipLog.getList()) != len(self.ipList):
@@ -271,6 +270,14 @@ class heartbeat():
         # samt skifter til kandidat hvis den ikke hører fra lederen.
         #print "Leader-election in:", timer - time.time()
 
+  def set(self, key, value):
+    
+    if (self.state == "leader"):
+      pass
+    
+    if (self.state == "follower"):
+      pass
+ 
 def mySimpleServer(port):
   Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
 
