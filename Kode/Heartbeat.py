@@ -286,8 +286,12 @@ class Heartbeat():
 
   #def start(self):
   #  t1 = threading.Thread(target=self.start2())
-   # t1.start()
- 
+   # t1.start() 
+#################################
+##################################
+################################
+# HER STARTER BRUGER FUNKTIONER.
+
   def set(self, key, value):
     
     myJson = json.dumps({"key" : key, "value" : value}, separators=(',', ':'))
@@ -306,9 +310,18 @@ class Heartbeat():
 
      if (self.state == "follower"):
        self.sock.sendto("de:" + myJson, (self.leaderIp, 5005))
-   
+  #Application niveau funktion, kaldes af brugeren for at få værdi tilsvarende input
   def get(self, key):
-    return self.ipLog.userDict[key]
+    return self.ipLog.userDic[key]
+  
+  def getDict(self):
+    return self.ipLog.userDic
+  
+  def getState(self):
+    return self.state
+  
+  def getIps(self):
+    return self.ipLog.ipList
  
 def mySimpleServer(port):
   Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
