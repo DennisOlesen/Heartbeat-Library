@@ -314,7 +314,7 @@ class Heartbeat():
   def get(self, key):
     return self.ipLog.userDic[key]
   
-  def getDict(self):
+  def getDic(self):
     return self.ipLog.userDic
   
   def getState(self):

@@ -16,9 +16,6 @@ timeS = time.time() + 3
 for i in range(0, 10000):
   hb.start()
 
-#Sets my key
-hb.set("eriks", "mor")
-
 while(1):
  if (hb.getState() == "follower"):
   hb.start()
@@ -30,11 +27,15 @@ while(1):
   hb.start
  
  elif (hb.getState() == "leader"):
+  #cpuLoad = psutil.cpu_percent()
+  #hb.set(myIp, cpuLoad)
   hb.start()
   ipList = hb.getIps()
+  print ipList
+  print hb.getDic()
   for ip in ipList:
     if ip != myIp:
-      if hb.get(ip) < 0.8:
+      if hb.get(str(ip)) < 0.8:
         if ip not in whiteList:
           whiteList.append(ip)
       elif ip in whiteList:
