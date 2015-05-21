@@ -61,6 +61,16 @@ class Heartbeat():
     self.sock.bind( ("", 5005))
     self.sock.setblocking(0)
 
+    self.start_lock = threading.Lock()
+    self.update_event = threading.Condition()
+
+    self.start_lock.acquire()
+    threading.Thread(target=self.run).start()
+
+    self.start_lock.acquire()
+    self.start_lock.release()
+    del self.start_lock
+ 
 
 
   def broadcast(self, data):
@@ -82,9 +92,12 @@ class Heartbeat():
       # Hvis der er lige så mange som forventet, comitter vi. 
       #print "expected" + str(self.expectedResponses) + "responses"
       if self.expectedResponses == 0 and len(self.ipLog.getLog()) != 0 and len(self.ipList) != 1:
-	 print "Commiting"
-	 self.ipLog.commit(self.currentKey)
-	 self.message = self.message + " co:" + str(self.currentKey)
+	print "Commiting"
+	self.ipLog.commit(self.currentKey)
+	self.message = self.message + " co:" + str(self.currentKey)
+        with self.update_event:
+          self.update_event.notify_all()
+
 	 
       #print self.ipLog.getKey()
       print "Log: " ,  self.ipLog.getLog()
@@ -221,7 +234,9 @@ class Heartbeat():
     #print "from leader:", data
     #print "noget data: " , data
     #print "Parse data: " , data
-    self.ipLog.parse(data)
+    if self.ipLog.parse(data):
+      with self.update_event:
+        self.update_event.wait()
   
     #print self.ipLog.getLog()
    except:
@@ -252,7 +267,10 @@ class Heartbeat():
        #print "Yoloswag"
        #print "msg: " + msg + ":msg"
       
-       self.ipLog.parse(msg)
+       if self.ipLog.parse(msg):
+         with self.update_event:
+           self.update_event.wait()
+
        #s = socket(AF_INET,SOCK_DGRAM)
        if len(self.ipLog.getLog()) == 0 and self.ipLog.getKey() == -1:
 	 self.sock.sendto(str(-1), (addr[0], 5005))
@@ -270,16 +288,22 @@ class Heartbeat():
      print "State set to: candidate"
    time.sleep(0.5)
 
-  def start(self):
+  def run(self):
+    lck = self.start_lock
+
     #thread.start_new_thread(mySimpleServer, (8080,))
-    #while(True):
+    while(True):
     # Lederen er ansvarlig for at opdatere loggen løbende via Heartbeats.
+      if lck != None and len(self.leaderIp) != 0:
+        lck.release()
+        lck = None
+
       if self.state == "leader":
-	 self.leader()
+	     self.leader()
       elif self.state == "candidate":
-	 self.candidate()
+	     self.candidate()
       elif self.state == "follower":
-	 self.follower()
+	     self.follower()
 	# Følgeren lytter på og besvarer lederens forspørgsler,
 	# samt skifter til kandidat hvis den ikke hører fra lederen.
 	#print "Leader-election in:", timer - time.time()
@@ -293,23 +317,38 @@ class Heartbeat():
 # HER STARTER BRUGER FUNKTIONER.
 
   def set(self, key, value):
-    
+    if self.ipLog.userDic.has_key(key) and self.ipLog.userDic[key] == value:
+      return
+
     myJson = json.dumps({"key" : key, "value" : value}, separators=(',', ':'))
+
     if (self.state == "leader"):
       self.message = self.message + " " + str(self.ipLog.getKey()+1) + "," + "se:" + myJson 
       self.ipLog.parse(self.message)
+      with self.update_event:
+        self.update_event.wait()
 
     if (self.state == "follower"):
       self.sock.sendto("se:" + myJson, (self.leaderIp, 5005))
+      while not self.ipLog.userDic.has_key(key) or self.ipLog.userDic[key] != value:
+        with self.update_event:
+          self.update_event.wait()
+
 
   def delete(self, key): 
      myJson = json.dumps({"key" : key}, separators=(',', ':'))
      if (self.state == "leader"):
        self.message = self.message + " " + str(self.ipLog.getKey()+1) + "," +"de:" + myJson 
        self.ipLog.parse(self.message)
+       with self.update_event:
+         self.update_event.wait()
 
      if (self.state == "follower"):
        self.sock.sendto("de:" + myJson, (self.leaderIp, 5005))
+       while self.ipLog.userDic.has_key(key):
+         with self.update_event:
+           self.update_event.wait()
+
   #Application niveau funktion, kaldes af brugeren for at få værdi tilsvarende input
   def get(self, key):
     return self.ipLog.userDic[key]

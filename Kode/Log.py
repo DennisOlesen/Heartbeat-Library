@@ -81,7 +81,10 @@ class log():
   def parse(self, text): 
     if text[0:3] == "ow:":
       self.overwrite(text[3:])
-      return
+      return False
+
+
+    commits = False
 
     textSplit = text.split()
     for sub in textSplit:
@@ -96,11 +99,15 @@ class log():
         self.remove(int(key), text[3:])
       if text[0:3] == "co:":
         self.commit(int(text[3:]))
+        commits = True
       if text[0:3] == "se:":
         self.set(int(key), text[3:])
       if text[0:3] == "de:":
         self.delete(int(key), text[3:])
-      
+    
+    return commits
+
+
   def getKey(self):
     return self.key-1
 

@@ -13,23 +13,20 @@ whiteList = []
 hb = Heartbeat()
 timeS = time.time() + 3
 #Asserts that we're a member, prior to sending requests.
-for i in range(0, 10000):
-  hb.start()
 
 while(1):
+
+ print "abc"
  if (hb.getState() == "follower"):
-  hb.start()
   time.sleep(100)
   cpuLoad = psutil.cpu_percent()
   hb.set(myIp, cpuLoad)
 
  elif (hb.getState() == "candidate"):
-  hb.start
- 
+  pass 
  elif (hb.getState() == "leader"):
   #cpuLoad = psutil.cpu_percent()
   #hb.set(myIp, cpuLoad)
-  hb.start()
   ipList = hb.getIps()
   print ipList
   print hb.getDic()
@@ -41,6 +38,8 @@ while(1):
       elif ip in whiteList:
         whiteList.remove(ip)
   print whiteList
+
+  hb.set('abc', 1)
 
 
 #print "eriksmor"
