@@ -329,8 +329,11 @@ class Heartbeat():
         self.update_event.wait()
 
     if (self.state == "follower"):
+      print "set follower 1"
       self.sock.sendto("se:" + myJson, (self.leaderIp, 5005))
+      print "set follower 2"
       while not self.ipLog.userDic.has_key(key) or self.ipLog.userDic[key] != value:
+        print "Waiting for set"
         with self.update_event:
           self.update_event.wait()
 
