@@ -31,8 +31,8 @@ while(1):
   print ipList
   print hb.getDic()
   for ip in ipList:
-    if ip != myIp:
-      if hb.get(str(ip)) < 0.8:
+    if ip != myIp: 
+      if hb.get(str(ip)) < 0.8 and hb.get(str(ip)) != None:
         if ip not in whiteList:
           whiteList.append(ip)
       elif ip in whiteList:

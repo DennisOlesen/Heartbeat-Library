@@ -351,8 +351,9 @@ class Heartbeat():
 
   #Application niveau funktion, kaldes af brugeren for at få værdi tilsvarende input
   def get(self, key):
-    return self.ipLog.userDic[key]
-  
+    if self.ipLog.userDic.has_key(key):
+      return self.ipLog.userDic[key]
+    return None 
   def getDic(self):
     return self.ipLog.userDic
   
