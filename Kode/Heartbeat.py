@@ -235,8 +235,9 @@ class Heartbeat():
     #print "noget data: " , data
     #print "Parse data: " , data
     if self.ipLog.parse(data):
+      print "it's all good"
       with self.update_event:
-        self.update_event.wait()
+        self.update_event.notify_all()
   
     #print self.ipLog.getLog()
    except:
@@ -268,8 +269,9 @@ class Heartbeat():
        #print "msg: " + msg + ":msg"
       
        if self.ipLog.parse(msg):
+         print "parsed a msg"
          with self.update_event:
-           self.update_event.wait()
+           self.update_event.notify_all()
 
        #s = socket(AF_INET,SOCK_DGRAM)
        if len(self.ipLog.getLog()) == 0 and self.ipLog.getKey() == -1:
@@ -335,7 +337,9 @@ class Heartbeat():
       while not self.ipLog.userDic.has_key(key) or self.ipLog.userDic[key] != value:
         print "Waiting for set"
         with self.update_event:
+          print "self.update_event"
           self.update_event.wait()
+          print"done waiting"
 
 
   def delete(self, key): 
