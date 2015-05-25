@@ -297,6 +297,7 @@ class Heartbeat():
 #################################
 # HER STARTER BRUGER FUNKTIONER.
 
+  # Applikation niveau funktion, kaldes af brugeren for at sætte en værdi tilsvarende input
   def set(self, key, value):
     if self.ipLog.userDic.has_key(key) and self.ipLog.userDic[key] == value:
       return
@@ -320,7 +321,7 @@ class Heartbeat():
           self.update_event.wait()
           print"done waiting"
 
-
+  # Applikation niveau funktion, kaldes af brugeren for at slette en værdi tilsvarende input
   def delete(self, key):
      myJson = json.dumps({"key" : key}, separators=(',', ':'))
      if (self.state == "leader"):
@@ -335,7 +336,7 @@ class Heartbeat():
          with self.update_event:
            self.update_event.wait()
 
-  #Application niveau funktion, kaldes af brugeren for at få værdi tilsvarende input
+  # Applikation niveau funktion, kaldes af brugeren for at få værdi tilsvarende input
   def get(self, key):
     if self.ipLog.userDic.has_key(key):
       return self.ipLog.userDic[key]
