@@ -42,7 +42,7 @@ class Heartbeat():
     self.myIp = (s.getsockname()[0])
     s = None
 
-    self.ipLog = Log.log() 
+    self.ipLog = Log.log()
     self.castTimer = 0
     self.ipList = []
     self.tLastVote = 0
@@ -75,14 +75,14 @@ class Heartbeat():
 
   def leader(self):
     self.leaderIp = self.myIp
-    #Laver ipList. hvis lederen er ny og derfor ikke har en
+    # Laver ipList. hvis lederen er ny og derfor ikke har en
     if len(self.ipLog.getList()) != len(self.ipList):
        self.ipList = []
        for sub in self.ipLog.getList():
          self.ipList.append([sub, time.time() + LTIMEOUT])
-    #Broadcaster med tidsinterval
+    # Broadcaster med tidsinterval
     if self.castTimer < time.time():
-      # Hvis der er lige så mange som forventet, comitter vi. 
+      # Hvis der er lige så mange som forventet, comitter vi.
       #print "expected" + str(self.expectedResponses) + "responses"
       if self.expectedResponses == 0 and len(self.ipLog.getLog()) != 0 and len(self.ipList) != 1:
         print "Commiting"
@@ -113,25 +113,25 @@ class Heartbeat():
       #print "xxxxxxxxxxxxxxxxxxxxx"
       #modtager set fra follower.
       if (data[0:3] == "se:"):
-        self.message = self.message + " " + str(self.ipLog.getKey()+1) + "," + data 
+        self.message = self.message + " " + str(self.ipLog.getKey()+1) + "," + data
         self.ipLog.parse(self.message)
 
       if (data[0:3] == "de:"):
-        self.message = self.message + " " + str(self.ipLog.getKey()+1) + "," + data 
+        self.message = self.message + " " + str(self.ipLog.getKey()+1) + "," + data
         self.ipLog.parse(self.message)
 
 
       if (data == "Voted"):
         pass
       else:
-        #print self.message 
+        #print self.message
         if (int(data) >= self.currentKey):
-          self.expectedResponses -= 1 
+          self.expectedResponses -= 1
         #print "OW?: " , data, "<", self.ipLog.getLowestKey() , "ow?"
 
         if (int(data) < int(self.ipLog.getLowestKey())): # or int(data) > self.currentKey):
           #s = socket(AF_INET,SOCK_DGRAM)
-          print "sending ow" 
+          print "sending ow"
           self.sock.sendto("ow:" + str(self.ipLog.getLog()) + "-" + str(self.ipLog.getList() + "-" + str(self.ipLog.getUser())), (addr[0], 5005))
         #print "self.currentKey: " , self.currentKey , " ok?"
         if (int(data) < self.currentKey and int(data) != -1):
@@ -261,7 +261,8 @@ class Heartbeat():
          with self.update_event:
            self.update_event.notify_all()
 
-       #s = socket(AF_INET,SOCK_DGRAM)
+       # Hvis followeren lige er startet op sender den -1 til leaderen,
+       # så denne ved, at followeren skal have sendt et overwrite.
        if len(self.ipLog.getLog()) == 0 and self.ipLog.getKey() == -1:
          self.sock.sendto(str(-1), (addr[0], 5005))
        else:
@@ -300,7 +301,7 @@ class Heartbeat():
 
   #def start(self):
   #  t1 = threading.Thread(target=self.start2())
-   # t1.start() 
+   # t1.start()
 #################################
 ##################################
 ################################
@@ -313,7 +314,7 @@ class Heartbeat():
     myJson = json.dumps({"key" : key, "value" : value}, separators=(',', ':'))
 
     if (self.state == "leader"):
-      self.message = self.message + " " + str(self.ipLog.getKey()+1) + "," + "se:" + myJson 
+      self.message = self.message + " " + str(self.ipLog.getKey()+1) + "," + "se:" + myJson
       self.ipLog.parse(self.message)
       with self.update_event:
         self.update_event.wait()
@@ -333,7 +334,7 @@ class Heartbeat():
   def delete(self, key):
      myJson = json.dumps({"key" : key}, separators=(',', ':'))
      if (self.state == "leader"):
-       self.message = self.message + " " + str(self.ipLog.getKey()+1) + "," +"de:" + myJson 
+       self.message = self.message + " " + str(self.ipLog.getKey()+1) + "," +"de:" + myJson
        self.ipLog.parse(self.message)
        with self.update_event:
          self.update_event.wait()
@@ -348,7 +349,7 @@ class Heartbeat():
   def get(self, key):
     if self.ipLog.userDic.has_key(key):
       return self.ipLog.userDic[key]
-    return None 
+    return None
   def getDic(self):
     return self.ipLog.userDic
 

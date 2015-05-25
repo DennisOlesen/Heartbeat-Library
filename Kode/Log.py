@@ -62,7 +62,7 @@ class log():
 
 
   def overwrite(self, newLog):
-    data = newLog.split("-") 
+    data = newLog.split("-")
     self.log = eval(data[0])
     self.ipList = eval(data[1])
     self.userDic = eval(data[2])
@@ -74,7 +74,7 @@ class log():
       if len(self.log) == 0:
          break
 
-  def parse(self, text): 
+  def parse(self, text):
     if text[0:3] == "ow:":
       self.overwrite(text[3:])
       return False
@@ -102,6 +102,13 @@ class log():
 
     return commits
 
+    def compile(self,key):
+      text = ""
+      for sub in self.log:
+        if sub[0] > key:
+          text = text + str(sub[0]) + "," + sub[1] + " "
+      return text
+
   def getKey(self):
     return self.key-1
 
@@ -118,10 +125,3 @@ class log():
     if len(self.log) == 0:
       return self.key-1
     return self.log[0][0]
-
-  def compile(self,key):
-    text = ""
-    for sub in self.log:
-      if sub[0] > key:
-        text = text + str(sub[0]) + "," + sub[1] + " "
-    return text
