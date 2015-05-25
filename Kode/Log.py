@@ -4,10 +4,10 @@ class log():
 
   def __init__(self):
    self.log = []
-   self.ipList = []  
+   self.ipList = []
    self.key = 0
    self.userDic = {}
-   
+
   def add(self, key, ip):
     if (len(self.log) != 0):
       if (self.log[len(self.log)-1][0] + 1) == int(key):
@@ -20,7 +20,7 @@ class log():
       self.key += 1
       if ip not in self.ipList:
          self.ipList.append(ip)
- 
+
   def set(self, key, data):
     myJson = json.loads(data)
     dicKey = myJson["key"]
@@ -99,7 +99,7 @@ class log():
         self.set(int(key), text[3:])
       if text[0:3] == "de:":
         self.delete(int(key), text[3:])
-    
+
     return commits
 
   def getKey(self):
@@ -107,15 +107,15 @@ class log():
 
   def getList(self):
     return self.ipList
-  
+
   def getUser(self):
     return self.userDic
 
   def getLog(self):
     return self.log
-  
+
   def getLowestKey(self):
-    if len(self.log) == 0: 
+    if len(self.log) == 0:
       return self.key-1
     return self.log[0][0]
 
