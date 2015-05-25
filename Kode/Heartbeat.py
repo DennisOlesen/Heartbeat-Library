@@ -293,16 +293,8 @@ class Heartbeat():
         self.candidate()
       elif self.state == "follower":
         self.follower()
-        # Følgeren lytter på og besvarer lederens forspørgsler,
-        # samt skifter til kandidat hvis den ikke hører fra lederen.
-        #print "Leader-election in:", timer - time.time()
 
-  #def start(self):
-  #  t1 = threading.Thread(target=self.start2())
-   # t1.start()
 #################################
-##################################
-################################
 # HER STARTER BRUGER FUNKTIONER.
 
   def set(self, key, value):
