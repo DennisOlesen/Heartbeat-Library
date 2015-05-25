@@ -5,7 +5,7 @@
 from __future__ import division
 from socket import *
 import time, random, os, sys
-import thread, threading, Log, traceback, json
+import threading, Log, traceback, json
 
 broadcast_IP = '255.255.255.255'
 broadcast_PORT = 54545
@@ -281,7 +281,6 @@ class Heartbeat():
   def run(self):
     lck = self.start_lock
 
-    #thread.start_new_thread(mySimpleServer, (8080,))
     while(True):
     # Lederen er ansvarlig for at opdatere loggen løbende via Heartbeats.
       if lck != None and len(self.leaderIp) != 0:
