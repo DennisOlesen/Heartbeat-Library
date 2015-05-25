@@ -75,10 +75,12 @@ class Heartbeat():
 
   def leader(self):  
     self.leaderIp = self.myIp
+    #Laver ipList. hvis lederen er ny og derfor ikke har en
     if len(self.ipLog.getList()) != len(self.ipList):
        self.ipList = []
        for sub in self.ipLog.getList():
 	 self.ipList.append([sub, time.time() + LTIMEOUT])
+    #Broadcaster med tidsinterval
     if self.castTimer < time.time():
       # Hvis der er lige så mange som forventet, comitter vi. 
       #print "expected" + str(self.expectedResponses) + "responses"
@@ -91,9 +93,9 @@ class Heartbeat():
 
 	 
       #print self.ipLog.getKey()
-      print "Log: " ,  self.ipLog.getLog()
-      print "List: " , self.ipLog.getList()
-      print "userDic: ", self.ipLog.getUser()
+      #print "Log: " ,  self.ipLog.getLog()
+      #print "List: " , self.ipLog.getList()
+      #print "userDic: ", self.ipLog.getUser()
       # Opdaterer loggen
       if len(self.ipList) > 1:
 	self.expectedResponses = len(self.ipList)-1
