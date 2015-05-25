@@ -6,12 +6,8 @@ from __future__ import division
 from socket import *
 import time, random, os, sys
 import thread, SimpleHTTPServer, SocketServer
-import threading
-import Log
-import traceback
-import json
+import threading, Log, traceback, json
 
-state = ""
 broadcast_IP = '255.255.255.255'
 broadcast_PORT = 54545
 LTIMEOUT = 2
@@ -36,9 +32,8 @@ class Heartbeat():
     b_sock.setblocking(0)
     self.b_sock = b_sock
     self.state = "follower"
-    """
-    Starter heartbeat-protokollen.
-    """
+    
+
     self.timer = time.time() + random.uniform(2.0, 5.0)
 
     # Finder frem til ip-adressen for maskinen, så det virker på linux.
@@ -71,15 +66,11 @@ class Heartbeat():
     self.start_lock.release()
     del self.start_lock
  
-
-
   def broadcast(self, data):
     """
     Sender data ud til en given broadcast IP og PORT.
     """
-    #print "broadcast send:", data
     self.b_sock.sendto(data, (broadcast_IP, broadcast_PORT))
-    #print data
 
 
   def leader(self):  
@@ -140,7 +131,7 @@ class Heartbeat():
 	  #s = socket(AF_INET,SOCK_DGRAM)
 	  #print "magic"
 	  print "sending ow" 
-	  self.sock.sendto("ow:" + str(self.ipLog.getLog()) + "-" + str(self.ipLog.getList()), (addr[0], 5005))
+	  self.sock.sendto("ow:" + str(self.ipLog.getLog()) + "-" + str(self.ipLog.getList() + "-" + str(self.ipLog.getUser())), (addr[0], 5005))
 	#print "self.currentKey: " , self.currentKey , " ok?"
 	if (int(data) < self.currentKey and int(data) != -1):
 	  #Tjekker hvis en følger er bagud, sender bagud data

@@ -62,15 +62,11 @@ class log():
 
 
   def overwrite(self, newLog):
-    #print "o1", newLog
     data = newLog.split("-") 
-    #print "o2", data
     self.log = eval(data[0])
-    #print "o3", self.log
     self.ipList = eval(data[1])
-    #print "04", self.ipList
+    self.userDic = eval(data[2])
     self.key = self.log[len(self.log)-1][0] + 1
-    #print self.ipList, self.log, self.key
 
   def commit(self, key):
     while(int(self.log[0][0]) <= int(key)):
@@ -82,7 +78,6 @@ class log():
     if text[0:3] == "ow:":
       self.overwrite(text[3:])
       return False
-
 
     commits = False
 
@@ -107,7 +102,6 @@ class log():
     
     return commits
 
-
   def getKey(self):
     return self.key-1
 
@@ -128,7 +122,6 @@ class log():
   def compile(self,key):
     text = ""
     for sub in self.log:
-      #print "test", sub, key
       if sub[0] > key:
         text = text + str(sub[0]) + "," + sub[1] + " "
     return text
