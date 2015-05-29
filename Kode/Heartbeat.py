@@ -120,10 +120,13 @@ class Heartbeat():
         self.ipLog.parse(self.message)
 
 
-      if (data == "Voted"):
+      if (data[0:4] == "Voted") or (data[0:3] == "Vote"):
         pass
       else:
         #print self.message
+        if (int(data) > self.ipLog.getKey()):
+           self.state = "follower"
+           return 
         if (int(data) >= self.currentKey):
           self.expectedResponses -= 1
         #print "OW?: " , data, "<", self.ipLog.getLowestKey() , "ow?"
@@ -191,7 +194,7 @@ class Heartbeat():
      # Votecounter starter på 1,
      # da en kandidat altid stemmer på sig selv.
       voteCounter = 1
-      self.broadcast("Vote")
+      self.broadcast("Vote" + " " + str(ipLog.getKey()))
       # Laver en voteTime, for at sikre sig at
       # den ikke venter på stemmer forevigt.
       voteTime = time.time() + LTIMEOUT
@@ -238,7 +241,7 @@ class Heartbeat():
      #print self.ipLog.getLog()
      # Stemmer på kandidat hvis den modtager besked.
      # Stemmer kun 1 gang per valg.
-     if message == "Vote" and self.tLastVote < time.time():
+     if message[0:3] == "Vote" and self.tLastVote < time.time():
        self.tLastVote = time.time() + LTIMEOUT
        #s = socket(AF_INET, SOCK_DGRAM)
        self.sock.sendto("Voted", (addr[0], 5005))
