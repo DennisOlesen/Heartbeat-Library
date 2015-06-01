@@ -12,11 +12,11 @@ while(True):
   if hb.getState() == "leader":
     tmpDic = hb.getDic()
     available_ips = []
-    
+
     for key in tmpDic:
       if tmpDic[key] < 0.8:
          available_ips.append(key)
     time.sleep(1)
-    print "available_ips: ", available_ips
+    print "Available IPs:", available_ips
   #Send available_ips to router 
 

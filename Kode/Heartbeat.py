@@ -43,7 +43,7 @@ class Heartbeat():
 
     self.ipLog = Log.log()
     self.castTimer = 0
-    self.castDelay = 1
+    self.castDelay = 0.5
     self.ipList = []
     self.tLastVote = 0
     self.message = ""
@@ -90,8 +90,8 @@ class Heartbeat():
         with self.update_event:
           self.update_event.notify_all()
 
-      print "Log: " ,  self.ipLog.getLog()
-      print "List: " , self.ipLog.getList()
+      #print "Log: " ,  self.ipLog.getLog()
+      #print "List: " , self.ipLog.getList()
       #print "userDic: ", self.ipLog.getUser()
       # Opdaterer loggen
       if len(self.ipList) > 1:
