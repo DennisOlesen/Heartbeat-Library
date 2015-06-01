@@ -1,4 +1,4 @@
-#-*- coding:utf-8 -*-
+  #-*- coding:utf-8 -*-
 
 # Bachelorprojekt 2015 - Heartbeat-protokollen.
 
@@ -43,6 +43,7 @@ class Heartbeat():
 
     self.ipLog = Log.log()
     self.castTimer = 0
+    self.castDelay = 1
     self.ipList = []
     self.tLastVote = 0
     self.message = ""
@@ -89,10 +90,8 @@ class Heartbeat():
         with self.update_event:
           self.update_event.notify_all()
 
-
-      #print self.ipLog.getKey()
-      #print "Log: " ,  self.ipLog.getLog()
-      #print "List: " , self.ipLog.getList()
+      print "Log: " ,  self.ipLog.getLog()
+      print "List: " , self.ipLog.getList()
       #print "userDic: ", self.ipLog.getUser()
       # Opdaterer loggen
       if len(self.ipList) > 1:
@@ -102,7 +101,7 @@ class Heartbeat():
       self.broadcast(str(self.ipLog.getKey()) + "-" + self.message)
       self.currentKey = self.ipLog.getKey()
       self.message = ""
-      self.castTimer = time.time() + 0.5
+      self.castTimer = time.time() + self.castDelay
     try:
       data, addr = self.sock.recvfrom(1024)
       #modtager set fra follower.
@@ -120,14 +119,14 @@ class Heartbeat():
       else:
         if (int(data) > self.ipLog.getKey()+1):
            self.state = "follower"
-           return 
+           return
         if (int(data) >= self.currentKey):
           self.expectedResponses -= 1
 
         if (int(data) < int(self.ipLog.getLowestKey())):
           self.sock.sendto("ow:" + str(self.ipLog.getLog()) + "-" + str(self.ipLog.getList()) + "-" + str(self.ipLog.getUser()), (addr[0], 5005))
 
- 
+
         if (int(data) < self.currentKey and int(data) != -1):
           # Tjekker hvis en følger er bagud, sender bagud data
           upToDateData = self.ipLog.compile(int(data))
@@ -290,6 +289,7 @@ class Heartbeat():
       self.sock.sendto("se:" + myJson, (self.leaderIp, 5005))
       while not self.ipLog.userDic.has_key(key) or self.ipLog.userDic[key] != value:
         with self.update_event:
+          print "self.update_event"
           self.update_event.wait()
 
   # Applikation niveau funktion, kaldes af brugeren for at slette en værdi tilsvarende input
