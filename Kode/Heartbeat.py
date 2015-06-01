@@ -55,15 +55,15 @@ class Heartbeat():
     self.sock.bind( ("", 5005))
     self.sock.setblocking(0)
 
-    #self.start_lock = threading.Lock()
-    #self.update_event = threading.Condition()
+    self.start_lock = threading.Lock()
+    self.update_event = threading.Condition()
 
-    #self.start_lock.acquire()
-    #threading.Thread(target=self.run).start()
+    self.start_lock.acquire()
+    threading.Thread(target=self.run).start()
 
-    #self.start_lock.acquire()
-    #self.start_lock.release()
-    #del self.start_lock
+    self.start_lock.acquire()
+    self.start_lock.release()
+    del self.start_lock
 
   def broadcast(self, data):
     """
@@ -87,8 +87,8 @@ class Heartbeat():
         print "Commiting"
         self.ipLog.commit(self.currentKey)
         self.message = self.message + " co:" + str(self.currentKey)
-     #l   with self.update_event:
-     #l     self.update_event.notify_all()
+        with self.update_event:
+          self.update_event.notify_all()
 
 
       #print self.ipLog.getKey()
@@ -231,8 +231,8 @@ class Heartbeat():
     #print "Parse data: " , data
     if self.ipLog.parse(data):
       print data 
-      #lwith self.update_event:
-      #l  self.update_event.notify_all()
+      with self.update_event:
+        self.update_event.notify_all()
 
     #print self.ipLog.getLog()
    except:
@@ -265,8 +265,8 @@ class Heartbeat():
 
        if self.ipLog.parse(msg):
          print "parsed a msg"
-         #with self.update_event:
-         #  self.update_event.notify_all()
+         with self.update_event:
+           self.update_event.notify_all()
 
        # Hvis followeren lige er startet op sender den -1 til leaderen,
        # så denne ved, at followeren skal have sendt et overwrite.
@@ -287,13 +287,13 @@ class Heartbeat():
    time.sleep(0.5)
 
   def run(self):
-    #lck = self.start_lock
+    lck = self.start_lock
 
     while(True):
     # Lederen er ansvarlig for at opdatere loggen løbende via Heartbeats.
-     #l if lck != None and len(self.leaderIp) != 0:
-     #l   lck.release()
-     #l   lck = None
+      if lck != None and len(self.leaderIp) != 0:
+        lck.release()
+        lck = None
 
       if self.state == "leader":
         self.leader()
