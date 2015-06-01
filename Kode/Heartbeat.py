@@ -84,7 +84,6 @@ class Heartbeat():
       # Hvis der er lige så mange som forventet, comitter vi.
       #print "expected" + str(self.expectedResponses) + "responses"
       if self.expectedResponses == 0 and len(self.ipLog.getLog()) != 0 and len(self.ipList) != 1:
-        print "Commiting"
         self.ipLog.commit(self.currentKey)
         self.message = self.message + " co:" + str(self.currentKey)
         with self.update_event:
@@ -92,24 +91,20 @@ class Heartbeat():
 
 
       #print self.ipLog.getKey()
-      print "Log: " ,  self.ipLog.getLog()
-      print "List: " , self.ipLog.getList()
-      print "userDic: ", self.ipLog.getUser()
+      #print "Log: " ,  self.ipLog.getLog()
+      #print "List: " , self.ipLog.getList()
+      #print "userDic: ", self.ipLog.getUser()
       # Opdaterer loggen
       if len(self.ipList) > 1:
         self.expectedResponses = len(self.ipList)-1
       else:
         self.expectedResponses = 1
-      #print self.message
       self.broadcast(str(self.ipLog.getKey()) + "-" + self.message)
-      #print "Key, self.message: " , self.ipLog.getKey()-1, self.message
       self.currentKey = self.ipLog.getKey()
       self.message = ""
       self.castTimer = time.time() + 0.5
     try:
       data, addr = self.sock.recvfrom(1024)
-      #print "svar far hb: " , data , " ok?"
-      #print "xxxxxxxxxxxxxxxxxxxxx"
       #modtager set fra follower.
       if (data[0:3] == "se:"):
         self.message = self.message + " " + str(self.ipLog.getKey()+1) + "," + data
@@ -123,29 +118,21 @@ class Heartbeat():
       if (data[0:5] == "Voted") or (data[0:4] == "Vote"):
         pass
       else:
-        #print self.message
         if (int(data) > self.ipLog.getKey()+1):
            self.state = "follower"
            return 
         if (int(data) >= self.currentKey):
           self.expectedResponses -= 1
-        #print "OW?: " , data, "<", self.ipLog.getLowestKey() , "ow?"
 
-        if (int(data) < int(self.ipLog.getLowestKey())): # or int(data) > self.currentKey):
-          #s = socket(AF_INET,SOCK_DGRAM)
+        if (int(data) < int(self.ipLog.getLowestKey())):
           self.sock.sendto("ow:" + str(self.ipLog.getLog()) + "-" + str(self.ipLog.getList()) + "-" + str(self.ipLog.getUser()), (addr[0], 5005))
 
-#          print "ow:" + str(self.ipLog.getLog()) + "-" + str(self.ipLog.getList() + "-" + str(self.ipLog.getUser())), (addr[0], 5005)
  
-        #print "self.currentKey: " , self.currentKey , " ok?"
         if (int(data) < self.currentKey and int(data) != -1):
           # Tjekker hvis en følger er bagud, sender bagud data
           upToDateData = self.ipLog.compile(int(data))
 
-          #print "Sending", upToDateData, "..."
-          #s = socket(AF_INET,SOCK_DGRAM)
           self.sock.sendto(upToDateData, (addr[0], 5005))
-          #print "Data er sendt: " , upToDateData
 
         elemNotSet = 1 # Til at checke om elementer er blevet placeret
 
@@ -159,16 +146,12 @@ class Heartbeat():
             self.message = self.message + " " + str(self.ipLog.getKey()+1) + ","+"ad:" + str(addr[0])
             self.ipLog.parse(self.message)
 
-       # Printer en oversigt over IP-adresser samt
-        #for sub in self.ipList:
-        #  print "[" + str(sub[0]) + "]"
     except:
       pass
     # Appender sig selv til at starte med.
     if self.ipList == []:
       self.ipList.append([self.myIp, time.time() + LTIMEOUT])
       self.message = self.message + " " + str(self.ipLog.getKey()+1) + "," + "ad:" + str(self.myIp)
-      #print self.message
       self.ipLog.parse(self.message)
 
 
@@ -223,15 +206,10 @@ class Heartbeat():
   def follower(self):
    try:
     data, addr = self.sock.recvfrom(1024)
-    #print "from leader:", data
-    #print "noget data: " , data
-    #print "Parse data: " , data
     if self.ipLog.parse(data):
-      print data 
       with self.update_event:
         self.update_event.notify_all()
 
-    #print self.ipLog.getLog()
    except:
    # traceback.print_exc(file=sys.stdout)
      pass
@@ -263,9 +241,9 @@ class Heartbeat():
        else:
          self.sock.sendto(str(self.ipLog.getKey()+1), (addr[0], 5005))
        self.timer = time.time() + random.uniform(2.0, 5.0)
-       print "Log: ", self.ipLog.getLog()
-       print "List: ", self.ipLog.getList()
-       print "userDic: ", self.ipLog.getUser()
+       #print "Log: ", self.ipLog.getLog()
+       #print "List: ", self.ipLog.getList()
+       #print "userDic: ", self.ipLog.getUser()
 
 
    except:
@@ -309,15 +287,11 @@ class Heartbeat():
         self.update_event.wait()
 
     if (self.state == "follower"):
-      print "set follower 1"
       self.sock.sendto("se:" + myJson, (self.leaderIp, 5005))
-      print "set follower 2"
       while not self.ipLog.userDic.has_key(key) or self.ipLog.userDic[key] != value:
-        print "Waiting for set"
         with self.update_event:
           print "self.update_event"
           self.update_event.wait()
-          print"done waiting"
 
   # Applikation niveau funktion, kaldes af brugeren for at slette en værdi tilsvarende input
   def delete(self, key):
@@ -348,14 +322,3 @@ class Heartbeat():
 
   def getIps(self):
     return self.ipLog.ipList
-
-# Tester opgaven
-#def main():
- # hb = heartbeat()
-  #hb.start()
-
-
-
-# Sikrer sig at main metoden bliver eksekveret.
-#if __name__ == "__main__":
-  #main()
