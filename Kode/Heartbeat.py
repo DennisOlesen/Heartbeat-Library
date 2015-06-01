@@ -31,7 +31,8 @@ class Heartbeat():
     b_sock.setblocking(0)
     self.b_sock = b_sock
     self.state = "follower"
-
+    #TEST variabel
+    self.canbeleader = True
 
     self.timer = time.time() + random.uniform(2.0, 5.0)
 
@@ -43,7 +44,7 @@ class Heartbeat():
 
     self.ipLog = Log.log()
     self.castTimer = 0
-    self.castDelay = 0.5
+    self.castDelay = 0.15
     self.ipList = []
     self.tLastVote = 0
     self.message = ""
@@ -248,7 +249,8 @@ class Heartbeat():
    except:
      pass
 # Bliver kandidat hvis der ikke modtages besked fra lederen.
-   if self.timer - time.time() < 0:
+#TEST
+   if self.timer - time.time() < 0 and self.canbeleader:
      self.state = "candidate"
      print "State set to: candidate"
    time.sleep(0.5)
@@ -320,3 +322,7 @@ class Heartbeat():
 
   def getIps(self):
     return self.ipLog.ipList
+  #TEST 
+  def changeState(self):
+    self.canbeleader = False
+    self.state = "follower"
