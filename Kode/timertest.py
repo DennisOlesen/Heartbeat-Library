@@ -10,6 +10,6 @@ if hb.state == "leader":
   start_time = time.time() 
   
   while(hb.myIp == hb.leaderIp):
-   print hb.leaderIp , hb.myIp
+    pass
   end_time = time.time()
   print end_time - start_time

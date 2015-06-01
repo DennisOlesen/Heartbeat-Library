@@ -44,7 +44,7 @@ class Heartbeat():
 
     self.ipLog = Log.log()
     self.castTimer = 0
-    self.castDelay = 0.15
+    self.castDelay = 0.25
     self.ipList = []
     self.tLastVote = 0
     self.message = ""
