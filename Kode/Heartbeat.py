@@ -204,6 +204,7 @@ class Heartbeat():
 
 
   def follower(self):
+   print self.timer
    try:
     data, addr = self.sock.recvfrom(1024)
     if self.ipLog.parse(data):
@@ -214,6 +215,7 @@ class Heartbeat():
    # traceback.print_exc(file=sys.stdout)
      pass
    try:
+     print "din mor"
      message, addr = self.b_sock.recvfrom(1024)
      # Stemmer på kandidat hvis den modtager besked.
      # Stemmer kun 1 gang per valg.
