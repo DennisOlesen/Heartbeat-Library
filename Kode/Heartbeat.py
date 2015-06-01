@@ -92,9 +92,9 @@ class Heartbeat():
 
 
       #print self.ipLog.getKey()
-      #print "Log: " ,  self.ipLog.getLog()
-      #print "List: " , self.ipLog.getList()
-      #print "userDic: ", self.ipLog.getUser()
+      print "Log: " ,  self.ipLog.getLog()
+      print "List: " , self.ipLog.getList()
+      print "userDic: ", self.ipLog.getUser()
       # Opdaterer loggen
       if len(self.ipList) > 1:
         self.expectedResponses = len(self.ipList)-1
@@ -133,16 +133,13 @@ class Heartbeat():
 
         if (int(data) < int(self.ipLog.getLowestKey())): # or int(data) > self.currentKey):
           #s = socket(AF_INET,SOCK_DGRAM)
-          print "sending ow"
           self.sock.sendto("ow:" + str(self.ipLog.getLog()) + "-" + str(self.ipLog.getList()) + "-" + str(self.ipLog.getUser()), (addr[0], 5005))
 
-          print "din mor"
 #          print "ow:" + str(self.ipLog.getLog()) + "-" + str(self.ipLog.getList() + "-" + str(self.ipLog.getUser())), (addr[0], 5005)
  
         #print "self.currentKey: " , self.currentKey , " ok?"
         if (int(data) < self.currentKey and int(data) != -1):
           # Tjekker hvis en følger er bagud, sender bagud data
-          print "Pakker upToDateData"
           upToDateData = self.ipLog.compile(int(data))
 
           #print "Sending", upToDateData, "..."
@@ -240,31 +237,22 @@ class Heartbeat():
      pass
    try:
      message, addr = self.b_sock.recvfrom(1024)
-     #print "received:", self.message
-     ########print "Broadcast ip-address:",  addr
-     #print self.ipLog.getLog()
      # Stemmer på kandidat hvis den modtager besked.
      # Stemmer kun 1 gang per valg.
-     print message
      if message[0:4] == "Vote" and self.tLastVote < time.time() and (int(message[5:]) >= self.ipLog.getKey()):
        self.tLastVote = time.time() + LTIMEOUT
-       #s = socket(AF_INET, SOCK_DGRAM)
        self.sock.sendto("Voted", (addr[0], 5005))
      else:
        self.leaderIp = addr[0]
        # Svarer på lederens heartbeat.
        # Opdaterer loggen
-      # print "broadcastbesked: ",  message
        try:
          key, msg = message.split("-")
        except:
-         #print message.split("-")
          key = int(message.split("-")[1])
          msg = ""
-       #print "msg: " + msg + ":msg"
 
        if self.ipLog.parse(msg):
-         print "parsed a msg"
          with self.update_event:
            self.update_event.notify_all()
 
@@ -277,6 +265,8 @@ class Heartbeat():
        self.timer = time.time() + random.uniform(2.0, 5.0)
        print "Log: ", self.ipLog.getLog()
        print "List: ", self.ipLog.getList()
+       print "userDic: ", self.ipLog.getUser()
+
 
    except:
      pass
