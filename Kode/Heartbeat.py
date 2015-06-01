@@ -194,7 +194,7 @@ class Heartbeat():
      # Votecounter starter på 1,
      # da en kandidat altid stemmer på sig selv.
       voteCounter = 1
-      self.broadcast("Vote" + " " + str(ipLog.getKey()))
+      self.broadcast("Vote" + " " + str(self.ipLog.getKey()))
       # Laver en voteTime, for at sikre sig at
       # den ikke venter på stemmer forevigt.
       voteTime = time.time() + LTIMEOUT
