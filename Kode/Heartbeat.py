@@ -217,6 +217,7 @@ class Heartbeat():
    try:
      print "din mor"
      message, addr = self.b_sock.recvfrom(1024)
+     print message
      # Stemmer på kandidat hvis den modtager besked.
      # Stemmer kun 1 gang per valg.
      if message[0:4] == "Vote" and self.tLastVote < time.time() and (int(message[5:]) >= self.ipLog.getKey()):
