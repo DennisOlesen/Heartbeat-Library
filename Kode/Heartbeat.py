@@ -203,7 +203,6 @@ class Heartbeat():
       # den ikke venter på stemmer forevigt.
       voteTime = time.time() + LTIMEOUT
       while(voteCounter <= ((len(self.ipLog.ipList))/2.0)):
-        print ((len(self.ipList))/2.0)
         # Returnerer til følger hvis der ikke er stemmer nok
         if voteTime < time.time():
           self.state = "follower"
