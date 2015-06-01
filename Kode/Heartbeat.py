@@ -256,7 +256,7 @@ class Heartbeat():
    if self.timer - time.time() < 0 and self.canbeleader:
      self.state = "candidate"
      print "State set to: candidate"
-   time.sleep(0.5)
+   #time.sleep(0.5)
 
   def run(self):
     lck = self.start_lock
