@@ -35,7 +35,8 @@ class Heartbeat():
     self.canbeleader = True
 
     self.timer = time.time() + random.uniform(2.0, 5.0)
-
+    self.timer1 = 2.0
+    self.timer2 = 5.0
     # Finder frem til ip-adressen for maskinen, så det virker på linux.
     s = socket(AF_INET, SOCK_DGRAM)
     s.connect(("google.com", 80))
@@ -187,7 +188,7 @@ class Heartbeat():
         if voteTime < time.time():
           self.state = "follower"
           voteCounter = 0.0
-          self.timer = time.time() + random.uniform(2.0, 5.0)
+          self.timer = time.time() + random.uniform(self.timer1, self.timer2)
           break
         try:
           self.message, addr = self.sock.recvfrom(1024)
@@ -204,7 +205,6 @@ class Heartbeat():
 
 
   def follower(self):
-   print self.timer - time.time()
    try:
     data, addr = self.sock.recvfrom(1024)
     if self.ipLog.parse(data):
@@ -215,9 +215,7 @@ class Heartbeat():
    # traceback.print_exc(file=sys.stdout)
      pass
    try:
-     print "din mor"
      message, addr = self.b_sock.recvfrom(1024)
-     print message
      # Stemmer på kandidat hvis den modtager besked.
      # Stemmer kun 1 gang per valg.
      if message[0:4] == "Vote" and self.tLastVote < time.time() and (int(message[5:]) >= self.ipLog.getKey()):
@@ -243,7 +241,7 @@ class Heartbeat():
          self.sock.sendto(str(-1), (addr[0], 5005))
        else:
          self.sock.sendto(str(self.ipLog.getKey()+1), (addr[0], 5005))
-       self.timer = time.time() + random.uniform(2.0, 5.0)
+       self.timer = time.time() + random.uniform(self.timer1, self.timer2)
        #print "Log: ", self.ipLog.getLog()
        #print "List: ", self.ipLog.getList()
        #print "userDic: ", self.ipLog.getUser()
