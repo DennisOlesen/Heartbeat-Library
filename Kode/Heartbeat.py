@@ -204,7 +204,7 @@ class Heartbeat():
 
 
   def follower(self):
-   print self.timer
+   print self.timer - time.time()
    try:
     data, addr = self.sock.recvfrom(1024)
     if self.ipLog.parse(data):
