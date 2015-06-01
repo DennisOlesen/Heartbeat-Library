@@ -290,7 +290,6 @@ class Heartbeat():
       self.sock.sendto("se:" + myJson, (self.leaderIp, 5005))
       while not self.ipLog.userDic.has_key(key) or self.ipLog.userDic[key] != value:
         with self.update_event:
-          print "self.update_event"
           self.update_event.wait()
 
   # Applikation niveau funktion, kaldes af brugeren for at slette en værdi tilsvarende input
