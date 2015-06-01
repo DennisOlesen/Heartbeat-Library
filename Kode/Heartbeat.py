@@ -120,7 +120,7 @@ class Heartbeat():
         self.ipLog.parse(self.message)
 
 
-      if (data[0:4] == "Voted") or (data[0:3] == "Vote"):
+      if (data[0:5] == "Voted") or (data[0:4] == "Vote"):
         pass
       else:
         #print self.message
@@ -245,7 +245,8 @@ class Heartbeat():
      #print self.ipLog.getLog()
      # Stemmer på kandidat hvis den modtager besked.
      # Stemmer kun 1 gang per valg.
-     if message[0:3] == "Vote" and self.tLastVote < time.time():
+     print message
+     if message[0:4] == "Vote" and self.tLastVote < time.time() and (int(message[5:]) >= self.ipLog.getKey()):
        self.tLastVote = time.time() + LTIMEOUT
        #s = socket(AF_INET, SOCK_DGRAM)
        self.sock.sendto("Voted", (addr[0], 5005))
