@@ -197,16 +197,16 @@ class Heartbeat():
      # Den opretter en afstemning for at blive den nye leder.
      # Votecounter starter på 1,
      # da en kandidat altid stemmer på sig selv.
-      voteCounter = 1
+      voteCounter = 1.0
       self.broadcast("Vote" + " " + str(self.ipLog.getKey()))
       # Laver en voteTime, for at sikre sig at
       # den ikke venter på stemmer forevigt.
       voteTime = time.time() + LTIMEOUT
-      while(voteCounter <= ((len(self.ipList))/2)):
+      while(voteCounter <= ((len(self.ipList))/2.0)):
         # Returnerer til følger hvis der ikke er stemmer nok
         if voteTime < time.time():
           self.state = "follower"
-          voteCounter = 0
+          voteCounter = 0.0
           self.timer = time.time() + random.uniform(2.0, 5.0)
           break
         try:
