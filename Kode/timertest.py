@@ -2,7 +2,7 @@ from Heartbeat import Heartbeat
 import time
 hb = Heartbeat()
 
-time.sleep(10)
+time.sleep(5)
 if hb.state == "leader":
   print "changing state"
   hb.changeState()

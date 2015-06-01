@@ -35,8 +35,8 @@ class Heartbeat():
     self.canbeleader = True
 
     self.timer = time.time() + random.uniform(2.0, 5.0)
-    self.timer1 = 2.0
-    self.timer2 = 5.0
+    self.timer1 = 0.150
+    self.timer2 = 0.3
     # Finder frem til ip-adressen for maskinen, så det virker på linux.
     s = socket(AF_INET, SOCK_DGRAM)
     s.connect(("google.com", 80))
@@ -45,7 +45,7 @@ class Heartbeat():
 
     self.ipLog = Log.log()
     self.castTimer = 0
-    self.castDelay = 0.25
+    self.castDelay = 0.015
     self.ipList = []
     self.tLastVote = 0
     self.message = ""
