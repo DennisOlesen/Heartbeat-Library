@@ -124,7 +124,7 @@ class Heartbeat():
         pass
       else:
         #print self.message
-        if (int(data) > self.ipLog.getKey()):
+        if (int(data) > self.ipLog.getKey()+1):
            self.state = "follower"
            return 
         if (int(data) >= self.currentKey):
