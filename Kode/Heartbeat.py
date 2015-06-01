@@ -55,15 +55,15 @@ class Heartbeat():
     self.sock.bind( ("", 5005))
     self.sock.setblocking(0)
 
-    self.start_lock = threading.Lock()
-    self.update_event = threading.Condition()
+    #self.start_lock = threading.Lock()
+    #self.update_event = threading.Condition()
 
-    self.start_lock.acquire()
-    threading.Thread(target=self.run).start()
+    #self.start_lock.acquire()
+    #threading.Thread(target=self.run).start()
 
-    self.start_lock.acquire()
-    self.start_lock.release()
-    del self.start_lock
+    #self.start_lock.acquire()
+    #self.start_lock.release()
+    #del self.start_lock
 
   def broadcast(self, data):
     """
@@ -87,8 +87,8 @@ class Heartbeat():
         print "Commiting"
         self.ipLog.commit(self.currentKey)
         self.message = self.message + " co:" + str(self.currentKey)
-        with self.update_event:
-          self.update_event.notify_all()
+     #l   with self.update_event:
+     #l     self.update_event.notify_all()
 
 
       #print self.ipLog.getKey()
@@ -134,7 +134,11 @@ class Heartbeat():
         if (int(data) < int(self.ipLog.getLowestKey())): # or int(data) > self.currentKey):
           #s = socket(AF_INET,SOCK_DGRAM)
           print "sending ow"
-          self.sock.sendto("ow:" + str(self.ipLog.getLog()) + "-" + str(self.ipLog.getList() + "-" + str(self.ipLog.getUser())), (addr[0], 5005))
+          self.sock.sendto("ow:" + str(self.ipLog.getLog()) + "-" + str(self.ipLog.getList()) + "-" + str(self.ipLog.getUser()), (addr[0], 5005))
+
+          print "din mor"
+#          print "ow:" + str(self.ipLog.getLog()) + "-" + str(self.ipLog.getList() + "-" + str(self.ipLog.getUser())), (addr[0], 5005)
+ 
         #print "self.currentKey: " , self.currentKey , " ok?"
         if (int(data) < self.currentKey and int(data) != -1):
           # Tjekker hvis en følger er bagud, sender bagud data
@@ -226,9 +230,9 @@ class Heartbeat():
     #print "noget data: " , data
     #print "Parse data: " , data
     if self.ipLog.parse(data):
-      print "it's all good"
-      with self.update_event:
-        self.update_event.notify_all()
+      print data 
+      #lwith self.update_event:
+      #l  self.update_event.notify_all()
 
     #print self.ipLog.getLog()
    except:
@@ -260,8 +264,8 @@ class Heartbeat():
 
        if self.ipLog.parse(msg):
          print "parsed a msg"
-         with self.update_event:
-           self.update_event.notify_all()
+         #with self.update_event:
+         #  self.update_event.notify_all()
 
        # Hvis followeren lige er startet op sender den -1 til leaderen,
        # så denne ved, at followeren skal have sendt et overwrite.
@@ -282,13 +286,13 @@ class Heartbeat():
    time.sleep(0.5)
 
   def run(self):
-    lck = self.start_lock
+    #lck = self.start_lock
 
     while(True):
     # Lederen er ansvarlig for at opdatere loggen løbende via Heartbeats.
-      if lck != None and len(self.leaderIp) != 0:
-        lck.release()
-        lck = None
+     #l if lck != None and len(self.leaderIp) != 0:
+     #l   lck.release()
+     #l   lck = None
 
       if self.state == "leader":
         self.leader()
