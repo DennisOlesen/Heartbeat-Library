@@ -1,33 +1,35 @@
-\BOOKMARK [1][-]{section*.1}{Abstract \(Dansk\)}{}% 1
-\BOOKMARK [1][-]{section*.2}{Abstract \(Engelsk\)}{}% 2
-\BOOKMARK [1][-]{section*.3}{Beskrivelse af problemet }{}% 3
-\BOOKMARK [2][-]{section*.4}{Redeg\370relse}{section*.3}% 4
-\BOOKMARK [1][-]{section*.5}{Problemorienteret analyse}{}% 5
-\BOOKMARK [1][-]{section*.6}{Programmerings overvejelser}{}% 6
-\BOOKMARK [2][-]{section*.7}{Discovery}{section*.6}% 7
-\BOOKMARK [2][-]{section*.8}{Broadcast/MultiCast/UDP/TCP}{section*.6}% 8
-\BOOKMARK [2][-]{section*.9}{Liveness}{section*.6}% 9
-\BOOKMARK [2][-]{section*.10}{Leader election}{section*.6}% 10
-\BOOKMARK [2][-]{section*.12}{Logging}{section*.6}% 11
-\BOOKMARK [2][-]{section*.13}{Load-balancing}{section*.6}% 12
-\BOOKMARK [2][-]{section*.15}{Opsamling:}{section*.6}% 13
-\BOOKMARK [3][-]{section*.17}{Sammenspil mellem funktioner}{section*.15}% 14
-\BOOKMARK [2][-]{section*.18}{Beskrivelse af funktioner}{section*.6}% 15
-\BOOKMARK [2][-]{section*.19}{Protokol format.}{section*.6}% 16
-\BOOKMARK [2][-]{section*.20}{Log:}{section*.6}% 17
-\BOOKMARK [2][-]{section*.21}{Heartbeat-systemet:}{section*.6}% 18
-\BOOKMARK [3][-]{section*.22}{Leader:}{section*.21}% 19
-\BOOKMARK [3][-]{section*.23}{Follower:}{section*.21}% 20
-\BOOKMARK [3][-]{section*.24}{Candidate:}{section*.21}% 21
-\BOOKMARK [3][-]{section*.25}{Tr\345dning:}{section*.21}% 22
-\BOOKMARK [3][-]{section*.26}{Applikations-lags funktioner:}{section*.21}% 23
-\BOOKMARK [1][-]{section*.27}{Afpr\370vning:}{}% 24
-\BOOKMARK [2][-]{section*.28}{Runtime testning:}{section*.27}% 25
-\BOOKMARK [2][-]{section*.29}{Pr\370vek\370rsel m. load-balancing:}{section*.27}% 26
-\BOOKMARK [2][-]{section*.30}{Leader-election}{section*.27}% 27
-\BOOKMARK [2][-]{section*.31}{Ydelse}{section*.27}% 28
-\BOOKMARK [3][-]{section*.32}{K\370retid:}{section*.31}% 29
-\BOOKMARK [3][-]{section*.33}{Skalering:}{section*.31}% 30
-\BOOKMARK [1][-]{section*.34}{Brugervejledning:}{}% 31
-\BOOKMARK [1][-]{section*.35}{Diskussion / Konklusion \(what to call it?\)}{}% 32
-\BOOKMARK [1][-]{section*.36}{Litteraturhenvisninger}{}% 33
+\BOOKMARK [1][-]{section*.2}{Abstract \(Dansk\)}{}% 1
+\BOOKMARK [1][-]{section*.3}{Abstract \(Engelsk\)}{}% 2
+\BOOKMARK [1][-]{section*.4}{Beskrivelse af problemet}{}% 3
+\BOOKMARK [2][-]{section*.5}{Redeg\370relse}{section*.4}% 4
+\BOOKMARK [1][-]{section*.6}{Problemorienteret analyse}{}% 5
+\BOOKMARK [1][-]{section*.7}{Programmerings overvejelser}{}% 6
+\BOOKMARK [2][-]{section*.8}{Discovery}{section*.7}% 7
+\BOOKMARK [2][-]{section*.9}{Broadcast/MultiCast/UDP/TCP}{section*.7}% 8
+\BOOKMARK [2][-]{section*.10}{Liveness}{section*.7}% 9
+\BOOKMARK [2][-]{section*.11}{Leader election}{section*.7}% 10
+\BOOKMARK [2][-]{section*.13}{Logging}{section*.7}% 11
+\BOOKMARK [2][-]{section*.14}{Load-balancing}{section*.7}% 12
+\BOOKMARK [2][-]{section*.16}{Opsamling:}{section*.7}% 13
+\BOOKMARK [3][-]{section*.18}{Sammenspil mellem funktioner}{section*.16}% 14
+\BOOKMARK [3][-]{section*.19}{Protokol format}{section*.16}% 15
+\BOOKMARK [2][-]{section*.20}{Log}{section*.7}% 16
+\BOOKMARK [2][-]{section*.21}{Heartbeat-systemet:}{section*.7}% 17
+\BOOKMARK [3][-]{section*.22}{Leader:}{section*.21}% 18
+\BOOKMARK [3][-]{section*.23}{Follower:}{section*.21}% 19
+\BOOKMARK [3][-]{section*.24}{Candidate:}{section*.21}% 20
+\BOOKMARK [3][-]{section*.25}{Tr\345dning:}{section*.21}% 21
+\BOOKMARK [3][-]{section*.26}{Applikations-lags funktioner:}{section*.21}% 22
+\BOOKMARK [1][-]{section*.27}{Afpr\370vning:}{}% 23
+\BOOKMARK [2][-]{section*.28}{Runtime testning:}{section*.27}% 24
+\BOOKMARK [2][-]{section*.29}{Pr\370vek\370rsel m. load-balancing:}{section*.27}% 25
+\BOOKMARK [2][-]{section*.30}{Leader-election}{section*.27}% 26
+\BOOKMARK [2][-]{section*.33}{Ydelse}{section*.27}% 27
+\BOOKMARK [3][-]{section*.34}{K\370retid}{section*.33}% 28
+\BOOKMARK [3][-]{section*.35}{Skalering:}{section*.33}% 29
+\BOOKMARK [1][-]{section*.36}{Brugervejledning:}{}% 30
+\BOOKMARK [1][-]{section*.37}{Diskussion / Konklusion \(what to call it?\)}{}% 31
+\BOOKMARK [1][-]{section*.38}{Litteraturhenvisninger}{}% 32
+\BOOKMARK [1][-]{section*.39}{Appendix}{}% 33
+\BOOKMARK [2][-]{section*.40}{Heartbeat.py}{section*.39}% 34
+\BOOKMARK [2][-]{section*.41}{Log.py}{section*.39}% 35
