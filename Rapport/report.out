@@ -7,29 +7,33 @@
 \BOOKMARK [2][-]{section*.8}{Discovery}{section*.7}% 7
 \BOOKMARK [2][-]{section*.9}{Broadcast/MultiCast/UDP/TCP}{section*.7}% 8
 \BOOKMARK [2][-]{section*.10}{Liveness}{section*.7}% 9
-\BOOKMARK [2][-]{section*.11}{Leader election}{section*.7}% 10
-\BOOKMARK [2][-]{section*.13}{Logging}{section*.7}% 11
-\BOOKMARK [2][-]{section*.14}{Load-balancing}{section*.7}% 12
-\BOOKMARK [2][-]{section*.16}{Opsamling:}{section*.7}% 13
-\BOOKMARK [3][-]{section*.18}{Sammenspil mellem funktioner}{section*.16}% 14
-\BOOKMARK [3][-]{section*.19}{Protokol format}{section*.16}% 15
-\BOOKMARK [2][-]{section*.20}{Log}{section*.7}% 16
-\BOOKMARK [2][-]{section*.21}{Heartbeat-systemet:}{section*.7}% 17
-\BOOKMARK [3][-]{section*.22}{Leader:}{section*.21}% 18
-\BOOKMARK [3][-]{section*.23}{Follower:}{section*.21}% 19
-\BOOKMARK [3][-]{section*.24}{Candidate:}{section*.21}% 20
-\BOOKMARK [3][-]{section*.25}{Tr\345dning:}{section*.21}% 21
-\BOOKMARK [3][-]{section*.26}{Applikations-lags funktioner:}{section*.21}% 22
-\BOOKMARK [1][-]{section*.27}{Afpr\370vning:}{}% 23
-\BOOKMARK [2][-]{section*.28}{Runtime testning:}{section*.27}% 24
-\BOOKMARK [2][-]{section*.29}{Pr\370vek\370rsel m. load-balancing:}{section*.27}% 25
-\BOOKMARK [2][-]{section*.30}{Leader-election}{section*.27}% 26
-\BOOKMARK [2][-]{section*.33}{Ydelse}{section*.27}% 27
-\BOOKMARK [3][-]{section*.34}{K\370retid}{section*.33}% 28
-\BOOKMARK [3][-]{section*.35}{Skalering:}{section*.33}% 29
-\BOOKMARK [1][-]{section*.36}{Brugervejledning:}{}% 30
-\BOOKMARK [1][-]{section*.37}{Diskussion / Konklusion \(what to call it?\)}{}% 31
-\BOOKMARK [1][-]{section*.38}{Litteraturhenvisninger}{}% 32
-\BOOKMARK [1][-]{section*.39}{Appendix}{}% 33
-\BOOKMARK [2][-]{section*.40}{Heartbeat.py}{section*.39}% 34
-\BOOKMARK [2][-]{section*.41}{Log.py}{section*.39}% 35
+\BOOKMARK [2][-]{section*.11}{CAP-teoremet og dets begr\346nsning af systemet}{section*.7}% 10
+\BOOKMARK [2][-]{section*.12}{Leader election}{section*.7}% 11
+\BOOKMARK [2][-]{section*.14}{Logging}{section*.7}% 12
+\BOOKMARK [2][-]{section*.15}{Load-balancing}{section*.7}% 13
+\BOOKMARK [2][-]{section*.17}{Opsamling}{section*.7}% 14
+\BOOKMARK [1][-]{section*.19}{Implementering}{}% 15
+\BOOKMARK [2][-]{section*.20}{Overordnet struktur}{section*.19}% 16
+\BOOKMARK [3][-]{section*.21}{Funktioner}{section*.20}% 17
+\BOOKMARK [3][-]{section*.22}{Sammenspil mellem funktioner}{section*.20}% 18
+\BOOKMARK [3][-]{section*.23}{Protokol format}{section*.20}% 19
+\BOOKMARK [2][-]{section*.24}{Log}{section*.19}% 20
+\BOOKMARK [2][-]{section*.25}{Heartbeat-systemet}{section*.19}% 21
+\BOOKMARK [3][-]{section*.26}{Leader}{section*.25}% 22
+\BOOKMARK [3][-]{section*.27}{Follower}{section*.25}% 23
+\BOOKMARK [3][-]{section*.28}{Candidate}{section*.25}% 24
+\BOOKMARK [3][-]{section*.29}{Tr\345dning}{section*.25}% 25
+\BOOKMARK [3][-]{section*.30}{Applikations-lags funktioner}{section*.25}% 26
+\BOOKMARK [1][-]{section*.31}{Afpr\370vning}{}% 27
+\BOOKMARK [2][-]{section*.32}{Runtime testning}{section*.31}% 28
+\BOOKMARK [2][-]{section*.33}{Pr\370vek\370rsel m. load-balancing}{section*.31}% 29
+\BOOKMARK [2][-]{section*.34}{Leader-election}{section*.31}% 30
+\BOOKMARK [2][-]{section*.37}{Ydelse}{section*.31}% 31
+\BOOKMARK [3][-]{section*.38}{K\370retid}{section*.37}% 32
+\BOOKMARK [3][-]{section*.39}{Skalering}{section*.37}% 33
+\BOOKMARK [1][-]{section*.40}{Brugervejledning:}{}% 34
+\BOOKMARK [1][-]{section*.41}{Diskussion / Konklusion \(what to call it?\)}{}% 35
+\BOOKMARK [1][-]{section*.42}{Litteraturhenvisninger}{}% 36
+\BOOKMARK [1][-]{section*.43}{Appendix}{}% 37
+\BOOKMARK [2][-]{section*.44}{Heartbeat.py}{section*.43}% 38
+\BOOKMARK [2][-]{section*.45}{Log.py}{section*.43}% 39
