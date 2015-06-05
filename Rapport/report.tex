@@ -84,21 +84,25 @@
 %removes the numbers from sections
 \setcounter{secnumdepth}{0}
 
+
 %proper header formatting
 \usepackage{fancyhdr}
 \pagestyle{fancy}
+
+
+%Rydder fancyheads(sidehoved) underlige tekst
+\fancyhf{}
 \lhead[]{} %clear standard settings
 \chead[]{} %clear standard settings
-\rhead[]{\rightmark} %current section
+\rhead[]{} %current section
 \lfoot[]{} %clear standard settings
 \cfoot[]{\thepage} %current page number 
 \rfoot[]{} %clear standard settings
 \usepackage{float}
 \usepackage{hyperref} % The package for links. This is also used for the ToC links.
-%}}}
-\title{Heartbeat protokollen
-\\
-Bachelorprojekt 2015}
+
+
+\title{Heartbeat protokollen \\ Bachelorprojekt 2015}
 \author{Erik Allin - smt504 \\ Dennis Olesen - cwb579}
 \date{8. juni 2015}
 
@@ -108,18 +112,21 @@ Bachelorprojekt 2015}
 \begin{document}
 \maketitle
 \newpage
-%\renewcommand*\contentsname{Indholdsfortegnelse}
+\renewcommand*\contentsname{Indholdsfortegnelse}
 \tableofcontents
 %\section*{Forside-lel}
 \newpage
-%\clearpage
+\clearpage
 
-\section{Abstract (Dansk)}
-Vi undersøger muligheden for et Heartbeat bibliotek til eksempelvist Load balancing af servere, med minimal brugerimplementering. Der giver brugeren et delt dictionary som fælles data, samt overblik over liveliness af samtlige systemer.
+\section{Resumé (Dansk)}
+Vi undersøger muligheden for at kunne implementere et Heartbeat-bibliotek til eksempelvis load-balancing af servere, med et simpelt brugerinterface. Dette giver brugeren et delt dictionary som fælles data, samt overblik over liveliness af samtlige systemer.
 \\
-Som konsensus implementeres raft algoritmen og udfører derved leaderelection på ned til 300-400 ms uden forkerte elections. 
+Som konsensus implementeres Raft-algoritmen, som udfører leader-election på ned til 300-400 ms uden forkerte valg. 
 
 \section{Abstract (Engelsk)}
+We explore the opportunity of implementing a Heartbeat-library for solving such issues as load-balancing of servers with a simple user interface. This gives the user a shared dictionary as shared memory along with an overview of liveliness of all related systems.
+\\
+Using the Raft-algorithm for consensus, which applies leader-election in about 300-400 ms without any errors.
 
 \newpage
 \section{Beskrivelse af problemet}
@@ -136,7 +143,7 @@ For at kunne lave et bibliotek til implementering af eks. ressourcestyring via h
 I et sådant system er det meget relevant, hvordan dataen, der kommunikeres mellem de forskellige maskiner i systemet, bliver sendt rundt el. håndteret.
 Der findes forskellige modeller, for hvordan dette kan gøres, hvor den simpleste er, at alle maskiner kommunikere med alle.
 Derved sørges der for, at al data kommunikeres rundt blandt alle maskiner, så på dette område, ville dette system være tilstrækkeligt. 
-Det kan godt hurtigt gå hen og blive meget ressourcekrævende, da vi opnår $n^2$ antal beskeder, da alle maskiner skal sende mindst en besked ud til alle maskiner, ved hvert heartbeat.
+Det kan godt hurtigt gå hen og blive meget ressourcekrævende, da vi opnår $n^2$ antal forbindelser, da alle maskiner skal kommunikere med alle.
 \\[5px]
 Dette kan reduceres kraftigt ved at benytte gossiping [4], hvor en maskine skriver ud til en vilkårlig anden maskine, som herefter skriver ud til nogle andre, og så videre indtil beskeden er propageret ud til samtlige maskiner i systemet.
 \\
@@ -149,17 +156,22 @@ En simpel måde at gøre dette er via Bully algoritmen [5] hvor i, at hver maski
 \\[5px]
 Dette problem kan løses ved at bruge algoritmen som bruges i Raft [3], der bruger et system bestående af følgere, kandidater og leder.
 Når en leder undervejs går hen og dør, starter der et leader-election, hvor der vælges den hurtigste kandidat, som har mindst halvdelen af stemmerne, til at blive leder. Herved sikres det, at der kun vælges en leder, og derved risikerer vi ikke i stil med Bully algoritmen, at der kan opstå flere systemer parallelt med hinanden.
-
+\newpage
   
 \section{Problemorienteret analyse}
-I stil med Raft (se artikel) skal vi have en leder, der kan uddelegere opgaver, samt overvåge aktiviteten (liveness) for de resterende systemer. Dette kan lederen gøre ved regelmæssigt at sende heartbeats ud til alle de aktive følgere. I forbindelse med dette tjek af liveness, kan brugeren sende en værdi for evt. belastningen med vores heartbeats, der sendes til følgerne. Dette tillader brugeren, at lave en prioritering for hvilke følgere, der skal modtage næste opgave.
+I stil med Raft \textbf{[3]} skal vi have en leder, der kan uddelegere opgaver, samt overvåge aktiviteten (liveness) for de resterende systemer. Dette kan lederen gøre ved regelmæssigt at sende heartbeats ud til alle de aktive følgere. I forbindelse med dette tjek af liveness, kan brugeren sende en værdi for evt. belastningen med vores heartbeats, der sendes til følgerne. Dette tillader brugeren, at lave en prioritering for hvilke følgere, der skal modtage næste opgave.
 \\
 Da vi er interesserede i, at systemet også skal have høj tilgængelighed er vi afhængige af at lederen ikke er en single-point-of-failure. Kort sagt må systemet ikke fejle når en vilkårlig maskine fejler.
 \\[5px]
-Dette kan vi undgå ved, at have mulighed for at vælge en ny leder, når følgere i en længere periode ikke har modtaget heartbeats fra lederen. Dette gøres i stil med Rafts leadership-election [3]. Heri anvendes der kandidater, som følgere kan skifte status til, hvis de ikke modtager heartbeats i en længere periode, ca. 3 heartbeats, fra lederen. Herudover er det målet, at kandidaterne så vidt som muligt er up-to-date med loggen. Loggen er en metode, som vi bruger til at dele information om hvilke maskiner der er aktive, samt brugerdefinerede data uden at skulle sende hele informationen hver gang. Dette sparer ressourcer og sikrer at alle parter har den samme information.
+Dette kan vi undgå ved, at have mulighed for at vælge en ny leder, når følgere i en længere periode ikke har modtaget heartbeats fra lederen. Dette gøres i stil med Rafts leadership-election [3], hvor de fjernes ved omkring 3 på hinanden følgende udeblivelser. Heri anvendes der kandidater, som følgere kan skifte status til, hvis de ikke modtager heartbeats i en længere periode, ca. 3 heartbeats, fra lederen. Herudover er det målet, at kandidaterne så vidt som muligt er up-to-date og har en delt tilstand. 
+\\
+Loggen er en metode, som vi bruger til at dele information om hvilke maskiner der er aktive, samt brugerdefinerede data uden at skulle sende hele informationen hver gang. Dette sparer ressourcer og sikrer at alle parter har den samme information.
 \\[5px]
-Dette system vil altså afhænge af, at have fem del-funktionaliteter der tilsammen udgør systemet. Disse fem funktionaliteter kan ses som Discovery, hvor der oprettes forbindelse til følgere på netværket, samt liveness hvor der regelmæssigt tjekkes for, at følgere og leder er i live. Leader-election sikrer, at der hurtigt kan findes en ny leder, hvis den nuværende fejler. Logging sikrer sig, at der hele tiden er en vis konsistens i systemet, så alle medlemmer i systemet har den samme information, eller hurtigst muligt retter op og når en commited state, når der vælges en ny leder. Til sidst er der load-balancing, som afhænger af at det resterende system fungerer, så det kan balancere belastningen af følgerne på applikationsniveauet i forhold til vores case eksempel.
+Dette system vil altså afhænge af, at have fem del-funktionaliteter der tilsammen udgør systemet. Disse fem funktionaliteter kan ses som Discovery, hvor der oprettes forbindelse til følgere på netværket, hvilket også vil blive beskrevet nærmere senere. Derudover er der liveness hvor der regelmæssigt tjekkes for, at følgere og leder er i live. Leader-election sikrer, at der hurtigt kan findes en ny leder, hvis den nuværende fejler. Logging sikrer sig, at der hele tiden er en vis konsistens i systemet, så alle medlemmer i systemet har den samme information, eller hurtigst muligt retter op og når en commited state, når der vælges en ny leder. Til sidst er der load-balancing, som afhænger af at det resterende system fungerer, så det kan balancere belastningen af følgerne på applikationsniveauet i forhold til vores case eksempel.
 
+\subsection{Beskrivelse af konsistensmodeller}
+Yolo
+\newpage
 
 \section{Programmerings overvejelser}
 \subsection{Discovery}
@@ -169,18 +181,18 @@ Problematikken er i midlertidig om det er en directory server eller serverless m
 \\[5px]
 Her kan man argumentere for, at en directory server ville give mening, da der i forvejen sendes regelmæssige broadcasts i forbindelse med heartbeat. Altså kunne man her bruge heartbeatet, som en forespørgelse til systemer, der ikke er forbundet med lederen endnu.
 \\
-Directory serveren har dog det problem, at hvis den går ned, er der ikke længere styr på hvilke maskiner, der er i systemet. Dette er imidlertid en problematik som bør kunne løses med leader election, og logging, ved at man vedligeholder en replikeret log, som indeholder de aktive følgere, til alle medlemmer i systemet. 
+Directory serveren har dog det problem, at hvis den går ned, er der ikke længere styr på hvilke maskiner, der er i systemet. Dette er imidlertid en problematik, som bør kunne løses ved at bruge en serverless metode med leader election og logging, ved at man vedligeholder en replikeret log, som indeholder de aktive maskiner, til alle medlemmer i systemet. 
 \\
 Derved vil en ny leder have samme information, som den tidligere leder, såfremt man i stil med Raft-algoritmen ikke vælger en maskine der ikke er up-to-date, og kan derved overtage jobbet uden at miste konsistens eller tilgængelighed, da der kun afgives stemmer til kandidater der har en opdateret log. Ifølge DSCD [6], bruges der leasing til, at sikre sig, at maskinerne er aktive. Dette må kunne opretholdes med heartbeats, da dette foretager samme tjek, altså ved feedback om et kald, el. en service går igennem.
 
 \subsection{Broadcast/MultiCast/UDP/TCP}
-Men selve valget om hvorvidt man skal bruge broadcast eller multicast er ikke helt trivielt da de begge har fordele og ulemper der påvirker systemet. Forskellene ligger i at broadcast arbejder med UDP forbindelse mens, at multicast bruger TCP.
+Selve valget om hvorvidt man skal bruge broadcast eller multicast er ikke helt trivielt da de begge har fordele og ulemper der påvirker systemet. Forskellene ligger i at broadcast arbejder med UDP forbindelse mens, at multicast bruger TCP.
 \\
 Fordelen ved broadcast og UDP forbindelser er at vi sparer ressourcerne det kræves at skabe en fast forbindelse med hver enkelt følger i systemet. Vi kan endvidere, såfremt vi forbliver lokalt, udnytte broadcast til at kommunikere heartbeats ud til alle medlemmer i systemet, hvilket er den billigste måde at kommunikere med alle på en gang. Endvidere tillader dette os at tilføje nye maskiner løbende ved at klienten hører det broadcastede heartbeat og sender svar til lederen, uden at skulle kende lederens ip-adresse på forhånd, hvor man i tilfældet med multicast ville være afhængig af at en følger skulle kende lederen på forhånd. Derudover fungerer heartbeats på den måde at det ikke gør nogen reel skade hvis der misses en besked eller to, da det næste kommer kort efter. Dette betyder selvfølgelig at der vil være en længere periode mellem konsistens, men ikke noget der er meget langsommere end at lave og afslutte TCP forbindelser til alle modtagere.
 Herudover er både UDP og TCP implementeringer af systemet begrænset ved skalering.
 \\[5px]
 UDP har oftest loft over pakkestørrelse der giver problemer når loggens størrelse nærmer sig de ca. 1500 bytes. Dette er grundet, at der på link-laget som regel sættes et MTU, maximum transmission unit, for bedre at fungere med den reelle buffer størrelse. TCP er derimod begrænset af hastigheden da multicast bliver tungt i forbindelse med oprettelse af forbindelse til mange systemer ad gangen. 
-I denne implementation benyttes broadcasting da modulet er tiltænkt lokale systemer.
+I vores implementation benyttes broadcasting da modulet er tiltænkt lokale systemer.
 Dette betyder endvidere at den største begrænsning for køretid og effektivitet er relateret til hardwaremæssigt at sende beskeder på tværs af maskiner.
 
 \subsection{Liveness} 
@@ -217,7 +229,7 @@ Dette sikrer at hvis en maskine kommer ud af synkronisering vil den ikke kunne b
 
 
 \subsection{Logging}
-For at systemet hele tiden kan holdes konsistent, må vi indføre en form for såkaldt logging. Logging sørger for, at alle medlemmer af systemet hele tiden kan holde styr på, om de er med i systemet. Hvis de f.eks. mister forbindelsen i en periode, og så kommer tilbage i systemet, så vil medlemmet højst sandsynligt være kommet bagud i forhold til resten af systemet, og derved skal medlemmet ikke f.eks. forsøge at blive kandidat, der vil kunne forsinke systemet (som også beskrevet i forrige afsnit). 
+For at systemet hele tiden kan holdes konsistent, må vi indføre en form for logging. Logging sørger for, at alle medlemmer af systemet hele tiden kan holde styr på, om de er med i systemet. Samtidig sikrer loggen en trinvis opdatering af den delte tilstand. Hvis de f.eks. mister forbindelsen i en periode, og så kommer tilbage i systemet, så vil medlemmet højst sandsynligt være kommet bagud i forhold til resten af systemet, og derved skal medlemmet ikke f.eks. forsøge at blive kandidat, der vil kunne forsinke systemet (som også beskrevet i forrige afsnit). 
 \\
 Loggingen laves via timestamps og en logisk klokke, så der hele tiden kan ses hvilket stadie de forskellige dele af systemet er nået til. Derudover holder loggingen også styr på rækkefølgen det hele skal foregå i, for derved at kunne se, hvis nogle opgaver ikke er blevet udført af de forskellige dele af systemet. Dette sikres ved, at loggen hele tiden holdes konsistent og hele tiden bliver replikeret ud til alle alle medlemmer af systemet. Derved sikres det også, at når en ny leder bliver valgt, så vil denne leder også have den log, som den forrige leder havde, og derved går der ikke nogle opgaver tabt.
 \\[5px]
@@ -228,7 +240,7 @@ Her vil det dog stadig være nødvendigt at sende hele loggen når et nyt system
 
 
 \subsection{Load-balancing}
-I forbindelse med casen nævnt i afsnittet om motivation, er brugeren interesseret i at implementere et program til at håndtere belastningen af de forskellige servere. Dette kan heartbeat systemet tillade ved at lade brugeren opdatere en bruger-log, hvor den enkelte maskine kan sende information, der bliver delt ud til resten af maskinerne via et Heartbeat. Som det ses af figuren [1] vil et sådanne system være bygget op således at en load balancer maskine holder styr på alle maskinernes load, når router(ne) så vil sende en opgave videre spørger den load-balanceren hvilke maskiner er klar, hvorefter den sender opgaven videre til den konkrete maskine.
+I forbindelse med casen nævnt i afsnittet om motivation, er brugeren interesseret i at implementere et program til at håndtere belastningen af de forskellige servere. Dette kan heartbeat systemet tillade ved at lade brugeren opdatere en bruger-log, hvor den enkelte maskine kan sende information, der bliver delt ud til resten af maskinerne via et Heartbeat. Som det ses af figur 2 vil et sådanne system være bygget op således at en load balancer maskine holder styr på alle maskinernes load, når router(ne) så vil sende en opgave videre spørger den load-balanceren hvilke maskiner er klar, hvorefter den sender opgaven videre til den konkrete maskine.
 Herefter svarer maskinen tilbage og load-balanceren modtager en opdateret værdi for maskinens belastning.
 
 \begin{figure}[H]
@@ -238,9 +250,8 @@ Herefter svarer maskinen tilbage og load-balanceren modtager en opdateret værdi
 \end{figure}
 
 
-
 \subsection{Opsamling}
-Vl vil altså implementere systemet via UDP beskeder, ud fra samme algoritme som er beskrevet i Rafts algoritme. Til dette vil vi dog gøre brug af en enkelt logisk klokke til håndtering af konsistentet, fremfor at arbejde i terminer som Raft [3]. Dette betyder endvidere, at vi bruger en lidt anderledes fremgangsmetode med tilbagegangen fra kandidat til følger. Dette giver os følgende state machine, der i høj grad minder om Raft (se figur nr. 1).
+Vl vil altså implementere systemet via UDP beskeder, ud fra samme algoritme som er beskrevet i Rafts algoritme. Til dette vil vi dog gøre brug af en enkelt logisk klokke til håndtering af konsistentet, fremfor at arbejde i terminer som Raft [3]. Dette betyder endvidere, at vi bruger en lidt anderledes fremgangsmetode med tilbagegangen fra kandidat til følger. Dette giver os følgende state machine, der i høj grad minder om Raft (se figur nr. 3).
 \begin{figure}[H]
   \caption{Vores state machine.}
   \centering
@@ -249,11 +260,15 @@ Vl vil altså implementere systemet via UDP beskeder, ud fra samme algoritme som
 
 Desuden ser vi at køretiden primært er afhængig af forbindelsen og hardware til at sende data mellem maskiner. Dette betyder, at programmerings sproglige køretids-begrænsninger ikke vil have nogen reel effekt på ydeevnen af programmet. Dette har tilladt os at lave implementeringen i Python, da det tilbyder et fornuftigt socket system via standard biblioteksfunktioner.
 
+\subsection{Valg af konsistensmodel}
+Yolo
+\newpage
+
 \section{Implementering} 
 \subsection{Overordnet struktur} 
 
 \subsubsection{Funktioner} 
-Det meste af systemet foregår i klassen Heartbeat, hvorfra der laves kald til en log datastruktur designet til at fungere sammen med heartbeat klassen. Selve heartbeat klassen er opbygget af tre funktioner der beskriver systemets tilstand henholdsvis follower(), candidate() og leader(). Disse bruges til at holde styr på hvilke opgaver der skal løses i det nuværende stadie. Disse tre funktioner håndtere alt datadeling samt leader-election og discovery.
+Det meste af systemet foregår i klassen Heartbeat, hvorfra der laves kald til en log datastruktur designet til at fungere sammen med heartbeat klassen. Selve heartbeat klassen er opbygget af tre funktioner der beskriver systemets tilstand henholdsvis follower, candidate og leader. Disse bruges til at holde styr på hvilke opgaver der skal løses i det nuværende stadie. Disse tre funktioner håndtere alt datadeling samt leader-election og discovery.
 \\[5px]
 Af disse funktioner gælder det at lederen er den der skal processere flest svar fra følgere, og kandidaten udelukkende er et midlertidig mellemstadie, der hurtigt enten skifter til leder eller følger. Dette gør at man for store systemer kan overveje, hvorvidt applikationen skal ligge lige så meget pres på lederen som på følgerne.
 Disse funktioner bliver kaldt gentagne gange i en uendelig løkke for at holde programmet kørende. Dette laves endvidere i en ny tråd, således at det ikke blokerer for bruger funktionaliteterne, men samtidig bliver ved med at holde sig selv opdateret.
@@ -294,27 +309,27 @@ Herudover sættes alle klienters state først og fremmest til at være follower,
 Herefter findes og defineres alle de nødvendige variable, der senere bliver nødvendige i klassen.
 
 \subsubsection{Leader}
-Som det første tjekker vi om det er en ny leder, dette gøres ved at sikre sig at heartbeats ipList stemmer overens med loggens liste. Hvis dette gælder laver vi en ny ipList hvor hver ip gives en tid, hvor hvis ikke ip adressen besvarer et heartbeat inden tiden er gået, vil adressen fjernes fra listen over aktive systemer. Denne værdi kan ændres afhængig af hvor ofte man vil heartbeate, samt størrelsen af programmet. vi har sat den til to sekunder, hvilket svarer til at man bliver fjernet efter at have misset tre til fire heartbeats. 
-Herefter sender vi et heartbeat, såfremt nuværende system tid er højere end værdien af castTimer. I heartbeatet er det første vi gør at tjekke hvorvidt det er muligt at committe de ændringer der var sket ved det forrige heartbeat. Dette gør vi ved at have en currentKey, som er den nøgle der var størst sidst vi broadcastede. Denne nøgle tjekker vi så om alle følgerne er foran. Såfremt alle følgerne svarer med en nøgle der er lig eller større end currentKey, kan vi committe på currentKey.
+Som det første tjekker vi om det er en ny leder, dette gøres ved at sikre sig at heartbeats ipList stemmer overens med loggens liste. Hvis dette gælder laver vi en ny liste af ip-adresser hvor hver ip gives en tid, hvor hvis ikke ip-adressen besvarer et heartbeat inden tiden er gået, vil adressen fjernes fra listen over aktive systemer. Denne værdi kan ændres afhængig af hvor ofte man vil heartbeate, samt størrelsen af programmet. Vi har sat den til to sekunder, hvilket svarer til at man bliver fjernet efter at have misset tre til fire heartbeats. 
+Herefter sender vi et heartbeat, såfremt nuværende system tid er højere end en pågældende værdi for hvor ofte, der et heartbeat broadcastes. I heartbeatet er det første vi gør at tjekke hvorvidt det er muligt at committe de ændringer der var sket ved det forrige heartbeat. Dette gør vi ved at have en nøgle-værdi, som er den nøgle der var størst sidst vi broadcastede. Denne nøgle tjekker vi så om alle følgerne er foran. Såfremt alle følgerne svarer med en nøgle der er lig eller større end denne nøgle, så kan vi committe på nøglen.
 \\
-For at holde styr på hvorvidt alle i systemet er nået til enighed, og vi derved kan committe, sætter vi variablen expectedResponses til længden af ipList, minus en grundet lederen altid er enig, hvis der er mere end en aktiv adresse, og til en  hvis der kun er lederen, da vi ikke ønsker at committe så længe der kun er en aktiv maskine.
+For at holde styr på hvorvidt alle i systemet er nået til enighed, og vi derved kan committe, sætter vi variablen en variabel for antal forventede svar til længden af listen af ip-adresser, minus en grundet lederen altid er enig, hvis der er mere end en aktiv adresse, og til en  hvis der kun er lederen, da vi ikke ønsker at committe så længe der kun er en aktiv maskine.
 \\[5px]
-Denne expectedResponse sætter vi så ned hver gang vi modtager en key fra en følger, som er større end currentKey. med den antagelse at der kun kommer et svar per følger per broadcast, og at nye følgere altid sender -1, og derved aldrig er større end currentKey.
+Dette antal forventede svar sætter vi så ned hver gang vi modtager en key fra en følger, som er større end den nuværende nøgle, med den antagelse at der kun kommer et svar per følger per broadcast, og at nye følgere altid sender -1, og derved aldrig er større end den nuværende nøgle.
 \\
 Såfremt vi ønsker at committe tilføjer vi co:currentKey, til broadcast beskeden.
 Efter broadcasting, eller hvis vi ikke broadcaster denne iteration, kommer vi videre til at læse data fra følgerne. Vi tjekker første for om følgerne har sendt en set eller delete besked, fra applikationsniveauet. Disse sender vi videre til vores broadcast besked, og parser dem med lederen med det samme, for at opdatere nøglerne.
 \\
-Såfremt følgerne sender nøglen -1, ved vi at det er en ny følger, og vi skal derfor sende en overwrite indeholdende uptodate log, ip liste og user dictionary. Alternativt sender vi overwrite hvis følgeren sendte en key der er mindre end lederens laveste key.
-Såfremt nøglen er mindre end currentKey, men større end lowestKey sender vi den manglende data via loggens compile funktion.
-Herefter opdaterer vi værdierne i ipListen. Således at hvis lederen ikke er i listen tilføjer vi den. Hvis en følger ikke har svaret tilbage inden for den givne tid, fjerner vi den fra ipList og loggen. Hvis følgeren svarer tilbage opdaterer vi dens levetid. 
+Såfremt følgerne sender nøglen -1, ved vi at det er en ny følger, og vi skal derfor sende en overwrite indeholdende up-to-date log, ip liste og user dictionary. Alternativt sender vi overwrite hvis følgeren sendte en key der er mindre end lederens laveste key.
+Såfremt nøglen er mindre end den nuværende nøgle, men større end laveste nøgle sender vi den manglende data via loggens compile funktion.
+Herefter opdaterer vi værdierne i ip-listen. Således at hvis lederen ikke er i listen tilføjer vi den. Hvis en følger ikke har svaret tilbage inden for den givne tid, fjerner vi den fra ip-listen og loggen. Hvis følgeren svarer tilbage opdaterer vi dens levetid. 
 Alle opdateringer til listen tilføjes til broadcast beskeden, så de bliver sendt ud til resten af medlemmerne i systemet.
 
 \subsubsection{Follower}
-Først og fremmest i followeren forsøger vi at modtage data fra broadcasts, og undersøger hvad dette data indeholder.
+I followeren forsøger vi at modtage data fra broadcasts, og undersøger hvad dette data indeholder.
 \\
 Hvis beskeden, message indeholder “Vote”, så ved vi, at der er tale om et broadcast fra en candidate, og followeren svarer derfor tilbage med “Voted” for at svare på det leader election, som kandidaten har sat igang.
 Hvis message ikke er “Vote”, så ved vi der er tale om et broadcast fra leder, og vi splitter derfor beskeden op i henholdsvis den key vi modtager, samt beskeden.
-Herefter parses beskeden, via vores funktion parse().
+Herefter parses beskeden, via vores funktion parse.
 \\
 Hvis følgeren lige er kommet ind i systemet - hvilket betyder, at den har en tom log, og dens nuværende key er -1, så sender følgeren -1 tilbage til lederen, da lederen så ved, at følgeren skal have et overwrite, da følgeren ikke har den seneste log.
 Hvis dette ikke er tilfældet, så svarer følgeren tilbage med sin key, så lederen ved om følgeren er up to date.
@@ -324,45 +339,43 @@ Hvis der går tilstrækkelig lang tid mellem, at følgeren modtager nogle besked
 
 
 \subsubsection{Candidate}
-I første omgang, så tæller kandidaten sig selv med, så voteCounteren sættes til 1.
+I første omgang, så tæller kandidaten sig selv med, så vote-counteren sættes til 1.
 Herefter broadcaster kandidaten “Vote” ud, som følgeren så modtager og behandler, som beskrevet i afsnittet om denne.
 \\
 Herefter sættes der en voteTimer, så det leader-election, som kandidaten sætter i gang kører for evigt.
-Herefter så starter det rigtige leader-election, og det bliver kørt indtil kandidaten modtager stemmer fra mindst halvdelen af de aktive systemer, el. længden af ipList. Derudover så stoppes valget også, hvis voteTimeren bliver overskrevet, hvilket fører til at kandidaten går hen og bliver en følger, og voteCounteren sættes til 0.
+Herefter så starter det rigtige leader-election, og det bliver kørt indtil kandidaten modtager stemmer fra mindst halvdelen af de aktive systemer, el. længden af listen over ip-adresser. Derudover så stoppes valget også, hvis vote-timeren bliver overskrevet, hvilket fører til at kandidaten går hen og bliver en følger, og vote-counteren sættes til 0.
 \\
-Hvis kandidaten ikke er blevet sat til følger efter while-løkken, så ved vi, at denne må have opnået nok stemmer til at blive leder, og dennes state ændres derfor.
+Hvis kandidaten ikke er blevet sat til følger efter valgperioden, så ved vi, at denne må have opnået nok stemmer til at blive leder, og dennes state ændres derfor.
 
 \subsubsection{Trådning}
 For at programmet kan køre og vedligeholde en liste over ip adresser, uden at blokere for brugeren, bliver programmet eksekveret i en tråd. Dette implementeres via. threading og semaphore. Dette betyder imidlertid at der er blevet taget nogle valg for at holde en konsistentet mellem heartbeat klassen og brugeren.
 \\ 
 Derfor er der taget nogle valg angående funktionaliteten af enkelte funktioner.
-Set og delete er begge lavet ud fra at de først må returnere til når der er committed i systemet, derfor er der sat en semaphor, update event, der var på en notify all. Denne notify all bliver sendt i lederen når der sendes en commit besked, samt i følgeren når den log.parse() returnere true. Derfor er der tilføjet til Parse() at den returnere true hvis en af beskedderne var en commit, og false ellers.
+Set og delete er begge lavet ud fra at de først må returnere til når der er committed i systemet, derfor er der sat en semaphor, update event, der var på en notify all. Denne notify all bliver sendt i lederen når der sendes en commit besked, samt i følgeren når den log.parse() returnere true. Derfor er der tilføjet til funktionen parse, at den returnerer true hvis en af beskederne var en commit, og false ellers.
 \\
-Endvidere er der sat en lås i init, start lock, der først slippes når leaderIp er sat. dette sikrer at brugeren ikke kan kalde set/delete før end der er kontakt til en leder, eller at programmet selv er leder.
+Endvidere er der sat en lås i init, start lock, der først slippes når leaderIp er sat. Dette sikrer at brugeren ikke kan kalde set/delete før end, at der er kontakt til en leder, eller at klienten selv er leder.
 \\
-Dette betyder også at variablen leaderIp skal sættes som det første når en maskine bliver leder, til trods for at man ellers bare kunne bruge myIp. 
+Dette betyder også at lederens ip-adresse skal sættes, som det første når en maskine bliver leder, til trods for at man ellers bare kunne bruge værdien myIp. 
 
 \textbf{TILFØJ EN HELT MASSE OM KONSISTENTET NÅR VI HAR LÆST OM DET.}
 
 
 \subsubsection{Applikations-lags funktioner}
 For at kunne give brugeren mulighed for, at tilføje, fjerne og hente fra det tidligere beskrevne user-dictionary, er der lavet en række applikations-lags funktioner. \\
-Fælles for disse er, at de understøtter, at en bruger kan tilføje en kommando til denne, og derudover så ventes der via den beskrevne trådning til, at kommandoen er blevet udført, el. committed på tværs af systemet, dette sikrer at funktionen ikke vil returnere førend man kan være tilstrækkelig sikker på at den værdi man har tilføjet, rent faktisk er blevet tilføjet. Alternativet ville gøre det upraktisk at programmere med.
+Fælles for disse er, at de understøtter, at en bruger kan tilføje en kommando til denne, og derudover så ventes der via den beskrevne trådning til, at kommandoen er blevet udført, el. committed på tværs af systemet, dette sikrer at funktionen ikke vil returnere førend man kan være sikker på at den værdi man har tilføjet, rent faktisk er blevet tilføjet. Alternativet ville gøre det upraktisk at programmere med.
 \\[5px]
-Endelig så benyttes der i alle funktionerne json-formatet. Dette tillader os, at tilføje og hente værdier med en tilhørende key, og til fordel for vores eget format, som er beskrevet tidligere, så har vi ikke nogen begrænsninger ved, at der splittes på mellemrum eller bindestreg, og disse derved ikke kan bruges i dictionariet. Disse fordele får vi dog kun såfremt at json-formatet blev brugt over hele linjen, hvilket systemet i sin nuværende implementation mangler.
-
+Endelig så benyttes der i alle brugerfunktionerne json-formatet. Dette tillader os, at tilføje og hente værdier med en tilhørende key, og til fordel for vores eget format, som er beskrevet tidligere, så har vi ikke nogen begrænsninger ved, at der splittes på mellemrum eller bindestreg, og disse derved ikke kan bruges i dictionariet. Disse fordele får vi dog kun såfremt at json-formatet blev brugt over hele linjen, hvilket systemet i sin nuværende implementation mangler.
+\newpage
 
 \section{Afprøvning} 
 \subsection{Runtime testning}
-Prøvekørsel af generelt system:
 Til at teste, at vores Heartbeat-bibliotek virker efter hensigten, så kan vi teste systemet af på forskellige måder.
 \\
-Den aller simpleste måde er blot, at lade systemet køre og se, at der ikke undervejs opstår fejl.
+Den simpleste måde er blot, at lade systemet køre og se, at der ikke undervejs opstår fejl.
 Nedenfor ses en kørsel med tre maskiner, hvor der undervejs bliver til- og frakoblet en maskine af gangen. Herved kan vi se, at systemet virker under optimale forhold, samt når der undervejs opstår problemer med forbindelsen hos de individuelle maskiner. 
 \\
 Dette tab af forbindelse finder så blot sted, når vi dræber kørslen af programmet på den pågældende maskine.
 \begin{lstlisting}
-Testen:
 State set to: candidate
 State set to: leader
 Log:  []
@@ -391,6 +404,11 @@ Log:  [[8, 're:192.168.43.69']]
 List:  ['192.168.43.165']
 Program slut.
 \end{lstlisting}
+Testresultatet er vist fra lederens synspunkt - hvilket ses af de to første linjer, hvor den pågældende maskine skifter fra at være follower, til at være kandidat, til at være leder.
+\\
+Herefter printes for heartbeat loggen, som viser trinvise ændringer, samt listen, ipList over nuværende aktive maskiner.
+\\
+Loggen viser altså, når der bliver tilføjet, ad, eller fjernet, re, en maskine fra ip-listen og ip-listen ændres herefter med den pågældende ændring.
 
 \subsection{Prøvekørsel m. load-balancing}
 Når vi har testet, at systemet uden yderligere tilføjelser virker, så kan vi gå videre og teste med nogle konkrete eksempler på, hvordan systemet kan benyttes af fremtidige brugere.
@@ -403,7 +421,6 @@ I vores tilfælde bruges denne liste dog ikke til yderligere, men viser blot at 
 \\
 Det antages yderligere i dette eksempel, at kun følgere er en del af denne load-balancing.
 \begin{lstlisting}
-Testen:
 State set to: candidate
 State set to: leader
 Available IPs: []
@@ -427,6 +444,9 @@ Available IPs: [u'192.168.43.69']
 Available IPs: [u'192.168.43.165', u'192.168.43.69']
 Program slut.
 \end{lstlisting}
+I denne test ses der også fra lederens synspunkt.
+\\
+Undervejs i testen ses det hvordan listen af tilgængelige IP-adresser opdateres, og derved kan det give et indblik i, hvordan en evt. load-balancing kan fungere i et sådant system.
 
 \subsection{Leader-election}
 For at teste leader-election kan man måle tiden, der går før, der er blevet valgt en ny leder og at en følger har opdateret, at denne er den nye leder. Dette er her gjort ved at lave et program, der tvinger lederen til at blive følger, og starter en timer i det øjeblik der skiftes til følger. Denne følger stopper så timeren ved det øjeblik at den har opdateret lederens ip-adresse til den nye leder.
@@ -462,48 +482,57 @@ Som nævnt i analysen ville en alle-til-alle kobling af maskinerne kræve at der
 Det var da påstået at dette kunne effektiviseres ved at bruge et leder hierarki.
 At dette er gældende i denne implementation kan man se ved at finde alle beskeder der bliver sendt regelmæssigt.
 \\
-Vi ved at der ved hvert heartbeat sendes en besked til alle maskiner, samt at alle maskiner skal svare tilbage, hvilket lederen også er afhængig af at vente på. dette giver os 2*n beskeder. Endvidere ved vi at vi i værste tilfælde kan komme til at skulle sende en overwrite per maskine der modtager en besked. Dette giver os samlet 3*n beskeder per heartbeat. Da vi ikke interesserer os for konstanter kan vi se det som en køretid på O(n).
+Vi ved at der ved hvert heartbeat sendes en besked til alle maskiner, samt at alle maskiner skal svare tilbage, hvilket lederen også er afhængig af at vente på. dette giver os 2*n beskeder. Endvidere ved vi at vi i værste tilfælde kan komme til at skulle sende en overwrite per maskine der modtager en besked. Dette giver os samlet 3*n beskeder per heartbeat.
+\newpage
 
 \subsubsection{Skalering}
 Når det kommer til skalering af vores system, så er vi begrænset af, som tidligere nævnt,  Maximum Transmission Unit. Denne vil vi i denne forbindelse antage ligger på 1500 [2], jvf. RFC-894, bytes. Endvidere er vi nødt til at definere en standard størrelse for en string-repræsentation af en ip-adresse. Denne vil variere alt efter systemet og hvordan maskinen gemmer strings. Ved at kalde sys.getsizeof(“192.168.100.0”), har vi fået en størrelse på 34 bytes. Dette er på et 32-bit system.
 \\[5px]
-Ud fra disse kan man regne sig til at det maks ville være muligt at sende ca. 44 ip-adresser pr. heartbeat.
+Ud fra disse kan man regne sig til at det maks ville være muligt at sende $1500 / 34$ eller ca. 44 ip-adresser pr. heartbeat. 
 \\ 
 Endvidere antager vi, at loggen altid er commitet, altså tom. samt at user-dictionariet ikke er i brug, da vi ikke kan antage hvilken størrelse data brugeren bruger.
 Da overwrite er den største besked, eftersom at den sender alle ip-adresser, ville systemet altså kunne acceptere op imod 44 brugere, fra dette skal der trækkes størrelsen af en tom liste, samt størrelsen af et tomt dictionary. Dette er samlet 168 bytes (136 for dictionary, 32 for liste). 
 Dette begrænser os til maks at have 39 aktive maskiner i systemet ad gangen, såfremt der ikke er anden data.
+\\
+For at kunne skalere dette, kunne man udvide programmet, så den bruger et mix af UDP og TCP. Dette ville fjerne den nuværende begrænsning på antallet af aktive maskiner i systemet. Uden at miste UDP-protokollens hastighedsfordele ved mindre systemer.
+\newpage
 
-\section{Brugervejledning:}
+\section{Brugervejledning}
 For at kunne bruge programmet, må man først initialisere heartbeat-klassen med Heartbeat(). Dette sætter et heartbeat instans i gang, der kører på en ny tråd.
 \\[5px]
 Når denne tråd så er sat i gang, så får klassen tildelt en state. Hvis denne state er “leader”, så ved vi med fordel, at der kun er en enkelt af maskinerne i systemet der har denne state, hvilket vil sige at det man vælger at gøre når man er leder kun sker en gang, hvorimod der i tilfældet af at staten er “follower” kan kode blive udført af flere maskiner. Dette betyder at hvis man f.eks. ønsker at sende en besked videre til klienten, ønsker man som regel kun, at sende denne besked en enkelt gang. I dette tilfælde bør det udføres fra lederen. Er man derimod interesseret i at opdatere en værdi for hver maskine med et unikt id, kan man gøre det fra follower, som set i \textbf{LoadBalancing.py} nedenstående.
-Endvidere har man adgang til et fælles dictionary mellem alle maskinerne, der kan tilgås via set(key, value), delete(key) og get(key) eller ved at hente hele dictionariet via getDic()
+Endvidere har man adgang til et fælles dictionary mellem alle maskinerne, der kan tilgås via set(key, value), delete(key) og get(key) eller ved at hente hele dictionariet via getDic.
 \\
 Ved set og delete gælder der, at funktionerne først vil returnere, når værdierne er sat fælles på maskinerne, så kan der foretages flere ændringer fra bruger applikationen.
 \\
 \lstinputlisting[language=Python]{LoadBalancing.py}
-Denne instans kobler alle heartbeat-klasser på det lokale netværk sammen, og vedligeholder en liste over aktive ip-adresser, som kan tilgås via getIps().
+Denne instans kobler alle heartbeat-klasser på det lokale netværk sammen, og vedligeholder en liste over aktive ip-adresser, som kan tilgås via getIps.
+\newpage
 
-
-\section{Diskussion / Konklusion (what to call it?)}
+\section{Konklusion}
 Når det kommer til den endelige, implementerede version af vores Heartbeat-biblioteket, så må det vurderes, om denne lever op til hvad der oprindeligt var formålet.
 \\
 Kører man biblioteket igennem, så ser man hurtigt, at nogle ting er blevet som forventet, hvor andet i større eller mindre grad har opnået det, der var hensigten bag.
-
-\textbf{Manglende implementeringer}
-Hvis vi starter med ting, som gerne måtte have været implementeret, men som det blev vurderet til, at der ikke var tilstrækkelig med tid til, så var der bl.a. ændringen til json-formatering ved de forskellige kommandoer, der sendes rundt i systemet.
-Denne formatering bliver på nuværende tidspunkt benyttet i applikations-lags funktionerne set og delete - men mangler i de resterende funktioner.
-Fordelen ved json-formateringen er som også tidligere beskrevet i under-afsnittet “Applikations-lags funktioner”, at der ikke er begrænsninger i form af at, der splittes på forskellige ting, som i vores tilfælde er bindestreg og mellemrum.
-
-\textbf{TCP/UDP ved skalering}
-Endvidere kunne man udvide programmet, så den bruger et mix af UDP og TCP. Dette ville fjerne den nuværende begrænsning på antallet af aktive maskiner i systemet. Uden at miste UDP-protokollens hastighedsfordele ved mindre systemer.
-
+\\[5px]
 \textbf{Hvad er blevet opnået?}
-I forhold til forventningerne om at lave et bibliotek, der gør implementeringen af heartbeat systemet så nemt at bruge for brugeren som muligt. Er det her opnået at kunne starte et heartbeat system op, blot ved at lave klassen.
-Alt grundlæggende arbejde der udføres af heartbeatet er skjult fra brugeren, og er så ofte som muligt blevet automatiseret.
 \\
-Endvidere ses der at der ved overvejede timer intervaller, som set på (figur test), er en begrænset periode hvor systemet ikke vil have en leder.
-Dette har også vist, i forhold til casen med load balancing, at dette har kunne implementeres kort og simpelt, (Se \textbf{LoadBalancing.py} fra afsnittet brugervejledning), og uden en forståelse for hvordan heartbeatet reelt fungerer.
+I forhold til forventningerne om at lave et bibliotek, der gør implementeringen af heartbeat systemet så nemt at bruge for brugeren som muligt, så er det her opnået, at kunne starte et heartbeat system op, blot ved at  klassen.
+Alt grundlæggende arbejde der udføres af heartbeatet er skjult fra brugeren, og bliver så ofte som muligt automatiseret.
+\\
+Endvidere ses der, at der ved overvejede timer-intervaller, som set på (figur 4), er en begrænset periode, hvor systemet ikke vil få valgt en leder.
+\\
+Dette er også vist i forhold til casen med load-balancing ved, at dette er blevet implementeret kort og simpelt, (se \textbf{LoadBalancing.py} fra afsnittet brugervejledning), og uden en forståelse for hvordan heartbeatet reelt fungerer.
+\newpage
+
+\section{Perspektivering}
+I tilfældet af at vi stod med mere tid til projektet, så kunne man overveje, at lave følgende tilføjelser til systemet.
+\\
+For det første, så kunne man løse nuværende begrænsninger, ved at se på en kombination af både TCP og UDP, som ville tillade os at skifte protokol afhængig af størrelsen på systemet. Dette kunne evt. gøres ved at tjekke størrelsen af de sendte pakker og derudfra vælge protokol.
+\\
+Som en anden ting, kunne det vurderes om programmet skulle kunne udvides til en endnu bredere brugerskare. En måde hvorpå dette kunne gøres, var ved at lave grafisk brugerinterface til systemet, for lettere at kunne få et overblik over aktive maskiner i systemet, uden at være afhængig af en grundlæggende forståelse for programmering.
+\\
+For at kunne tjekke systemets reelle ydeevne, kunne det også være interessant, at prøve programmet af i større systemer, el. i den virkelige verden i eksempelvis et firma.
+\newpage
 
 \section{Litteraturhenvisninger}
 \textbf{[1]} Slides fra kurset datanet - Copyright J.F Kurose and K.W. Ross, All Rights Reserved
@@ -517,7 +546,10 @@ Dette har også vist, i forhold til casen med load balancing, at dette har kunne
 \textbf{[5]} Eksempel på Bully-algoritmen - \url{http://www.cs.colostate.edu/~cs551/CourseNotes/Synchronization/BullyExample.html} - 2. juni 2015
 \\[5px]
 \textbf{[6]} Coulouris, George F., Jean Dollimore, Tim Kindberg and Gordon Blair. Distributed systems: concepts and design. pearson education, 2012.
+\\[5px]
+\textbf{[7]} Kurose James, F., and W. Ross Keith. Computer Networking: A top-down approach. Sixth Edition, 2013.
 \newpage
+
 
 \section{Appendix}
 \subsection{Heartbeat.py}
