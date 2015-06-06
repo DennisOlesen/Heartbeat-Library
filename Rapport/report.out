@@ -12,8 +12,8 @@
 \BOOKMARK [2][-]{section*.13}{Leader election}{section*.8}% 12
 \BOOKMARK [2][-]{section*.15}{Logging}{section*.8}% 13
 \BOOKMARK [2][-]{section*.16}{Load-balancing}{section*.8}% 14
-\BOOKMARK [2][-]{section*.18}{Opsamling}{section*.8}% 15
-\BOOKMARK [2][-]{section*.20}{Valg af konsistensmodel}{section*.8}% 16
+\BOOKMARK [2][-]{section*.18}{Valg af konsistensmodel}{section*.8}% 15
+\BOOKMARK [2][-]{section*.19}{Opsamling}{section*.8}% 16
 \BOOKMARK [1][-]{section*.21}{Implementering}{}% 17
 \BOOKMARK [2][-]{section*.22}{Overordnet struktur}{section*.21}% 18
 \BOOKMARK [3][-]{section*.23}{Funktioner}{section*.22}% 19
