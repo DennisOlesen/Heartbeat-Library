@@ -265,7 +265,7 @@ Herefter svarer maskinen tilbage og load-balanceren modtager en opdateret værdi
 \subsection{Valg af konsistensmodel}
 For at sikre, at der vil være enighed omkring loggen samt bruger-opdateringer, på tværs af systemerne, så er vi afhængige af, at have valgt en konsistens model, der opfylder, at alle maskiner vil have de samme beskeder i samme rækkefølge.
 \\[5px]
-Hvis vi ser tilbage på de førnævnte tre konsistens modeller i vores problemorienterede analyse, så kan vi ud fra disse vurdere, hvilken vi har gjort brug af.
+Hvis vi ser tilbage på de førnævnte tre konsistens modeller \textbf{[8]} i vores problemorienterede analyse, så kan vi ud fra disse vurdere, hvilken vi har gjort brug af.
 Ser vi på strict consistency modellen, så må det hurtigt vurderes, at i vores system er det ikke tilfældet, at to samtidige skrive-operationer vil kunne ødelægge vores system, eller at den der skriver først nødvendigvis er den kommer først i rækkefølgen. I vores tilfælde er det lederen, der tildeler den pågældende operation en key, der så bestemmer rækkefølgen på operationerne.
 Altså er strict consistency ikke den model, vi gør brug af.
 \\[5px]
@@ -275,13 +275,12 @@ Endvidere gælder det for causal at kommandoer der ikke er kausale ikke behøves
 Vi kan endelig komme frem til, at vi i højere grad benytter os af sequential consistency modellen. Rækkefølgen på en skreven operation er afhængig af hvornår, der er enighed om denne i systemet. I vores tilfælde bestemmer lederen rækkefølgen, og sender den derefter ud til de andre systemer.
 
 \subsection{Opsamling}
-Vi vil altså implementere systemet via UDP beskeder, ud fra samme algoritme som er beskrevet i Rafts algoritme. Til dette vil vi dog gøre brug af en enkelt logisk klokke til håndtering af konsistentet, fremfor at arbejde i terminer som Raft [3]. Dette betyder endvidere, at vi bruger en lidt anderledes fremgangsmetode med tilbagegangen fra kandidat til følger. Dette giver os følgende state machine, der i høj grad minder om Raft (se figur nr. 3).
+Vi vil altså implementere systemet via UDP beskeder, ud fra samme algoritme som er beskrevet i Rafts algoritme. Til dette vil vi dog gøre brug af en enkelt logisk klokke til håndtering af konsistentet, fremfor at arbejde i terminer som Raft [3]. Dette betyder endvidere, at vi bruger en lidt anderledes fremgangsmetode med tilbagegangen fra kandidat til følger. Dette giver os følgende state machine, der i høj grad minder om Raft (se figur nr. 3). \\
 \begin{figure}[H]
   \caption{Vores state machine.}
   \centering
     \includegraphics[width=1\textwidth]{State-machine.png}
 \end{figure}
-
 Desuden ser vi at køretiden primært er afhængig af forbindelsen og hardware til at sende data mellem maskiner. Dette betyder, at programmerings sproglige køretids-begrænsninger ikke vil have nogen reel effekt på ydeevnen af programmet. Dette har tilladt os at lave implementeringen i Python, da det tilbyder et fornuftigt socket system via standard biblioteksfunktioner.
 \newpage
 
@@ -377,9 +376,6 @@ Set og delete er begge lavet ud fra at de først må returnere til når der er c
 Endvidere er der sat en lås i init, start lock, der først slippes når leaderIp er sat. Dette sikrer at brugeren ikke kan kalde set/delete før end, at der er kontakt til en leder, eller at klienten selv er leder.
 \\
 Dette betyder også at lederens ip-adresse skal sættes, som det første når en maskine bliver leder, til trods for at man ellers bare kunne bruge værdien myIp. 
-
-\textbf{TILFØJ EN HELT MASSE OM KONSISTENTET NÅR VI HAR LÆST OM DET.}
-
 
 \subsubsection{Applikations-lags funktioner}
 For at kunne give brugeren mulighed for, at tilføje, fjerne og hente fra det tidligere beskrevne user-dictionary, er der lavet en række applikations-lags funktioner. \\
