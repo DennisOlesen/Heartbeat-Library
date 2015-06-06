@@ -170,7 +170,20 @@ Loggen er en metode, som vi bruger til at dele information om hvilke maskiner de
 Dette system vil altså afhænge af, at have fem del-funktionaliteter der tilsammen udgør systemet. Disse fem funktionaliteter kan ses som Discovery, hvor der oprettes forbindelse til følgere på netværket, hvilket også vil blive beskrevet nærmere senere. Derudover er der liveness hvor der regelmæssigt tjekkes for, at følgere og leder er i live. Leader-election sikrer, at der hurtigt kan findes en ny leder, hvis den nuværende fejler. Logging sikrer sig, at der hele tiden er en vis konsistens i systemet, så alle medlemmer i systemet har den samme information, eller hurtigst muligt retter op og når en commited state, når der vælges en ny leder. Til sidst er der load-balancing, som afhænger af at det resterende system fungerer, så det kan balancere belastningen af følgerne på applikationsniveauet i forhold til vores case eksempel.
 
 \subsection{Beskrivelse af konsistensmodeller}
-Yolo
+I forbindelse med at der arbejdes på distribuerede systemer vil det være nødvendigt at have en konsistens model. Dette sikrer, at vi kan have en fælles state på alle maskiner. 
+Der findes dog en lang række konsistens modeller, og det er derfor nødvendigt, at finde den rette til vores formål. En række af disse modeller, er dem som er beskrevet herunder. \textbf{[8]}
+\\[5px]
+\textbf{Strict Consistency}
+\\
+Strict consistency modellen er som det meget ligger i navnet den optimale model, idet den sikrer til enhver tid, at alle der læser fra et pågældende system vil læse den seneste besked, der er skrevet til systemet. Derudover vil den besked der skrives først, altid vil være først i rækkefølgen. Dette er imidlertid ikke muligt, at opretholde såfremt man arbejder på mere end en kerne, da to samtidige skrive-operationer vil kunne ødelægge denne model, da der opstår uenighed om hvilken skrive-operation, der er udført først.
+\\[5px]
+\textbf{Sequential Consistency}
+\\
+Vil vi den forrige models problem til livs, kan det være værd at se på sequential consistency modellen. Heri er rækkefølgen på skrevne operationer afhængigt af hvornår der er enighed om, at denne operation er udført. Dette er forskellig fra strict consistency, da denne afhænger kræver at rækkefølgen er den samme som rækkefølgen af hvornår ting er blevet eksekveret.
+\\[5px]
+\textbf{Causal Consistency}
+\\
+Rykker vi ned og bliver endnu mindre strikse end i sequential consistency modellen, så kan vi se på causal consistency. Heri kan writes, der ikke er kausalt afhængige af hinanden godt ses i forskellig rækkefølge på forskellige maskiner. Der gælder dog, at hvis de er kausalt afhængige, så skal rækkefølgen opretholdes - en write, \textit{write2} der er kausalt afhængig af en tidligere write, \textit{write1} må altså vente til, at \textit{write1} er tilføjet det samlede system før den selv kan blive det.
 \newpage
 
 \section{Programmerings overvejelser}
@@ -548,6 +561,8 @@ For at kunne tjekke systemets reelle ydeevne, kunne det også være interessant,
 \textbf{[6]} Coulouris, George F., Jean Dollimore, Tim Kindberg and Gordon Blair. Distributed systems: concepts and design. pearson education, 2012.
 \\[5px]
 \textbf{[7]} Kurose James, F., and W. Ross Keith. Computer Networking: A top-down approach. Sixth Edition, 2013.
+\\[5px]
+\textbf{[8]} Brian Vinter. Distributed Shared Memory: A Survey of Paradigms and Concepts in Distributed Shared Memory Research, May 28 1997.
 \newpage
 
 
