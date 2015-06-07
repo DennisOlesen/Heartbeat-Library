@@ -7,9 +7,9 @@
 \BOOKMARK [1][-]{section*.8}{Programmerings overvejelser}{}% 7
 \BOOKMARK [2][-]{section*.9}{Discovery}{section*.8}% 8
 \BOOKMARK [2][-]{section*.10}{Broadcast/MultiCast/UDP/TCP}{section*.8}% 9
-\BOOKMARK [2][-]{section*.11}{Liveness}{section*.8}% 10
+\BOOKMARK [2][-]{section*.11}{Liveliness}{section*.8}% 10
 \BOOKMARK [2][-]{section*.12}{CAP-teoremet og dets begr\346nsning af systemet}{section*.8}% 11
-\BOOKMARK [2][-]{section*.13}{Leader election}{section*.8}% 12
+\BOOKMARK [2][-]{section*.13}{Leader-election}{section*.8}% 12
 \BOOKMARK [2][-]{section*.15}{Logging}{section*.8}% 13
 \BOOKMARK [2][-]{section*.16}{Load-balancing}{section*.8}% 14
 \BOOKMARK [2][-]{section*.18}{Valg af konsistensmodel}{section*.8}% 15
