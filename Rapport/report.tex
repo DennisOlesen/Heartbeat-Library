@@ -163,7 +163,7 @@ I stil med Raft \textbf{[3]} skal vi have en leder, der kan uddelegere opgaver, 
 \\
 Da vi er interesserede i, at systemet også skal have høj tilgængelighed er vi afhængige af at lederen ikke er en single-point-of-failure. Kort sagt må systemet ikke fejle når en vilkårlig maskine fejler.
 \\[5px]
-Dette kan vi undgå ved, at have mulighed for at vælge en ny leder, når følgere i en længere periode ikke har modtaget heartbeats fra lederen. Dette gøres i stil med Rafts leader-election [3], hvor de fjernes ved omkring 3 på hinanden følgende udeblivelser. Heri anvendes der kandidater, som følgere kan skifte status til, hvis de ikke modtager heartbeats i en længere periode, ca. 3 heartbeats, fra lederen. Herudover er det målet, at kandidaterne så vidt som muligt er up-to-date og har en delt tilstand. 
+Dette kan vi undgå ved, at have mulighed for at vælge en ny leder, når følgere i en længere periode ikke har modtaget heartbeats fra lederen. Dette gøres i stil med Rafts leader-election \textbf{[3]}, hvor de fjernes ved omkring 3 på hinanden følgende udeblivelser. Heri anvendes der kandidater, som følgere kan skifte status til, hvis de ikke modtager heartbeats i en længere periode, ca. 3 heartbeats, fra lederen. Herudover er det målet, at kandidaterne så vidt som muligt er up-to-date og har en delt tilstand. 
 \\
 Loggen er en metode, som vi bruger til at dele information om hvilke maskiner der er aktive, samt brugerdefinerede data uden at skulle sende hele informationen hver gang. Dette sparer ressourcer og sikrer at alle parter har den samme information.
 \\[5px]
@@ -188,7 +188,7 @@ Rykker vi ned og bliver endnu mindre strikse end i sequential consistency modell
 
 \section{Programmerings overvejelser}
 \subsection{Discovery}
-For at skabe forbindelse til maskiner på et lokalt netværk, er man, som vi kom frem til i forrige afsnit, nødt til at benytte sig af en Discovery protokol. Et sådant system kendes også som Network Discovery services, som set i DSCD \textbf{[6]}. Normen er her, at man opretter forbindelse til andre systemer i netværket, ved at broadcaste eller multicaste. Derved kan man få beskeden ud til de resterende systemer. Broadcast virker som den oplagte måde, at gøre det på da der arbejdes på et lokalt netværk.
+For at skabe forbindelse til maskiner på et lokalt netværk, er man, som vi kom frem til i forrige afsnit, nødt til at benytte sig af en Discovery protokol. Et sådant system kendes også som Network Discovery services, som set i DSCD \textbf{[6]}. Normen er her, at man opretter forbindelse til andre systemer i netværket, ved at broadcaste eller multicaste. \textbf{[7]} Derved kan man få beskeden ud til de resterende systemer. Broadcast virker som den oplagte måde, at gøre det på da der arbejdes på et lokalt netværk.
 Ville man ændre modulet til at fungere på internettet, frem for det lokale netværk, kunne multicast med fordel anvendes.
 Problematikken er i midlertidig om det er en directory server eller serverless model, der vil fungere bedst i forbindelse med resten af systemet.
 \\[5px]
@@ -199,12 +199,12 @@ Directory serveren har dog det problem, at hvis den går ned, er der ikke længe
 Derved vil en ny leder have samme information, som den tidligere leder, såfremt man i stil med Raft-algoritmen ikke vælger en maskine der ikke er up-to-date, og kan derved overtage jobbet uden at miste konsistens eller tilgængelighed, da der kun afgives stemmer til kandidater der har en opdateret log. Ifølge DSCD [6], bruges der leasing til, at sikre sig, at maskinerne er aktive. Dette må kunne opretholdes med heartbeats, da dette foretager samme tjek, altså ved feedback om et kald, el. en service går igennem.
 
 \subsection{Broadcast/MultiCast/UDP/TCP}
-Selve valget om hvorvidt man skal bruge broadcast eller multicast er ikke helt trivielt da de begge har fordele og ulemper der påvirker systemet. Forskellene ligger i at broadcast arbejder med UDP forbindelse mens, at multicast bruger TCP.
+Selve valget om hvorvidt man skal bruge broadcast eller multicast er ikke helt trivielt da de begge har fordele og ulemper der påvirker systemet. Forskellene ligger i at broadcast arbejder med UDP forbindelse mens, at multicast bruger TCP \textbf{[7]}.
 \\
 Fordelen ved broadcast og UDP forbindelser er at vi sparer ressourcerne det kræves at skabe en fast forbindelse med hver enkelt følger i systemet. Vi kan endvidere, såfremt vi forbliver lokalt, udnytte broadcast til at kommunikere heartbeats ud til alle medlemmer i systemet, hvilket er den billigste måde at kommunikere med alle på en gang. Endvidere tillader dette os at tilføje nye maskiner løbende ved at klienten hører det broadcastede heartbeat og sender svar til lederen, uden at skulle kende lederens IP-adresse på forhånd, hvor man i tilfældet med multicast ville være afhængig af at en følger skulle kende lederen på forhånd. Derudover fungerer heartbeats på den måde at det ikke gør nogen reel skade hvis der misses en besked eller to, da det næste kommer kort efter. Dette betyder selvfølgelig at der vil være en længere periode mellem konsistens, men ikke noget der er meget langsommere end at lave og afslutte TCP forbindelser til alle modtagere.
 Herudover er både UDP og TCP implementeringer af systemet begrænset ved skalering.
 \\[5px]
-UDP har oftest loft over pakkestørrelse der giver problemer når loggens størrelse nærmer sig de ca. 1500 bytes. Dette er grundet, at der på link-laget som regel sættes et MTU, Maximum Transmission Unit, for bedre at fungere med den reelle buffer størrelse. TCP er derimod begrænset af hastigheden da multicast bliver tungt i forbindelse med oprettelse af forbindelse til mange systemer ad gangen. 
+UDP har oftest loft over pakkestørrelse der giver problemer når loggens størrelse nærmer sig de ca. 1500 bytes \textbf{[2]}. Dette er grundet, at der på link-laget som regel sættes et MTU, Maximum Transmission Unit, for bedre at fungere med den reelle buffer størrelse. TCP er derimod begrænset af hastigheden da multicast bliver tungt i forbindelse med oprettelse af forbindelse til mange systemer ad gangen. 
 I vores implementation benyttes broadcasting da modulet er tiltænkt lokale systemer.
 Dette betyder endvidere at den største begrænsning for køretid og effektivitet er relateret til hardwaremæssigt at sende beskeder på tværs af maskiner.
 
@@ -381,7 +381,7 @@ Dette betyder også at lederens IP-adresse skal sættes, som det første når en
 For at kunne give brugeren mulighed for, at tilføje, fjerne og hente fra det tidligere beskrevne user-dictionary, er der lavet en række applikations-lags funktioner. \\
 Fælles for disse er, at de understøtter, at en bruger kan tilføje en kommando til denne, og derudover så ventes der via den beskrevne trådning til, at kommandoen er blevet udført, el. committed på tværs af systemet, dette sikrer at funktionen ikke vil returnere førend man kan være sikker på at den værdi man har tilføjet, rent faktisk er blevet tilføjet. Alternativet ville gøre det upraktisk at programmere med.
 \\[5px]
-Endelig så benyttes der i alle brugerfunktionerne json-formatet. Dette tillader os, at tilføje og hente værdier med en tilhørende key, og til fordel for vores eget format, som er beskrevet tidligere, så har vi ikke nogen begrænsninger ved, at der splittes på mellemrum eller bindestreg, og disse derved ikke kan bruges i dictionariet. Disse fordele får vi dog kun såfremt at json-formatet blev brugt over hele linjen, hvilket systemet i sin nuværende implementation mangler.
+Endelig så benyttes der i alle brugerfunktionerne json-formatet \textbf{[9]}. Dette tillader os, at tilføje og hente værdier med en tilhørende key, og til fordel for vores eget format, som er beskrevet tidligere, så har vi ikke nogen begrænsninger ved, at der splittes på mellemrum eller bindestreg, og disse derved ikke kan bruges i dictionariet. Disse fordele får vi dog kun såfremt at json-formatet blev brugt over hele linjen, hvilket systemet i sin nuværende implementation mangler.
 \newpage
 
 \section{Afprøvning} 
@@ -503,7 +503,7 @@ Vi ved at der ved hvert heartbeat sendes en besked til alle maskiner, samt at al
 \newpage
 
 \subsubsection{Skalering}
-Når det kommer til skalering af vores system, så er vi begrænset af, som tidligere nævnt, Maximum Transmission Unit. Denne vil vi i denne forbindelse antage ligger på 1500 [2], jvf. RFC-894, bytes. Endvidere er vi nødt til at definere en standard størrelse for en string-repræsentation af en IP-adresse. Denne vil variere alt efter systemet og hvordan maskinen gemmer strings. Ved at kalde sys.getsizeof(“192.168.100.0”), har vi fået en størrelse på 34 bytes. Dette er på et 32-bit system.
+Når det kommer til skalering af vores system, så er vi begrænset af, som tidligere nævnt, Maximum Transmission Unit. Denne vil vi i denne forbindelse antage ligger på 1500 \textbf{[2]}, jvf. RFC-894, bytes. Endvidere er vi nødt til at definere en standard størrelse for en string-repræsentation af en IP-adresse. Denne vil variere alt efter systemet og hvordan maskinen gemmer strings. Ved at kalde sys.getsizeof(“192.168.100.0”), har vi fået en størrelse på 34 bytes. Dette er på et 32-bit system.
 \\[5px]
 Ud fra disse kan man regne sig til at det maks ville være muligt at sende $1500 / 34$ eller ca. 44 IP-adresser pr. heartbeat. 
 \\ 
@@ -567,6 +567,10 @@ For at kunne tjekke systemets reelle ydeevne, kunne det også være interessant,
 \textbf{[7]} Kurose James, F., and W. Ross Keith. Computer Networking: A top-down approach. Sixth Edition, 2013.
 \\[5px]
 \textbf{[8]} Brian Vinter. Distributed Shared Memory: A Survey of Paradigms and Concepts in Distributed Shared Memory Research, May 28 1997.
+\\[5px]
+\textbf{[9]} Python, json dokumentation - \url{http://docs.python.org/2/library/json.html} - 7. juni 2015
+
+
 
 \newpage
 

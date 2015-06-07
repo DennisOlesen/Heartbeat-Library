@@ -5,7 +5,7 @@
 from __future__ import division
 from socket import *
 import time, random, os, sys
-import threading, Log, traceback, json
+import threading, Log, json
 
 broadcast_IP = '255.255.255.255'
 broadcast_PORT = 54545
@@ -31,7 +31,8 @@ class Heartbeat():
     b_sock.setblocking(0)
     self.b_sock = b_sock
     self.state = "follower"
-    #TEST variabel
+    
+    #Test variabel
     self.canbeleader = True
 
     self.timer = time.time() + random.uniform(2.0, 5.0)
@@ -212,7 +213,6 @@ class Heartbeat():
         self.update_event.notify_all()
 
    except:
-   # traceback.print_exc(file=sys.stdout)
      pass
    try:
      message, addr = self.b_sock.recvfrom(1024)
