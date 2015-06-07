@@ -78,8 +78,6 @@
 %allows use of the BibTex for the bibliography
 \usepackage[numbers]{natbib}
 
-%make references and URLs in the pdf to clickable links
-\usepackage{hyperref}
 
 %removes the numbers from sections
 \setcounter{secnumdepth}{0}
@@ -146,25 +144,25 @@ Der findes forskellige modeller, for hvordan dette kan gøres, hvor den simplest
 Derved sørges der for, at alt data kommunikeres rundt blandt alle maskiner, så på dette område, ville dette system være tilstrækkeligt. 
 Det kan dog godt hurtigt gå hen og blive meget ressourcekrævende, da vi opnår $n^2$ antal forbindelser, da alle maskiner skal kommunikere med alle de andre.
 \\[5px]
-Dette kan reduceres kraftigt ved at benytte gossiping [4], hvor en maskine skriver ud til en vilkårlig anden maskine, som herefter skriver ud til nogle andre, og så videre indtil beskeden er propageret ud til samtlige maskiner i systemet.
+Dette kan reduceres kraftigt ved at benytte gossiping \hyperref[fire]{\textbf{[4]}}, hvor en maskine skriver ud til en vilkårlig anden maskine, som herefter skriver ud til nogle andre, og så videre indtil beskeden er propageret ud til samtlige maskiner i systemet.
 \\
-Her vinder man dog mest i meget store systemer, hvor det ikke kan lade sig gøre at fordele en besked rundt alle maskiner samtidig.
+Her vinder man dog mest i meget store systemer, hvor det ikke kan lade sig gøre at fordele en besked rundt til alle maskiner samtidig.
 \\[5px]
 En lidt anderledes tilgang er at have en leder, der styrer alt kommunikation, samt at resten af maskinerne er følgere, der lytter på lederen og svarer tilbage når de modtager et heartbeat. Dette sikrer at alle følger-maskinerne kun skal sende en besked, mens at lederen derimod sender ud til alle følgerne. Dette vil give os, at lederen skal sende lige så mange beskeder, som der er af følgere, mens følgerne kun sender en hver. 
 Dette giver os en væsentlig forbedring i antal beskeder end eksempelvist hvis alle snakker med alle. Dette har imidlertid det problem at der vil være en single-point-of-failure i forbindelse med lederen, da systemet ikke kan køre uden lederen. For at undgå dette kan man vælge en protokol for at vælge en ny leder, i tilfælde af at den forrige mister forbindelsen. 
 \\[5px]
-En simpel måde at gøre dette er via Bully algoritmen [5] hvori, at hver maskine får tildelt et ID, og såfremt lederen dør, så vælges den leder med det højeste ID. Dette kan lade sig gøre ved, at lade hver maskine sende en besked til alle maskiner med højere ID end sin egen, og såfremt den ikke modtager et svar tilbage lader den sig selv blive leder. Dette er en relativ simpel algoritme, der dog ikke tager hensyn til problemer ved partitionering, da man kan risikerer, at der kan opstå flere systemer samtidig. 
+En simpel måde at gøre dette er via Bully algoritmen \hyperref[fem]{\textbf{[5]}} hvori, at hver maskine får tildelt et ID, og såfremt lederen dør, så vælges den leder med det højeste ID. Dette kan lade sig gøre ved, at lade hver maskine sende en besked til alle maskiner med højere ID end sin egen, og såfremt den ikke modtager et svar tilbage lader den sig selv blive leder. Dette er en relativ simpel algoritme, der dog ikke tager hensyn til problemer ved partitionering, da man kan risikerer, at der kan opstå flere systemer samtidig. 
 \\[5px]
-Dette problem kan løses ved at bruge algoritmen som bruges i Raft [3], der bruger et system bestående af følgere, kandidater og leder.
+Dette problem kan løses ved at bruge algoritmen som bruges i Raft \hyperref[tre]{\textbf{[3]}}, der bruger et system bestående af følgere, kandidater og leder.
 Når en leder undervejs går hen og dør, starter der et leader-election, hvor der vælges den hurtigste kandidat, som har mindst halvdelen af stemmerne, til at blive leder. Herved sikres det, at der kun vælges en leder, og derved risikerer vi ikke i stil med Bully algoritmen, at der kan opstå flere systemer parallelt med hinanden.
 \newpage
   
 \section{Problemorienteret analyse}
-I stil med Raft \textbf{[3]} skal vi have en leder, der kan uddelegere opgaver, samt overvåge aktiviteten (liveliness) for de resterende systemer. Dette kan lederen gøre ved regelmæssigt at sende heartbeats ud til alle de aktive følgere. I forbindelse med dette tjek af liveliness, kan brugeren sende en værdi for evt. belastningen med vores heartbeats, der sendes til følgerne. Dette tillader brugeren, at lave en prioritering for hvilke følgere, der skal modtage næste opgave.
+I stil med Raft \hyperref[tre]{\textbf{[3]}} skal vi have en leder, der kan uddelegere opgaver, samt overvåge aktiviteten (liveliness) for de resterende systemer. Dette kan lederen gøre ved regelmæssigt at sende heartbeats ud til alle de aktive følgere. I forbindelse med dette tjek af liveliness, kan brugeren sende en værdi for evt. belastningen med vores heartbeats, der sendes til følgerne. Dette tillader brugeren, at lave en prioritering for hvilke følgere, der skal modtage næste opgave.
 \\
 Da vi er interesserede i, at systemet også skal have høj tilgængelighed er vi afhængige af at lederen ikke er en single-point-of-failure. Kort sagt må systemet ikke fejle når en vilkårlig maskine fejler.
 \\[5px]
-Dette kan vi undgå ved, at have mulighed for at vælge en ny leder, når følgere i en længere periode ikke har modtaget heartbeats fra lederen. Dette gøres i stil med Rafts leader-election \textbf{[3]}, hvor de fjernes ved omkring 3 på hinanden følgende udeblivelser. Heri anvendes der kandidater, som følgere kan skifte status til, hvis de ikke modtager heartbeats i en længere periode, ca. 3 heartbeats, fra lederen. Herudover er det målet, at kandidaterne så vidt som muligt er up-to-date og har en delt tilstand. 
+Dette kan vi undgå ved, at have mulighed for at vælge en ny leder, når følgere i en længere periode ikke har modtaget heartbeats fra lederen. Dette gøres i stil med Rafts leader-election \hyperref[tre]{\textbf{[3]}}, hvor de fjernes ved omkring 3 på hinanden følgende udeblivelser. Heri anvendes der kandidater, som følgere kan skifte status til, hvis de ikke modtager heartbeats i en længere periode, ca. 3 heartbeats, fra lederen. Herudover er det målet, at kandidaterne så vidt som muligt er up-to-date og har en delt tilstand. 
 \\
 Loggen er en metode, som vi bruger til at dele information om hvilke maskiner der er aktive, samt brugerdefinerede data uden at skulle sende hele informationen hver gang. Dette sparer ressourcer og sikrer at alle parter har den samme information.
 \\[5px]
@@ -172,7 +170,7 @@ Dette system vil altså afhænge af, at have fem del-funktionaliteter der tilsam
 
 \subsection{Beskrivelse af konsistensmodeller}
 I forbindelse med at der arbejdes på distribuerede systemer vil det være nødvendigt at have en konsistens model. Dette sikrer, at vi kan have en fælles state på alle maskiner. 
-Der findes dog en lang række konsistens modeller, og det er derfor nødvendigt, at finde den rette til vores formål. En række af disse modeller, er dem som er beskrevet herunder. \textbf{[8]}
+Der findes dog en lang række konsistens modeller, og det er derfor nødvendigt, at finde den rette til vores formål. En række af disse modeller, er dem som er beskrevet herunder. \hyperref[otte]{\textbf{[8]}}
 \\[5px]
 \textbf{Strict Consistency}
 \\
@@ -189,7 +187,7 @@ Rykker vi ned og bliver endnu mindre strikse end i sequential consistency modell
 
 \section{Programmerings overvejelser}
 \subsection{Discovery}
-For at skabe forbindelse til maskiner på et lokalt netværk, er man, som vi kom frem til i forrige afsnit, nødt til at benytte sig af en Discovery protokol. Et sådant system kendes også som Network Discovery services, som set i DSCD \textbf{[6]}. Normen er her, at man opretter forbindelse til andre systemer i netværket, ved at broadcaste eller multicaste. \textbf{[7]} Derved kan man få beskeden ud til de resterende systemer. Broadcast virker som den oplagte måde, at gøre det på da der arbejdes på et lokalt netværk.
+For at skabe forbindelse til maskiner på et lokalt netværk, er man, som vi kom frem til i forrige afsnit, nødt til at benytte sig af en Discovery protokol. Et sådant system kendes også som Network Discovery services, som set i DSCD \hyperref[seks]{\textbf{[6]}}. Normen er her, at man opretter forbindelse til andre systemer i netværket, ved at broadcaste eller multicaste. \hyperref[syv]{\textbf{[7]}} Derved kan man få beskeden ud til de resterende systemer. Broadcast virker som den oplagte måde, at gøre det på da der arbejdes på et lokalt netværk.
 Ville man ændre modulet til at fungere på internettet, frem for på det lokale netværk, kunne multicast med fordel anvendes.
 Problematikken er i midlertidig om det er en directory server eller serverless model, der vil fungere bedst i forbindelse med resten af systemet.
 \\[5px]
@@ -197,17 +195,18 @@ Her kan man argumentere for, at en directory server ville give mening, da der i 
 \\
 Directory serveren har dog det problem, at hvis den går ned, er der ikke længere styr på hvilke maskiner, der er i systemet. Dette er imidlertid en problematik, som bør kunne løses ved at bruge en serverless metode med leader-election og logging, ved at man vedligeholder en replikeret log, som indeholder de aktive maskiner, til alle medlemmer i systemet. 
 \\
-Derved vil en ny leder have samme information, som den tidligere leder, såfremt man i stil med Raft-algoritmen ikke vælger en maskine der ikke er up-to-date, og kan derved overtage jobbet uden at miste konsistens eller tilgængelighed, da der kun afgives stemmer til kandidater der har en opdateret log. Ifølge DSCD [6], bruges der leasing til, at sikre sig, at maskinerne er aktive. Dette må kunne opretholdes med heartbeats, da dette foretager samme tjek, altså ved feedback om et kald, el. en service går igennem.
+Derved vil en ny leder have samme information, som den tidligere leder, såfremt man i stil med Raft-algoritmen ikke vælger en maskine der ikke er up-to-date, og kan derved overtage jobbet uden at miste konsistens eller tilgængelighed, da der kun afgives stemmer til kandidater der har en opdateret log. Ifølge DSCD \hyperref[seks]{\textbf{[6]}}, bruges der leasing til, at sikre sig, at maskinerne er aktive. Dette må kunne opretholdes med heartbeats, da dette foretager samme tjek, altså ved feedback om et kald, el. en service går igennem.
 
 \subsection{Broadcast/MultiCast/UDP/TCP}
-Selve valget om hvorvidt man skal bruge broadcast eller multicast er ikke helt trivielt da de begge har fordele og ulemper der påvirker systemet. Forskellene ligger i at broadcast arbejder med UDP forbindelse mens, at multicast bruger TCP \textbf{[7]}.
+Selve valget om hvorvidt man skal bruge broadcast eller multicast er ikke helt trivielt da de begge har fordele og ulemper der påvirker systemet. Forskellene ligger i at broadcast arbejder med UDP forbindelse mens, at multicast bruger TCP \hyperref[syv]{\textbf{[7]}}.
 \\
 Fordelen ved broadcast og UDP forbindelser er, at vi sparer ressourcerne det kræves at skabe en fast forbindelse med hver enkelt følger i systemet. Vi kan endvidere, såfremt vi forbliver lokalt, udnytte broadcast til at kommunikere heartbeats ud til alle medlemmer i systemet, hvilket er den billigste måde at kommunikere med alle på en gang. Endvidere tillader dette os, at tilføje nye maskiner løbende ved at klienten hører det broadcastede heartbeat og sender svar til lederen, uden at skulle kende lederens IP-adresse på forhånd, hvor man i tilfældet med multicast ville være afhængig af at en følger skulle kende lederen på forhånd. Derudover fungerer heartbeats på den måde at det ikke gør nogen reel skade hvis der misses en besked eller to, da det næste kommer kort efter. Dette betyder selvfølgelig at der vil være en længere periode mellem konsistens, men ikke noget der er meget langsommere end at lave og afslutte TCP forbindelser til alle modtagere.
 Herudover er både UDP og TCP implementeringer af systemet begrænset ved skalering.
 \\[5px]
-UDP har oftest loft over pakkestørrelse der giver problemer når loggens størrelse nærmer sig de ca. 1500 bytes \textbf{[2]}. Dette er grundet, at der på link-laget som regel sættes et MTU, Maximum Transmission Unit, for bedre at fungere med den reelle buffer størrelse. TCP er derimod begrænset af hastigheden da multicast bliver tungt i forbindelse med oprettelse af forbindelse til mange systemer ad gangen. 
+UDP har oftest loft over pakkestørrelse der giver problemer når loggens størrelse nærmer sig de ca. 1500 bytes \hyperref[to]{\textbf{[2]}}. Dette er grundet, at der på link-laget som regel sættes et MTU, Maximum Transmission Unit, for bedre at fungere med den reelle buffer størrelse. TCP er derimod begrænset af hastigheden da multicast bliver tungt i forbindelse med oprettelse af forbindelse til mange systemer ad gangen. 
 I vores implementation benyttes broadcasting, da modulet er tiltænkt lokale systemer.
 Dette betyder endvidere at den største begrænsning for køretid og effektivitet er relateret til hardwaremæssigt at sende beskeder på tværs af maskiner.
+
 
 \subsection{Liveliness} 
 Liveliness er langt hen ad vejen en af grundidéerne ved heartbeat. Derfor ligger det også naturligt, at liveliness bliver tjekket via heartbeats, samt manglen heraf. Man kan definere et system til, at være i live, når det har forbindelse til lederen. Ved brug af leader-election, som ses senere vil der altid være en ny leder, der kan erstatte en afgående, el. død leder (inden for et rimelig interval). I praksis vil tjek for liveliness ligge meget op ad det, der er omtalt i Discovery-afsnittet.
@@ -219,12 +218,12 @@ CAP teoremet er idéen om at et distribueret system ikke kan vedligeholde de tre
 Den høje tilgængelighed eksistere i form af at der altid vil være en aktiv leder, da en ny vælges umiddelbart efter mistet forbindelse med den gamle.
 \\
 Dog kan dette fejle såfremt der sker en for stor partitionering af systemet. 
-I Raft [3] fungerer leader-election ved at man kun kan blive leder såfremt man har over halvdelen af stemmerne, for at sikre at der ikke eksisterer to samtidige uafhængige systemer. Dette betyder til gengæld at hvis halvdelen af systemerne plus lederen, eller flere, falder fra samtidig, vil de tilbageværende følgere ikke kunne blive ledere, da de antager at de skal have n/2 stemmer men der kun er højst (n/2)-1 systemer tilbage. 
+I Raft \hyperref[tre]{\textbf{[3]}} fungerer leader-election ved at man kun kan blive leder såfremt man har over halvdelen af stemmerne, for at sikre at der ikke eksisterer to samtidige uafhængige systemer. Dette betyder til gengæld at hvis halvdelen af systemerne plus lederen, eller flere, falder fra samtidig, vil de tilbageværende følgere ikke kunne blive ledere, da de antager at de skal have n/2 stemmer men der kun er højst (n/2)-1 systemer tilbage. 
 
 \subsection{Leader-election} 
 Da vi ønsker at opbygge vores system i stil med Raft-algoritmen, er leader-election en essentiel del af dette heartbeat system. Det sørger for at såfremt lederen, altså det system der modtager og videresender forespørgsler, skulle stoppe med at fungere, så vil der, under enighed mellem alle i systemet, blive valgt en ny leder.
 \\
-For at gøre dette, kan man, i stil med Raft [3], indføre tre stadier for systemerne:
+For at gøre dette, kan man, i stil med Raft \hyperref[tre]{\textbf{[3]}}, indføre tre stadier for systemerne:
 \\
 Følger, kandidat og leder.
 \\[5px]
@@ -266,7 +265,7 @@ Herefter svarer maskinen tilbage og load-balanceren modtager en opdateret værdi
 \subsection{Valg af konsistensmodel}
 For at sikre, at der vil være enighed omkring loggen samt bruger-opdateringer, på tværs af systemerne, så er vi afhængige af, at have valgt en konsistens model, der opfylder, at alle maskiner vil have de samme beskeder i samme rækkefølge.
 \\[5px]
-Hvis vi ser tilbage på de førnævnte tre konsistens modeller \textbf{[8]} i vores problemorienterede analyse, så kan vi ud fra disse vurdere, hvilken vi har gjort brug af.
+Hvis vi ser tilbage på de førnævnte tre konsistens modeller \hyperref[otte]{\textbf{[8]}} i vores problemorienterede analyse, så kan vi ud fra disse vurdere, hvilken vi har gjort brug af.
 Ser vi på strict consistency modellen, så må det hurtigt vurderes, at i vores system er det ikke tilfældet, at to samtidige skrive-operationer vil kunne ødelægge vores system, eller at den der skriver først nødvendigvis er den kommer først i rækkefølgen. I vores tilfælde er det lederen, der tildeler den pågældende operation en key, der så bestemmer rækkefølgen på operationerne.
 Altså er strict consistency ikke den model, vi gør brug af.
 \\[5px]
@@ -276,7 +275,7 @@ Endvidere gælder det for causal at kommandoer der ikke er kausale ikke behøves
 Vi kan endelig komme frem til, at vi i højere grad benytter os af sequential consistency modellen. Rækkefølgen på en skreven operation er afhængig af hvornår, der er enighed om denne i systemet. I vores tilfælde bestemmer lederen rækkefølgen, og sender den derefter ud til de andre systemer.
 
 \subsection{Opsamling}
-Vi vil altså implementere systemet via UDP beskeder, ud fra samme algoritme som er beskrevet i Rafts algoritme. Til dette vil vi dog gøre brug af en enkelt logisk klokke til håndtering af konsistentet, fremfor at arbejde i terminer som Raft [3]. Dette betyder endvidere, at vi bruger en lidt anderledes fremgangsmetode med tilbagegangen fra kandidat til følger. Dette giver os følgende state machine, der i høj grad minder om Raft (se figur nr. 3). \\
+Vi vil altså implementere systemet via UDP beskeder, ud fra samme algoritme som er beskrevet i Rafts algoritme. Til dette vil vi dog gøre brug af en enkelt logisk klokke til håndtering af konsistentet, fremfor at arbejde i terminer som Raft \hyperref[tre]{\textbf{[3]}}. Dette betyder endvidere, at vi bruger en lidt anderledes fremgangsmetode med tilbagegangen fra kandidat til følger. Dette giver os følgende state machine, der i høj grad minder om Raft (se figur nr. 3). \\
 \begin{figure}[H]
   \caption{Vores state machine.}
   \centering
@@ -382,7 +381,7 @@ Dette betyder også at lederens IP-adresse skal sættes, som det første når en
 For at kunne give brugeren mulighed for, at tilføje, fjerne og hente fra det tidligere beskrevne user-dictionary, er der lavet en række applikations-lags funktioner. \\
 Fælles for disse er, at de understøtter, at en bruger kan tilføje en kommando til denne, og derudover så ventes der via den beskrevne trådning til, at kommandoen er blevet udført, el. committed på tværs af systemet, dette sikrer at funktionen ikke vil returnere førend man kan være sikker på at den værdi man har tilføjet, rent faktisk er blevet tilføjet. Alternativet ville gøre det upraktisk at programmere med.
 \\[5px]
-Endelig så benyttes der i alle brugerfunktionerne json-formatet \textbf{[9]}. Dette tillader os, at tilføje og hente værdier med en tilhørende key, og til fordel for vores eget format, som er beskrevet tidligere, så har vi ikke nogen begrænsninger ved, at der splittes på mellemrum eller bindestreg, og disse derved ikke kan bruges i dictionariet. Disse fordele får vi dog kun såfremt at json-formatet blev brugt over hele linjen, hvilket systemet i sin nuværende implementation mangler.
+Endelig så benyttes der i alle brugerfunktionerne json-formatet \hyperref[ni]{\textbf{[9]}}. Dette tillader os, at tilføje og hente værdier med en tilhørende key, og til fordel for vores eget format, som er beskrevet tidligere, så har vi ikke nogen begrænsninger ved, at der splittes på mellemrum eller bindestreg, og disse derved ikke kan bruges i dictionariet. Disse fordele får vi dog kun såfremt at json-formatet blev brugt over hele linjen, hvilket systemet i sin nuværende implementation mangler.
 \newpage
 
 \section{Afprøvning} 
@@ -485,7 +484,7 @@ Dette giver nedenstående graf:
     \includegraphics[width=0.8\textwidth]{Raftleadergraf.png}
 \end{figure}
 
-Grafen for vores Heartbeat system viser i stil med Raft [3], at der kommer mindre tid uden leder jo tættere man kommer på heartbeatets timer.
+Grafen for vores Heartbeat system viser i stil med Raft \hyperref[tre]{\textbf{[3]}}, at der kommer mindre tid uden leder jo tættere man kommer på heartbeatets timer.
 \\
 Dog viste forsøget at jo tættere man kommer på, jo mindre tolerance er der over for missede pakker. Dette ses især i forbindelse med målingen på 120-240 ms, hvor der i de fleste tilfælde bliver valgt leder før den forrige leder er stoppet. Dette giver nogle forkerte data, da heartbeatsne fra den nye leder bliver buffet i den første leders socket, og derfor skulle den blot læse fra bufferen. Dette viser, at man nødvendigvis må være nødt til, at tage hensyn til hvor tolerant ens system skal være over for pakketab. Man kan altså ikke bare skrue helt ned for timeren uden, at det kan give problemer med systemet. 
 \\
@@ -504,7 +503,7 @@ Vi ved at der ved hvert heartbeat sendes en besked til alle maskiner, samt at al
 \newpage
 
 \subsubsection{Skalering}
-Når det kommer til skalering af vores system, så er vi begrænset af, som tidligere nævnt, Maximum Transmission Unit. Denne vil vi i denne forbindelse antage ligger på 1500 \textbf{[2]}, jvf. RFC-894, bytes. Endvidere er vi nødt til at definere en standard størrelse for en string-repræsentation af en IP-adresse. Denne vil variere alt efter systemet og hvordan maskinen gemmer strings. Ved at kalde sys.getsizeof(“192.168.100.0”), har vi fået en størrelse på 34 bytes. Dette er på et 32-bit system.
+Når det kommer til skalering af vores system, så er vi begrænset af, som tidligere nævnt, Maximum Transmission Unit. Denne vil vi i denne forbindelse antage ligger på 1500 \hyperref[to]{\textbf{[2]}}, jvf. RFC-894, bytes. Endvidere er vi nødt til at definere en standard størrelse for en string-repræsentation af en IP-adresse. Denne vil variere alt efter systemet og hvordan maskinen gemmer strings. Ved at kalde sys.getsizeof(“192.168.100.0”), har vi fået en størrelse på 34 bytes. Dette er på et 32-bit system.
 \\[5px]
 Ud fra disse kan man regne sig til at det maks ville være muligt at sende $1500 / 34$ eller ca. 44 IP-adresser pr. heartbeat. 
 \\ 
@@ -553,23 +552,23 @@ For at kunne tjekke systemets reelle ydeevne, kunne det også være interessant,
 \newpage
 
 \section{Litteraturhenvisninger}
-\textbf{[1]} Slides fra kurset datanet - Copyright J.F Kurose and K.W. Ross, All Rights Reserved
+\textbf{[1]} Slides fra kurset datanet - Copyright J.F Kurose and K.W. Ross, All Rights Reserved \label{et}
 \\[5px]
-\textbf{[2]} RFC 894 - \url{https://tools.ietf.org/html/rfc894} - 1. juni 2015
+\textbf{[2]} RFC 894 - \url{https://tools.ietf.org/html/rfc894} - 1. juni 2015 \label{to}
 \\[5px]
-\textbf{[3]} Ongaro, Diego, and John Ousterhout. "In search of an understandable consensus algorithm." Proc. USENIX Annual Technical Conference. 2014.
+\textbf{[3]} Ongaro, Diego, and John Ousterhout. "In search of an understandable consensus algorithm." Proc. USENIX Annual Technical Conference. 2014. \label{tre}
 \\[5px]
-\textbf{[4]} Kermarrec, Anne-Marie, and Maarten Van Steen. "Gossiping in distributed systems." ACM SIGOPS Operating Systems Review 41.5 (2007): 2-7.
+\textbf{[4]} Kermarrec, Anne-Marie, and Maarten Van Steen. "Gossiping in distributed systems." ACM SIGOPS Operating Systems Review 41.5 (2007): 2-7. \label{fire}
 \\[5px]
-\textbf{[5]} Eksempel på Bully algoritmen - \url{http://www.cs.colostate.edu/~cs551/CourseNotes/Synchronization/BullyExample.html} - 2. juni 2015
+\textbf{[5]} Eksempel på Bully algoritmen - \url{http://www.cs.colostate.edu/~cs551/CourseNotes/Synchronization/BullyExample.html} - 2. juni 2015 \label{fem}
 \\[5px]
-\textbf{[6]} Coulouris, George F., Jean Dollimore, Tim Kindberg and Gordon Blair. Distributed systems: concepts and design. pearson education, 2012.
+\textbf{[6]} Coulouris, George F., Jean Dollimore, Tim Kindberg and Gordon Blair. Distributed systems: concepts and design. pearson education, 2012. \label{seks}
 \\[5px]
-\textbf{[7]} Kurose James, F., and W. Ross Keith. Computer Networking: A top-down approach. Sixth Edition, 2013.
+\textbf{[7]} Kurose James, F., and W. Ross Keith. Computer Networking: A top-down approach. Sixth Edition, 2013. \label{syv}
 \\[5px]
-\textbf{[8]} Brian Vinter. Distributed Shared Memory: A Survey of Paradigms and Concepts in Distributed Shared Memory Research, May 28 1997.
+\textbf{[8]} Brian Vinter. Distributed Shared Memory: A Survey of Paradigms and Concepts in Distributed Shared Memory Research, May 28 1997. \label{otte}
 \\[5px]
-\textbf{[9]} Python, json dokumentation - \url{http://docs.python.org/2/library/json.html} - 7. juni 2015
+\textbf{[9]} Python, json dokumentation - \url{http://docs.python.org/2/library/json.html} - 7. juni 2015 \label{ni}
 
 \newpage
 
