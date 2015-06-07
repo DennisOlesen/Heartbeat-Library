@@ -119,7 +119,7 @@
 \clearpage
 
 \section{Resumé}
-Vi undersøger muligheden for at kunne implementere et Heartbeat-bibliotek til eksempelvis load-balancing af servere, med et simpelt brugerinterface. Dette giver brugeren et delt dictionary som fælles data, samt overblik over liveliness af samtlige systemer.
+Vi undersøger muligheden for, at kunne implementere et Heartbeat-bibliotek til eksempelvis load-balancing af servere, med et simpelt brugerinterface. Dette giver brugeren et delt dictionary som fælles data samt overblik over liveliness af samtlige systemer.
 \\
 Som konsensus implementeres Raft-algoritmen, som udfører leader-election på ned til 300-400 ms uden forkerte valg. 
 
@@ -127,23 +127,24 @@ Som konsensus implementeres Raft-algoritmen, som udfører leader-election på ne
 We explore the opportunity of implementing a Heartbeat-library for solving such issues as load-balancing of servers with a simple user interface. This gives the user a shared dictionary as shared memory along with an overview of liveliness of all related systems.
 \\
 Using the Raft-algorithm for consensus, which applies leader-election in about 300-400 ms without any errors.
-
 \newpage
+
 \section{Beskrivelse af problemet}
-I forbindelse med udvikling af et distribueret system vil man være afhængig af, at kunne sikre sig konsistens samt høj tilgængelighed af det involverede system samt at systemet er tolerant over for partitioneringer. Metoder til at opdage når en maskine fejler, samt derefter at foretage de nødvendige fejlprocedurer, vil altså være at finde i størstedelen af de distribuerede systemer.\\
-Ved at konstruere et bibliotek, som gør det simpelt for brugeren at implementere disse metoder vil der både kunne spares udviklingstid for fremtidige projekter, der omhandler distribuerede systemer, og være et fælles produkt at kunne optimere og opdatere, fremfor at skulle tage hensyn til hvert enkelt nye system. 
+I forbindelse med udvikling af et distribueret system vil man være afhængig af, at kunne sikre sig konsistens samt høj tilgængelighed af det involverede system samt at systemet er tolerant over for partitioneringer. Metoder til at opdage når en maskine fejler, samt derefter at foretage de nødvendige fejlprocedurer, vil altså være at finde i størstedelen af de distribuerede systemer.
+\\
+Ved at konstruere et bibliotek, som gør det simpelt for brugeren at implementere disse metoder, vil der både kunne spares udviklingstid for fremtidige projekter, der omhandler distribuerede systemer. Derudover vil det være et fælles produkt at kunne optimere og opdatere, fremfor at skulle tage hensyn til hvert enkelt nyudviklede system. 
 \\[5px]
-Eksempelvis ser vi på en case, hvor der skal håndteres en række servere stående lokalt hos en mindre virksomhed. Denne virksomhed ønsker, at lave en simpel håndtering af hvilke maskiner der er aktive samt en håndtering af ressourcestyringen for hver af maskinerne, således at den maskine med lavest belastning altid får den næste opgave. For at gøre dette ønskes der lavet et bibliotek, der tillader maskinerne at snakke sammen regelmæssigt og derved have mest mulig tid, hvor systemet er tilgængeligt. Dette ønskes at kunne implementeres så simpelt som muligt, da systemet skal implementeres uden at noge i virksomheden har nogen forudgående forståelse for hvordan systemet fungerer.
+Der kan eksempelvis ses på en case, hvor der skal håndteres en række servere stående lokalt hos en mindre virksomhed. Denne virksomhed ønsker, at lave en simpel håndtering af hvilke maskiner der er aktive samt en håndtering af ressourcestyringen for hver af maskinerne. Denne ressourcestyring gør så den maskine med lavest belastning altid får den næste opgave. For at gøre dette ønskes der lavet et bibliotek, der tillader maskinerne at snakke sammen regelmæssigt og derved have mest mulig tid, hvor systemet er tilgængeligt. Dette ønskes at kunne blive implementeret så simpelt som muligt, da systemet skal implementeres uden at nogle i virksomheden har nogen forudgående forståelse for hvordan systemet fungerer.
 \\[5px]
-Et sådant bibliotek vil herved kunne sikre fremtidige applikationer, der bruger distribuerede systemer, en fælles og gennemtestet implementation til overvågning af aktive og inaktive systemer, samt en fælles hukommelse så maskinerne kan tale med hinanden alt efter af brugerens behov.
+Et sådant bibliotek vil altså kunne sikre fremtidige applikationer, der bruger distribuerede systemer, en fælles og gennemtestet implementation til overvågning af aktive og inaktive systemer, samt en fælles hukommelse så maskinerne kan tale med hinanden alt efter af brugerens behov.
 
 \subsection{Redegørelse}
 For at kunne lave et bibliotek til implementering af eks. ressourcestyring via heartbeat protokollen, så er vi nødt til, at forstå hvordan systemet skal hænge sammen.
 \\
-I et sådant system er det meget relevant, hvordan dataen, der kommunikeres mellem de forskellige maskiner i systemet, bliver sendt rundt el. håndteret.
-Der findes forskellige modeller, for hvordan dette kan gøres, hvor den simpleste er, at alle maskiner kommunikere med alle.
+I et sådant system er det meget relevant, hvordan dataen der kommunikeres mellem de forskellige maskiner i systemet, bliver sendt rundt el. håndteret.
+Der findes forskellige modeller, for hvordan dette kan gøres, hvor den simpleste er, at alle maskiner kommunikerer med alle.
 Derved sørges der for, at alt data kommunikeres rundt blandt alle maskiner, så på dette område, ville dette system være tilstrækkeligt. 
-Det kan godt hurtigt gå hen og blive meget ressourcekrævende, da vi opnår $n^2$ antal forbindelser, da alle maskiner skal kommunikere med alle.
+Det kan dog godt hurtigt gå hen og blive meget ressourcekrævende, da vi opnår $n^2$ antal forbindelser, da alle maskiner skal kommunikere med alle de andre.
 \\[5px]
 Dette kan reduceres kraftigt ved at benytte gossiping [4], hvor en maskine skriver ud til en vilkårlig anden maskine, som herefter skriver ud til nogle andre, og så videre indtil beskeden er propageret ud til samtlige maskiner i systemet.
 \\
@@ -152,7 +153,7 @@ Her vinder man dog mest i meget store systemer, hvor det ikke kan lade sig gøre
 En lidt anderledes tilgang er at have en leder, der styrer alt kommunikation, samt at resten af maskinerne er følgere, der lytter på lederen og svarer tilbage når de modtager et heartbeat. Dette sikrer at alle følger-maskinerne kun skal sende en besked, mens at lederen derimod sender ud til alle følgerne. Dette vil give os, at lederen skal sende lige så mange beskeder, som der er af følgere, mens følgerne kun sender en hver. 
 Dette giver os en væsentlig forbedring i antal beskeder end eksempelvist hvis alle snakker med alle. Dette har imidlertid det problem at der vil være en single-point-of-failure i forbindelse med lederen, da systemet ikke kan køre uden lederen. For at undgå dette kan man vælge en protokol for at vælge en ny leder, i tilfælde af at den forrige mister forbindelsen. 
 \\[5px]
-En simpel måde at gøre dette er via Bully algoritmen [5] hvor i, at hver maskine får tildelt et ID, og såfremt lederen dør, så vælges den leder med det højeste ID. Dette kan lade sig gøre ved, at lade hver maskine sende en besked til alle maskiner med højere ID end sin egen, og såfremt den ikke modtager et svar tilbage lader den sig selv være leder. Dette er en relativ simpel algoritme, der dog ikke tager hensyn til problemer ved partitionering, da man kan risikerer, at der kan opstå flere systemer samtidig. 
+En simpel måde at gøre dette er via Bully algoritmen [5] hvori, at hver maskine får tildelt et ID, og såfremt lederen dør, så vælges den leder med det højeste ID. Dette kan lade sig gøre ved, at lade hver maskine sende en besked til alle maskiner med højere ID end sin egen, og såfremt den ikke modtager et svar tilbage lader den sig selv blive leder. Dette er en relativ simpel algoritme, der dog ikke tager hensyn til problemer ved partitionering, da man kan risikerer, at der kan opstå flere systemer samtidig. 
 \\[5px]
 Dette problem kan løses ved at bruge algoritmen som bruges i Raft [3], der bruger et system bestående af følgere, kandidater og leder.
 Når en leder undervejs går hen og dør, starter der et leader-election, hvor der vælges den hurtigste kandidat, som har mindst halvdelen af stemmerne, til at blive leder. Herved sikres det, at der kun vælges en leder, og derved risikerer vi ikke i stil med Bully algoritmen, at der kan opstå flere systemer parallelt med hinanden.
@@ -167,7 +168,7 @@ Dette kan vi undgå ved, at have mulighed for at vælge en ny leder, når følge
 \\
 Loggen er en metode, som vi bruger til at dele information om hvilke maskiner der er aktive, samt brugerdefinerede data uden at skulle sende hele informationen hver gang. Dette sparer ressourcer og sikrer at alle parter har den samme information.
 \\[5px]
-Dette system vil altså afhænge af, at have fem del-funktionaliteter der tilsammen udgør systemet. Disse fem funktionaliteter kan ses som Discovery, hvor der oprettes forbindelse til følgere på netværket, hvilket også vil blive beskrevet nærmere senere. Derudover er der liveliness hvor der regelmæssigt tjekkes for, at følgere og leder er i live. Leader-election sikrer, at der hurtigt kan findes en ny leder, hvis den nuværende fejler. Logging sikrer sig, at der hele tiden er en vis konsistens i systemet, så alle medlemmer i systemet har den samme information, eller hurtigst muligt retter op og når en commited state, når der vælges en ny leder. Til sidst er der load-balancing, som afhænger af at det resterende system fungerer, så det kan balancere belastningen af følgerne på applikationsniveauet i forhold til vores case eksempel.
+Dette system vil altså afhænge af, at have fem del-funktionaliteter der tilsammen udgør systemet. Disse fem funktionaliteter kan ses som Discovery, hvor der oprettes forbindelse til følgere på netværket, hvilket også vil blive beskrevet nærmere senere. Derudover er der liveliness hvor der regelmæssigt tjekkes for, at følgere og leder er i live. Leader-election sikrer, at der hurtigt kan findes en ny leder, hvis den nuværende fejler. Logging sikrer sig, at der hele tiden er en vis konsistens i systemet, så alle medlemmer i systemet har den samme information, eller hurtigst muligt retter op og når en committed state, når der vælges en ny leder. Til sidst er der load-balancing, som afhænger af at det resterende system fungerer, så det kan balancere belastningen af følgerne på applikationsniveauet i forhold til vores case eksempel.
 
 \subsection{Beskrivelse af konsistensmodeller}
 I forbindelse med at der arbejdes på distribuerede systemer vil det være nødvendigt at have en konsistens model. Dette sikrer, at vi kan have en fælles state på alle maskiner. 
@@ -175,7 +176,7 @@ Der findes dog en lang række konsistens modeller, og det er derfor nødvendigt,
 \\[5px]
 \textbf{Strict Consistency}
 \\
-Strict consistency modellen er som det meget ligger i navnet den optimale model, idet den sikrer til enhver tid, at alle der læser fra et pågældende system vil læse den seneste besked, der er skrevet til systemet. Derudover vil den besked der skrives først, altid vil være først i rækkefølgen. Dette er imidlertid ikke muligt, at opretholde såfremt man arbejder på mere end en kerne, da to samtidige skrive-operationer vil kunne ødelægge denne model, da der opstår uenighed om hvilken skrive-operation, der er udført først.
+Strict consistency modellen er som det meget ligger i navnet den optimale model, idet den sikrer til enhver tid, at alle der læser fra et pågældende system vil læse den seneste besked, der er skrevet til systemet. Derudover vil den besked der skrives først, altid være først i rækkefølgen. Dette er imidlertid ikke muligt, at opretholde såfremt man arbejder på mere end en kerne, da to samtidige skrive-operationer vil kunne ødelægge denne model, da der opstår uenighed om hvilken skrive-operation, der er udført først.
 \\[5px]
 \textbf{Sequential Consistency}
 \\
@@ -189,7 +190,7 @@ Rykker vi ned og bliver endnu mindre strikse end i sequential consistency modell
 \section{Programmerings overvejelser}
 \subsection{Discovery}
 For at skabe forbindelse til maskiner på et lokalt netværk, er man, som vi kom frem til i forrige afsnit, nødt til at benytte sig af en Discovery protokol. Et sådant system kendes også som Network Discovery services, som set i DSCD \textbf{[6]}. Normen er her, at man opretter forbindelse til andre systemer i netværket, ved at broadcaste eller multicaste. \textbf{[7]} Derved kan man få beskeden ud til de resterende systemer. Broadcast virker som den oplagte måde, at gøre det på da der arbejdes på et lokalt netværk.
-Ville man ændre modulet til at fungere på internettet, frem for det lokale netværk, kunne multicast med fordel anvendes.
+Ville man ændre modulet til at fungere på internettet, frem for på det lokale netværk, kunne multicast med fordel anvendes.
 Problematikken er i midlertidig om det er en directory server eller serverless model, der vil fungere bedst i forbindelse med resten af systemet.
 \\[5px]
 Her kan man argumentere for, at en directory server ville give mening, da der i forvejen sendes regelmæssige broadcasts i forbindelse med heartbeat. Altså kunne man her bruge heartbeatet, som en forespørgelse til systemer, der ikke er forbundet med lederen endnu.
@@ -201,15 +202,15 @@ Derved vil en ny leder have samme information, som den tidligere leder, såfremt
 \subsection{Broadcast/MultiCast/UDP/TCP}
 Selve valget om hvorvidt man skal bruge broadcast eller multicast er ikke helt trivielt da de begge har fordele og ulemper der påvirker systemet. Forskellene ligger i at broadcast arbejder med UDP forbindelse mens, at multicast bruger TCP \textbf{[7]}.
 \\
-Fordelen ved broadcast og UDP forbindelser er at vi sparer ressourcerne det kræves at skabe en fast forbindelse med hver enkelt følger i systemet. Vi kan endvidere, såfremt vi forbliver lokalt, udnytte broadcast til at kommunikere heartbeats ud til alle medlemmer i systemet, hvilket er den billigste måde at kommunikere med alle på en gang. Endvidere tillader dette os at tilføje nye maskiner løbende ved at klienten hører det broadcastede heartbeat og sender svar til lederen, uden at skulle kende lederens IP-adresse på forhånd, hvor man i tilfældet med multicast ville være afhængig af at en følger skulle kende lederen på forhånd. Derudover fungerer heartbeats på den måde at det ikke gør nogen reel skade hvis der misses en besked eller to, da det næste kommer kort efter. Dette betyder selvfølgelig at der vil være en længere periode mellem konsistens, men ikke noget der er meget langsommere end at lave og afslutte TCP forbindelser til alle modtagere.
+Fordelen ved broadcast og UDP forbindelser er, at vi sparer ressourcerne det kræves at skabe en fast forbindelse med hver enkelt følger i systemet. Vi kan endvidere, såfremt vi forbliver lokalt, udnytte broadcast til at kommunikere heartbeats ud til alle medlemmer i systemet, hvilket er den billigste måde at kommunikere med alle på en gang. Endvidere tillader dette os, at tilføje nye maskiner løbende ved at klienten hører det broadcastede heartbeat og sender svar til lederen, uden at skulle kende lederens IP-adresse på forhånd, hvor man i tilfældet med multicast ville være afhængig af at en følger skulle kende lederen på forhånd. Derudover fungerer heartbeats på den måde at det ikke gør nogen reel skade hvis der misses en besked eller to, da det næste kommer kort efter. Dette betyder selvfølgelig at der vil være en længere periode mellem konsistens, men ikke noget der er meget langsommere end at lave og afslutte TCP forbindelser til alle modtagere.
 Herudover er både UDP og TCP implementeringer af systemet begrænset ved skalering.
 \\[5px]
 UDP har oftest loft over pakkestørrelse der giver problemer når loggens størrelse nærmer sig de ca. 1500 bytes \textbf{[2]}. Dette er grundet, at der på link-laget som regel sættes et MTU, Maximum Transmission Unit, for bedre at fungere med den reelle buffer størrelse. TCP er derimod begrænset af hastigheden da multicast bliver tungt i forbindelse med oprettelse af forbindelse til mange systemer ad gangen. 
-I vores implementation benyttes broadcasting da modulet er tiltænkt lokale systemer.
+I vores implementation benyttes broadcasting, da modulet er tiltænkt lokale systemer.
 Dette betyder endvidere at den største begrænsning for køretid og effektivitet er relateret til hardwaremæssigt at sende beskeder på tværs af maskiner.
 
 \subsection{Liveliness} 
-Liveliness er langt hen ad vejen en af grundidéerne ved heartbeat. Derfor ligger det også naturligt, at liveliness bliver tjekket via heartbeats, samt manglen heraf. Man kan definere et system til, at være i live, når det har forbindelse til lederen. Ved brug af leader-election, som ses senere vil der altid være en ny leder, der kan erstatte en afgående, el. død leder (indenfor et rimelig interval). I praksis vil tjek for liveliness ligge meget op ad det, der er omtalt i Discovery-afsnittet.
+Liveliness er langt hen ad vejen en af grundidéerne ved heartbeat. Derfor ligger det også naturligt, at liveliness bliver tjekket via heartbeats, samt manglen heraf. Man kan definere et system til, at være i live, når det har forbindelse til lederen. Ved brug af leader-election, som ses senere vil der altid være en ny leder, der kan erstatte en afgående, el. død leder (inden for et rimelig interval). I praksis vil tjek for liveliness ligge meget op ad det, der er omtalt i Discovery-afsnittet.
 \\
 Dette grundet at heartbeats er måden hvorpå liveliness tjekkes, og at listen over aktive, el. levende, systemer opbevares i en log, som bliver opdateret løbende igennem Discovery-protokollen samt via brugerinput.
 
@@ -332,7 +333,7 @@ Herefter findes og defineres alle de nødvendige variable, der senere bliver nø
 Som det første tjekker vi om det er en ny leder, dette gøres ved at sikre sig at heartbeats ipList stemmer overens med loggens liste. Hvis dette gælder laver vi en ny liste af IP-adresser hvor hver ip gives en tid, hvor hvis ikke IP-adressen besvarer et heartbeat inden tiden er gået, vil adressen fjernes fra listen over aktive systemer. Denne værdi kan ændres afhængig af hvor ofte man vil heartbeate, samt størrelsen af programmet. Vi har sat den til to sekunder, hvilket svarer til at man bliver fjernet efter at have misset tre til fire heartbeats. 
 Herefter sender vi et heartbeat, såfremt nuværende system tid er højere end en pågældende værdi for hvor ofte, der et heartbeat broadcastes. I heartbeatet er det første vi gør at tjekke hvorvidt det er muligt at committe de ændringer der var sket ved det forrige heartbeat. Dette gør vi ved at have en nøgle-værdi, som er den nøgle der var størst sidst vi broadcastede. Denne nøgle tjekker vi så om alle følgerne er foran. Såfremt alle følgerne svarer med en nøgle der er lig eller større end denne nøgle, så kan vi committe på nøglen.
 \\
-For at holde styr på hvorvidt alle i systemet er nået til enighed, og vi derved kan committe, sætter vi variablen en variabel for antal forventede svar til længden af listen af IP-adresser, minus en grundet lederen altid er enig, hvis der er mere end en aktiv adresse, og til en  hvis der kun er lederen, da vi ikke ønsker at committe så længe der kun er en aktiv maskine.
+For at holde styr på hvorvidt alle i systemet er nået til enighed, og vi derved kan committe, sætter vi en variabel for antal forventede svar til længden af listen af IP-adresser, minus en grundet lederen altid er enig, hvis der er mere end en aktiv adresse. Dette gør vi grundet, at hvis der kun er lederen, så er vi ikke interesserede i at committe, da der så kun er en aktiv maskine, og derved ikke nogen maskiner at skulle være enige med.
 \\[5px]
 Dette antal forventede svar sætter vi så ned hver gang vi modtager en key fra en følger, som er større end den nuværende nøgle, med den antagelse at der kun kommer et svar per følger per broadcast, og at nye følgere altid sender -1, og derved aldrig er større end den nuværende nøgle.
 \\
@@ -486,7 +487,7 @@ Dette giver nedenstående graf:
 
 Grafen for vores Heartbeat system viser i stil med Raft [3], at der kommer mindre tid uden leder jo tættere man kommer på heartbeatets timer.
 \\
-Dog viste forsøget at jo tættere man kommer på, jo mindre tolerance er der over for missede pakker. Dette ses især i forbindelse med målingen på 120-240 ms, hvor der i de fleste tilfælde bliver valgt leder før den forrige leder er stoppet. Dette giver nogle forkerte data, da heartbeatsne fra den nye leder bliver buffet i den første leders socket, og derfor skulle den blot læse fra bufferen. Dette viser, at man nødvendigvis må være nødt til, at tage hensyn til hvor tolerant ens system skal være overfor pakketab. Man kan altså ikke bare skrue helt ned for timeren uden, at det kan give problemer med systemet. 
+Dog viste forsøget at jo tættere man kommer på, jo mindre tolerance er der over for missede pakker. Dette ses især i forbindelse med målingen på 120-240 ms, hvor der i de fleste tilfælde bliver valgt leder før den forrige leder er stoppet. Dette giver nogle forkerte data, da heartbeatsne fra den nye leder bliver buffet i den første leders socket, og derfor skulle den blot læse fra bufferen. Dette viser, at man nødvendigvis må være nødt til, at tage hensyn til hvor tolerant ens system skal være over for pakketab. Man kan altså ikke bare skrue helt ned for timeren uden, at det kan give problemer med systemet. 
 \\
 Samme kan nogenlunde ses med Rafts eksempel, hvor ca. 80-90\% allerede har valgt en leader efter få ms. Til forskel fra vores graf, så har Raft dog langt flere målinger, hvilket giver en lidt pænere kurve.
 
@@ -499,7 +500,7 @@ Som nævnt i analysen ville en alle-til-alle kobling af maskinerne kræve at der
 Det var da påstået at dette kunne effektiviseres ved at bruge et leder hierarki.
 At dette er gældende i denne implementation kan man se ved at finde alle beskeder der bliver sendt regelmæssigt.
 \\
-Vi ved at der ved hvert heartbeat sendes en besked til alle maskiner, samt at alle maskiner skal svare tilbage, hvilket lederen også er afhængig af at vente på. dette giver os 2*n beskeder. Endvidere ved vi at vi i værste tilfælde kan komme til at skulle sende en overwrite per maskine der modtager en besked. Dette giver os samlet 3*n beskeder per heartbeat.
+Vi ved at der ved hvert heartbeat sendes en besked til alle maskiner, samt at alle maskiner skal svare tilbage, hvilket lederen også er afhængig af at vente på. Dette giver os 2*n beskeder. Endvidere ved vi at vi i værste tilfælde kan komme til at skulle sende en overwrite per maskine der modtager en besked. Dette giver os samlet 3*n beskeder per heartbeat.
 \newpage
 
 \subsubsection{Skalering}
@@ -507,9 +508,9 @@ Når det kommer til skalering af vores system, så er vi begrænset af, som tidl
 \\[5px]
 Ud fra disse kan man regne sig til at det maks ville være muligt at sende $1500 / 34$ eller ca. 44 IP-adresser pr. heartbeat. 
 \\ 
-Endvidere antager vi, at loggen altid er commitet, altså tom. samt at user-dictionariet ikke er i brug, da vi ikke kan antage hvilken størrelse data brugeren bruger.
+Endvidere antager vi, at loggen altid er commitet, altså tom. Samt at user-dictionariet ikke er i brug, da vi ikke kan antage hvilken størrelse data brugeren bruger.
 Da overwrite er den største besked, eftersom at den sender alle IP-adresser, ville systemet altså kunne acceptere op imod 44 brugere, fra dette skal der trækkes størrelsen af en tom liste, samt størrelsen af et tomt dictionary. Dette er samlet 168 bytes (136 for dictionary, 32 for liste). 
-Dette begrænser os til maks at have 39 aktive maskiner i systemet ad gangen, såfremt der ikke er andet data.
+Dette begrænser os til maks. at have 39 aktive maskiner i systemet ad gangen, såfremt der ikke er andet data.
 \\
 For at kunne skalere dette, kunne man udvide programmet, så den bruger et mix af UDP og TCP. Dette ville fjerne den nuværende begrænsning på antallet af aktive maskiner i systemet, uden at miste UDP-protokollens hastighedsfordele ved mindre systemer.
 \newpage
@@ -570,8 +571,6 @@ For at kunne tjekke systemets reelle ydeevne, kunne det også være interessant,
 \\[5px]
 \textbf{[9]} Python, json dokumentation - \url{http://docs.python.org/2/library/json.html} - 7. juni 2015
 
-
-
 \newpage
 
 
@@ -584,3 +583,4 @@ For at kunne tjekke systemets reelle ydeevne, kunne det også være interessant,
 
 
 \end{document}
+
