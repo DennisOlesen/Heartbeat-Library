@@ -20,4 +20,4 @@ while(True):
          available_ips.append(key)
     time.sleep(1)
     print "Available IPs:", available_ips
-  #Send available_ips to router
+  # Send available_ips to router

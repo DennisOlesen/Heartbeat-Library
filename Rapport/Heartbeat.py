@@ -31,13 +31,14 @@ class Heartbeat():
     b_sock.setblocking(0)
     self.b_sock = b_sock
     self.state = "follower"
-    
-    #Test variabel
+
+    # Test variabel
     self.canbeleader = True
 
     self.timer = time.time() + random.uniform(2.0, 5.0)
     self.timer1 = 0.12
     self.timer2 = 0.24
+
     # Finder frem til ip-adressen for maskinen, så det virker på linux.
     s = socket(AF_INET, SOCK_DGRAM)
     s.connect(("google.com", 80))
@@ -86,7 +87,6 @@ class Heartbeat():
     # Broadcaster med tidsinterval
     if self.castTimer < time.time():
       # Hvis der er lige så mange som forventet, comitter vi.
-      #print "expected" + str(self.expectedResponses) + "responses"
       if self.expectedResponses == 0 and len(self.ipLog.getLog()) != 0 and len(self.ipList) != 1:
         self.ipLog.commit(self.currentKey)
         self.message = self.message + " co:" + str(self.currentKey)
@@ -107,7 +107,7 @@ class Heartbeat():
       self.castTimer = time.time() + self.castDelay
     try:
       data, addr = self.sock.recvfrom(1024)
-      #modtager set fra follower.
+      # Modtager set fra follower.
       if (data[0:3] == "se:"):
         self.message = self.message + " " + str(self.ipLog.getKey()+1) + "," + data
         self.ipLog.parse(self.message)
@@ -157,7 +157,7 @@ class Heartbeat():
       self.ipLog.parse(self.message)
 
 
-     # Opdaterer værdier for lederen
+    # Opdaterer værdier for lederen
     for sub in self.ipList:
       if sub[0] == self.myIp:
          sub[1] = time.time() + LTIMEOUT
@@ -250,11 +250,10 @@ class Heartbeat():
    except:
      pass
 # Bliver kandidat hvis der ikke modtages besked fra lederen.
-#TEST
+   # Test
    if self.timer - time.time() < 0 and self.canbeleader:
      self.state = "candidate"
      print "State set to: candidate"
-   #time.sleep(0.5)
 
   def run(self):
     lck = self.start_lock
@@ -273,7 +272,7 @@ class Heartbeat():
         self.follower()
 
 #################################
-# HER STARTER BRUGER FUNKTIONER.
+# Her starter bruger funktioner.
 
   # Applikation niveau funktion, kaldes af brugeren for at sætte en værdi tilsvarende input
   def set(self, key, value):
@@ -323,7 +322,7 @@ class Heartbeat():
 
   def getIps(self):
     return self.ipLog.ipList
-  #TEST 
+  # Test
   def changeState(self):
     self.canbeleader = False
     self.state = "follower"
