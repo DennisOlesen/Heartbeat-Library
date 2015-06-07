@@ -5,7 +5,7 @@
 from __future__ import division
 from socket import *
 import time, random, os, sys
-import threading, Log, traceback, json
+import threading, Log, json
 
 broadcast_IP = '255.255.255.255'
 broadcast_PORT = 54545
@@ -85,7 +85,6 @@ class Heartbeat():
     # Broadcaster med tidsinterval
     if self.castTimer < time.time():
       # Hvis der er lige så mange som forventet, comitter vi.
-      #print "expected" + str(self.expectedResponses) + "responses"
       if self.expectedResponses == 0 and len(self.ipLog.getLog()) != 0 and len(self.ipList) != 1:
         self.ipLog.commit(self.currentKey)
         self.message = self.message + " co:" + str(self.currentKey)
@@ -212,7 +211,6 @@ class Heartbeat():
         self.update_event.notify_all()
 
    except:
-   # traceback.print_exc(file=sys.stdout)
      pass
    try:
      message, addr = self.b_sock.recvfrom(1024)
@@ -323,7 +321,7 @@ class Heartbeat():
 
   def getIps(self):
     return self.ipLog.ipList
-  #TEST 
+  #TEST
   def changeState(self):
     self.canbeleader = False
     self.state = "follower"

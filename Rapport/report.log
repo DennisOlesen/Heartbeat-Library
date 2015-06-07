@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/W32TeX) (format=pdflatex 2014.3.31)  7 JUN 2015 20:52
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/W32TeX) (format=pdflatex 2014.3.31)  7 JUN 2015 21:04
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1391,22 +1391,22 @@ Package babel Info: Redefining danish shorthand "~
 (babel)             in language  on input line 234.
  [40]
 Package babel Info: Redefining danish shorthand "|
-(babel)             in language  on input line 281.
+(babel)             in language  on input line 282.
 Package babel Info: Redefining danish shorthand "~
-(babel)             in language  on input line 281.
+(babel)             in language  on input line 282.
 Package babel Info: Redefining danish shorthand "|
-(babel)             in language  on input line 281.
+(babel)             in language  on input line 282.
 Package babel Info: Redefining danish shorthand "~
-(babel)             in language  on input line 281.
+(babel)             in language  on input line 282.
  [41]
 Package babel Info: Redefining danish shorthand "|
-(babel)             in language  on input line 324.
+(babel)             in language  on input line 325.
 Package babel Info: Redefining danish shorthand "~
-(babel)             in language  on input line 324.
+(babel)             in language  on input line 325.
 Package babel Info: Redefining danish shorthand "|
-(babel)             in language  on input line 324.
+(babel)             in language  on input line 325.
 Package babel Info: Redefining danish shorthand "~
-(babel)             in language  on input line 324.
+(babel)             in language  on input line 325.
  [42])
 Package babel Info: Redefining danish shorthand "|
 (babel)             in language  on input line 583.
@@ -1414,22 +1414,22 @@ Package babel Info: Redefining danish shorthand "~
 (babel)             in language  on input line 583.
  (./Log.py
 Package babel Info: Redefining danish shorthand "|
-(babel)             in language  on input line 38.
+(babel)             in language  on input line 40.
 Package babel Info: Redefining danish shorthand "~
-(babel)             in language  on input line 38.
+(babel)             in language  on input line 40.
 Package babel Info: Redefining danish shorthand "|
-(babel)             in language  on input line 38.
+(babel)             in language  on input line 40.
 Package babel Info: Redefining danish shorthand "~
-(babel)             in language  on input line 38.
+(babel)             in language  on input line 40.
  [43]
 Package babel Info: Redefining danish shorthand "|
-(babel)             in language  on input line 88.
+(babel)             in language  on input line 90.
 Package babel Info: Redefining danish shorthand "~
-(babel)             in language  on input line 88.
+(babel)             in language  on input line 90.
 Package babel Info: Redefining danish shorthand "|
-(babel)             in language  on input line 88.
+(babel)             in language  on input line 90.
 Package babel Info: Redefining danish shorthand "~
-(babel)             in language  on input line 88.
+(babel)             in language  on input line 90.
 
 [44])
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 587.
@@ -1451,8 +1451,8 @@ Package rerunfilecheck Info: File `report.out' has not changed.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 587.
  ) 
 Here is how much of TeX's memory you used:
- 10743 strings out of 493308
- 154001 string characters out of 6141367
+ 10742 strings out of 493308
+ 153985 string characters out of 6141367
  482478 words of memory out of 5000000
  13427 multiletter control sequences out of 15000+600000
  18042 words of font info for 42 fonts, out of 8000000 for 9000
@@ -1476,10 +1476,10 @@ rm1440.pfb><c:/texlive/2013/texmf-dist/fonts/type1/public/cm-super/sfrm2074.pfb
 ve/2013/texmf-dist/fonts/type1/public/cm-super/sfti1200.pfb><c:/texlive/2013/te
 xmf-dist/fonts/type1/public/cm-super/sftt0800.pfb><c:/texlive/2013/texmf-dist/f
 onts/type1/public/cm-super/sftt1200.pfb>
-Output written on report.pdf (45 pages, 730131 bytes).
+Output written on report.pdf (45 pages, 729452 bytes).
 PDF statistics:
- 1197 PDF objects out of 1200 (max. 8388607)
- 1113 compressed objects within 12 object streams
- 627 named destinations out of 1000 (max. 500000)
+ 1196 PDF objects out of 1200 (max. 8388607)
+ 1112 compressed objects within 12 object streams
+ 626 named destinations out of 1000 (max. 500000)
  362 words of extra memory for PDF output out of 10000 (max. 10000000)
 
