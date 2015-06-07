@@ -214,7 +214,7 @@ Liveliness er langt hen ad vejen en af grundidéerne ved heartbeat. Derfor ligge
 Dette grundet at heartbeats er måden hvorpå liveliness tjekkes, og at listen over aktive, el. levende, systemer opbevares i en log, som bliver opdateret løbende igennem Discovery-protokollen samt via brugerinput.
 
 \subsection{CAP-teoremet og dets begrænsning af systemet}
-CAP teoremet er idéen om at et distribueret system ikke kan vedligeholde de tre følgende kvaliteter på en gang: Konsistens, tilgængelighed og partitions-tolerance. Ifølge CAP er det kun muligt at have to af disse ad gangen. Dette betyder i vores tilfælde hvor vi ønsker høj tilgængelighed samt tolerance over for partitionering, at vi ikke kan forvente at have konsistens i alle tilfælde hvor systemet partitionerer.
+CAP teoremet er idéen om at et distribueret system ikke kan vedligeholde de tre følgende kvaliteter på en gang: Konsistens, tilgængelighed og partitions-tolerance \hyperref[ti]{\textbf{[10]}}. Ifølge CAP er det kun muligt at have to af disse ad gangen. Dette betyder i vores tilfælde hvor vi ønsker høj tilgængelighed samt tolerance over for partitionering, at vi ikke kan forvente at have konsistens i alle tilfælde hvor systemet partitionerer.
 Den høje tilgængelighed eksistere i form af at der altid vil være en aktiv leder, da en ny vælges umiddelbart efter mistet forbindelse med den gamle.
 \\
 Dog kan dette fejle såfremt der sker en for stor partitionering af systemet. 
@@ -227,7 +227,7 @@ For at gøre dette, kan man, i stil med Raft \hyperref[tre]{\textbf{[3]}}, indf�
 \\
 Følger, kandidat og leder.
 \\[5px]
-Disse fungerer ved, at ved at en følger kan blive kandidat, såfremt den ikke har modtaget beskeder fra lederen i en tidsbestemt periode. Når en følger bliver kandidat udsteder den et valg, og sender en forespørgsel om at blive valgt som en ny leder. Såfremt kandidaten får majoriteten af stemmerne, vil den blive valgt som den nye leder.
+Disse fungerer ved, at ved en følger kan blive kandidat, såfremt den ikke har modtaget beskeder fra lederen i en tidsbestemt periode. Når en følger bliver kandidat udsteder den et valg, og sender en forespørgsel om at blive valgt som en ny leder. Såfremt kandidaten får majoriteten af stemmerne, vil den blive valgt som den nye leder.
 \\
 Lederens rolle er at lytte på klienten som sender forespørgsler, og så sørge for at disse forespørgsler bliver sendt ud til de korrekte systemer, samt sikre sig konsistens i loggen.
 \\
@@ -257,7 +257,7 @@ I forbindelse med casen nævnt i afsnittet om motivation, er brugeren interesser
 Herefter svarer maskinen tilbage og load-balanceren modtager en opdateret værdi for maskinens belastning.
 
 \begin{figure}[H]
-  \caption{Load balancing.}
+  \caption{Load balancing \hyperref[et]{\textbf{[1]}}.}
   \centering
     \includegraphics[width=1\textwidth]{Loadbalancing}
 \end{figure}
@@ -266,7 +266,7 @@ Herefter svarer maskinen tilbage og load-balanceren modtager en opdateret værdi
 For at sikre, at der vil være enighed omkring loggen samt bruger-opdateringer, på tværs af systemerne, så er vi afhængige af, at have valgt en konsistens model, der opfylder, at alle maskiner vil have de samme beskeder i samme rækkefølge.
 \\[5px]
 Hvis vi ser tilbage på de førnævnte tre konsistens modeller \hyperref[otte]{\textbf{[8]}} i vores problemorienterede analyse, så kan vi ud fra disse vurdere, hvilken vi har gjort brug af.
-Ser vi på strict consistency modellen, så må det hurtigt vurderes, at i vores system er det ikke tilfældet, at to samtidige skrive-operationer vil kunne ødelægge vores system, eller at den der skriver først nødvendigvis er den kommer først i rækkefølgen. I vores tilfælde er det lederen, der tildeler den pågældende operation en key, der så bestemmer rækkefølgen på operationerne.
+Ser vi på strict consistency modellen, så må det hurtigt vurderes, at i vores system er det ikke tilfældet, at to samtidige skrive-operationer vil kunne ødelægge vores system, eller at den der skriver først nødvendigvis er den der kommer først i rækkefølgen. I vores tilfælde er det lederen, der tildeler den pågældende operation en key, der så bestemmer rækkefølgen på operationerne.
 Altså er strict consistency ikke den model, vi gør brug af.
 \\[5px]
 Kigger vi lidt på den modsatte side i forhold til hvor striks en model er, så ser vi på causal consistency. Heri gælder der specielle regler for, hvis operationer er kausalt afhængige. Sådanne regler benytter vi os ikke af vi vores system, da udførte operationer som sådan ikke har nogen indbyrdes afhængighed. I vores model er det blot den rækkefølge lederen modtager, og udsender udførte operationer, der bestemmer rækkefølgen, der er på tværs af systemet.
@@ -554,7 +554,7 @@ For at kunne tjekke systemets reelle ydeevne, kunne det også være interessant,
 \section{Litteraturhenvisninger}
 \textbf{[1]} Slides fra kurset datanet - Copyright J.F Kurose and K.W. Ross, All Rights Reserved \label{et}
 \\[5px]
-\textbf{[2]} RFC 894 - \url{https://tools.ietf.org/html/rfc894} - 1. juni 2015 \label{to}
+\textbf{[2]} RFC 894 - \url{http://tools.ietf.org/html/rfc894} - 1. juni 2015 \label{to}
 \\[5px]
 \textbf{[3]} Ongaro, Diego, and John Ousterhout. "In search of an understandable consensus algorithm." Proc. USENIX Annual Technical Conference. 2014. \label{tre}
 \\[5px]
@@ -569,6 +569,9 @@ For at kunne tjekke systemets reelle ydeevne, kunne det også være interessant,
 \textbf{[8]} Brian Vinter. Distributed Shared Memory: A Survey of Paradigms and Concepts in Distributed Shared Memory Research, May 28 1997. \label{otte}
 \\[5px]
 \textbf{[9]} Python, json dokumentation - \url{http://docs.python.org/2/library/json.html} - 7. juni 2015 \label{ni}
+\\[5px]
+\textbf{[10]} RFC 894 - \url{http://webpages.cs.luc.edu/~pld/353/gilbert_lynch_brewer_proof.pdf} - 7. juni 2015 \label{ti}
+
 
 \newpage
 
